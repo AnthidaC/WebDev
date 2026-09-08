@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เฉลยแนวทางกลางภาค - หน้าที่ 2: รายละเอียดเมนู (Flora & Fauna)</title>
+  <link class="menu-style-link" rel="stylesheet" href="midterm-solution.css">
+</head>
+<body>
+
+  <!-- แถบเมนูนำทางด้านบน (Sticky Navigation Bar) -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">🌿 Flora & Fauna</div>
+      <nav class="nav-links">
+        <a href="midterm-shop-solution.html" class="nav-item">ข้อมูลร้าน</a>
+        <a href="midterm-menu-solution.html" class="nav-item active">เมนู & บริการ</a>
+        <a href="midterm-booking-solution.html" class="nav-item">จองโต๊ะสัมมนา</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- หัวข้อหน้าเมนูและพื้นที่บริการ -->
+  <main class="container page-content">
+    <section class="menu-intro">
+      <h1>เมนูและแพ็กเกจบริการ</h1>
+      <p>เลือกชิมเครื่องดื่มสุดพิเศษที่รังสรรค์โดยบาริสต้ามืออาชีพ หรือจองแพ็กเกจพื้นที่ที่เหมาะกับคุณ</p>
+    </section>
+
+    <!-- แท็บเลือกหมวดหมู่เมนู (Filter Categories - Flexbox) -->
+    <nav class="category-nav">
+      <a href="#" class="category-btn active">ทั้งหมด</a>
+      <a href="#" class="category-btn">เครื่องดื่มพิเศษ</a>
+      <a href="#" class="category-btn">เบเกอรี่โฮมเมด</a>
+      <a href="#" class="category-btn">แพ็กเกจพื้นที่</a>
+    </nav>
+
+    <!-- รายการสินค้าและบริการ (Grid Menu Challenge) -->
+    <section class="menu-grid">
+      
+      <!-- การ์ดที่ 1 (Drink) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80" alt="Wild Forest Matcha Latte">
+          <span class="card-badge bestseller">Best Seller</span>
+        </div>
+        <div class="card-content">
+          <h3>Wild Forest Matcha Latte</h3>
+          <p class="card-desc">มัทฉะเกรดพิธีการเข้มข้นนำเข้าจากเมืองอุจิ ประเทศญี่ปุ่น ผสมผสานนมสดสูตรเฉพาะและโฟมนมเนียนนุ่ม หวานน้อยกลมกล่อมธรรมชาติ</p>
+          <div class="card-footer">
+            <span class="price">฿145</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-outline">สั่งจองโต๊ะ</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- การ์ดที่ 2 (Drink) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?auto=format&fit=crop&w=600&q=80" alt="Balsamic Rose Cold Brew">
+          <span class="card-badge seasonal">Seasonal</span>
+        </div>
+        <div class="card-content">
+          <h3>Balsamic Rose Cold Brew</h3>
+          <p class="card-desc">กาแฟอาราบิก้าสกัดเย็นบ่มนาน 18 ชั่วโมง ผสานกลิ่นไซรัปกุหลาบออร์แกนิกและเกสรดอกไม้ ให้รสสัมผัสหอมสดชื่นเป็นเอกลักษณ์</p>
+          <div class="card-footer">
+            <span class="price">฿160</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-outline">สั่งจองโต๊ะ</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- การ์ดที่ 3 (Bakery) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1562376502-6f769499c886?auto=format&fit=crop&w=600&q=80" alt="Botanical Waffle">
+        </div>
+        <div class="card-content">
+          <h3>Botanical Garden Waffle</h3>
+          <p class="card-desc">วาฟเฟิลสไตล์เบลเยียมอบร้อน เนื้อในนุ่ม ขอบนอกกรอบ ตกแต่งหน้าด้วยผลไม้ตระกูลเบอร์รี่สด ราดด้วยน้ำผึ้งแท้และไอศกรีมสูตรเฉพาะ</p>
+          <div class="card-footer">
+            <span class="price">฿185</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-outline">สั่งจองโต๊ะ</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- การ์ดที่ 4 (Bakery) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=600&q=80" alt="Signature Carrot Cake">
+          <span class="card-badge chef">Chef's Choice</span>
+        </div>
+        <div class="card-content">
+          <h3>Signature Carrot Cake</h3>
+          <p class="card-desc">เค้กแครอทสูตรเด็ดของร้าน อุดมด้วยถั่ววอลนัท ลูกเกด และเครื่องเทศหอมหวาน หน้าครีมชีสรสมะนาวละมุนลิ้น</p>
+          <div class="card-footer">
+            <span class="price">฿150</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-outline">สั่งจองโต๊ะ</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- การ์ดที่ 5 (Service) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=600&q=80" alt="Hot Desk Member Package">
+        </div>
+        <div class="card-content">
+          <h3>Hot Desk Member Pass</h3>
+          <p class="card-desc">สิทธิ์การนั่งทำงานในโซนเงียบสงบตลอด 1 วันเต็ม พร้อมปลั๊กไฟส่วนตัว และอินเทอร์เน็ตความเร็วสูง</p>
+          <div class="card-footer">
+            <span class="price">฿250</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-primary">ซื้อแพ็กเกจ</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- การ์ดที่ 6 (Service) -->
+      <article class="menu-card">
+        <div class="card-img-container">
+          <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80" alt="Glass Meeting Room">
+          <span class="card-badge hot">Hot Item</span>
+        </div>
+        <div class="card-content">
+          <h3>Glasshouse Private Room (2 hrs)</h3>
+          <p class="card-desc">ห้องกระจกส่วนตัวตกแต่งหรูหรา รองรับสมาชิกได้ 4-6 ท่าน เหมาะสำหรับการประชุมระดมความคิด ทำงานเดี่ยว หรือทำโปรเจกต์ส่งอาจารย์ มีจอโปรเจคเตอร์ให้บริการ</p>
+          <div class="card-footer">
+            <span class="price">฿600</span>
+            <a href="midterm-booking-solution.html" class="btn btn-sm btn-primary">จองห้องประชุม</a>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- ส่วนท้ายเว็บ (Shared Footer) -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Flora & Fauna Glasshouse Cafe. สงวนลิขสิทธิ์ทั้งหมด สำหรับใช้ในการสอบปลายภาคและกลางภาคปฏิบัติวิชา Web Development</p>
+    </div>
+  </footer>
+
+  <!-- สคริปต์สลับพรีวิวเฉลย/โจทย์ในเบราว์เซอร์ -->
+  <script src="solution-toggle.js"></script>
+</body>
+</html>

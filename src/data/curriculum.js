@@ -597,10 +597,87 @@ export const curriculum = {
       },
       hints: ["พิมพ์เมนูกลุ่มตัวเลือก <select> คู่กับ <option> และสร้างบล็อกป้อนข้อมูลอิสระ <textarea>"]
     },
-    // --- หมวดใหญ่ 2: Semantic HTML (3 บทเรียนย่อย) ---
+    {
+      id: "html-inputs-advanced",
+      title: "14. กล่องรับข้อมูลเฉพาะทาง HTML5 (Advanced Input Types)",
+      category: "1. HTML Core",
+      description: `เรียนรู้การใช้งานช่องรับข้อมูลประเภทเฉพาะทางใน HTML5 โดยระบุที่แอตทริบิวต์ \`type\` เพื่อเปลี่ยนพฤติกรรมอินเตอร์เฟสของเบราว์เซอร์ให้สอดคล้องกับข้อมูล:
+1. **ช่องกรอกตัวเลข (\`type="number"\`)** : คีย์เฉพาะตัวเลข มีลูกศรปรับค่าขึ้น-ลง สามารถควบคุมขอบเขตด้วย \`min\`, \`max\`
+2. **ช่องเลือกวันที่ (\`type="date"\`)** : แสดงปฏิทินให้คลิกเลือกวัน-เดือน-ปี
+3. **ช่องระดับสเกลแถบเลื่อน (\`type="range"\`)** : แถบเลื่อนปรับค่า สามารถตั้งค่า \`min\`, \`max\`, และค่าเริ่มต้น \`value\`
+4. **ช่องเลือกพาเลทสี (\`type="color"\`)** : กล่องคลิกเปิดแถบจานสีเลือกสี
+
+**เป้าหมาย:**
+สร้างฟอร์มส่งข้อมูลที่มีช่องรับข้อมูลดังนี้ภายในแท็ก \`<body>\`:
+1. ช่องระบุอายุเป็น **ตัวเลข** (\`type="number"\`) โดยระบุค่าต่ำสุดเป็น \`1\` และสูงสุดเป็น \`100\` (\`min="1" max="100"\`)
+2. ช่องระบุวันเกิดเป็น **วันที่** (\`type="date"\`)
+3. ช่องระดับความพึงพอใจเป็น **แถบเลื่อน** (\`type="range"\`) กำหนดจาก \`1\` ถึง \`5\` และมีค่าเริ่มต้นเป็น \`3\` (\`min="1" max="5" value="3"\`)
+4. ช่องเลือกธีมสีส่วนตัวเป็น **จานเลือกสี** (\`type="color"\`)`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <form>
+    <!-- เริ่มพิมพ์ช่องรับข้อมูลเฉพาะทางที่นี่ -->
+    
+  </form>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <form>
+    <label>อายุ: <input type="number" min="1" max="100" required></label>
+    <br><br>
+    <label>วันเกิด: <input type="date" required></label>
+    <br><br>
+    <label>ความพึงพอใจ: <input type="range" min="1" max="5" value="3"></label>
+    <br><br>
+    <label>ธีมสี: <input type="color"></label>
+  </form>
+</body>
+</html>`,
+      starterCss: `form { font-family: sans-serif; padding: 20px; }`,
+      targetCss: `form { font-family: sans-serif; padding: 20px; }`,
+      validation: (doc) => {
+        const num = doc.querySelector('input[type="number"]');
+        const date = doc.querySelector('input[type="date"]');
+        const range = doc.querySelector('input[type="range"]');
+        const color = doc.querySelector('input[type="color"]');
+
+        if (!num) return "กรุณาสร้างช่องระบุตัวเลข input[type='number']";
+        if (num.getAttribute('min') !== '1' || num.getAttribute('max') !== '100') {
+          return "กรุณากำหนดแอตทริบิวต์ min='1' และ max='100' ให้ช่องตัวเลข";
+        }
+        if (!date) return "กรุณาสร้างช่องเลือกวันที่ input[type='date']";
+        if (!range) return "กรุณาสร้างแถบเลื่อนระดับ input[type='range']";
+        if (range.getAttribute('min') !== '1' || range.getAttribute('max') !== '5' || range.getAttribute('value') !== '3') {
+          return "กรุณากำหนด min='1' max='5' และ value='3' ให้ช่องแถบเลื่อน";
+        }
+        if (!color) return "กรุณาสร้างกล่องเลือกสี input[type='color']";
+        return true;
+      },
+      hints: [
+        "เขียนอินพุตระบุประเภทดังนี้: <input type='number' min='1' max='100'>",
+        "<input type='date'>",
+        "<input type='range' min='1' max='5' value='3'>",
+        "<input type='color'>"
+      ]
+    },
+
+    // --- หมวดใหญ่ 2: Semantic HTML (4 บทเรียนย่อย) ---
     {
       id: "html-div-span",
-      title: "13. การแบ่งหมวดด้วยกล่องสี่เหลี่ยม (Block Div vs Inline Span)",
+      title: "14. การแบ่งหมวดด้วยกล่องสี่เหลี่ยม (Block Div vs Inline Span)",
       category: "2. Semantic HTML",
       description: `กล่องจัดวางอิลิเมนต์มีพื้นฐานที่พฤติกรรมแนวนอนต่างกัน:
 - \`<div>\` (Block) : คุมพื้นที่แถวกว้างเต็มจอ และบังคับตัดขึ้นบรรทัดใหม่
@@ -647,7 +724,7 @@ export const curriculum = {
     },
     {
       id: "html-layout-semantics",
-      title: "14. โครงสร้างความหมายหลัก (Semantic Layout Structure)",
+      title: "15. โครงสร้างความหมายหลัก (Semantic Layout Structure)",
       category: "2. Semantic HTML",
       description: `การกำหนดเลย์เอาต์หน้าต่างหลักเชิงความหมายระดับมหาวิทยาลัย:
 - \`<header>\` : แถบส่วนหัว
@@ -703,7 +780,7 @@ footer { background: #cbd5e1; font-size: 12px; }`,
     },
     {
       id: "html-content-semantics",
-      title: "15. การจัดเนื้อหาบทความย่อย (Section, Article & Aside)",
+      title: "16. การจัดเนื้อหาบทความย่อย (Section, Article & Aside)",
       category: "2. Semantic HTML",
       description: `การจำแนกเนื้อหาย่อยภายในพื้นที่หน้าจอหลัก:
 - \`<section>\` : จัดสัดส่วนกลุ่มหัวข้อใหญ่
@@ -755,10 +832,75 @@ aside { color: #64748b; font-size: 13px; }`,
       },
       hints: ["ครอบด้วย <section> ข้างในมี <article> และ <aside>"]
     },
-    // --- หมวดใหญ่ 3: CSS Basics (5 บทเรียนย่อย) ---
+    {
+      id: "html-details-summary",
+      title: "19. กล่องคำถามพับยืดหดไร้ JS (Interactive Details & Summary)",
+      category: "2. Semantic HTML",
+      description: `เรียนรู้การสร้างโครงสร้างแบบพับเปิด-ปิดเนื้อหาได้ด้วยตัวเอง (Accordion) โดยใช้เพียงแท็กมาตรฐาน HTML5 แท้ ๆ ไม่ต้องพึ่งพาโค้ด JavaScript:
+1. **แท็กแม่ครอบสปริง (\`<details>\`)** : ทำหน้าที่เป็นกล่องสไลด์พับ ซึ่งหากมีแอตทริบิวต์ \`open\` จะเปิดเผยเนื้อหาด้านในโดยเริ่มต้น
+2. **แท็กหัวเรื่องปุ่มคลิก (\`<summary>\`)** : ทำหน้าที่เป็นข้อความหัวเรื่องหลักที่แสดงให้เห็นตลอดเวลา และเมื่อคลิกจะสลับสภาวะเปิด-ปิด
+3. **เนื้อหาเสริมภายใน** : บรรจุแท็ก \`<p>\`, \`<img>\` หรืออะไรก็ได้ ซึ่งจะถูกซ่อนไว้เบื้องหลังหัวข้อ และโผล่แสดงเมื่อกดสลับเปิด
+
+**เป้าหมาย:**
+สร้างกล่องคำถามพบบ่อย (FAQ Accordion) ภายใน \`<body>\` ดังนี้:
+1. สร้างแท็ก \`<details>\` ครอบเนื้อหาคำถาม-คำตอบ
+2. ด้านในแท็กรายละเอียด ให้ใส่หัวเรื่องหลักด้วยแท็ก \`<summary>\` เขียนข้อความว่า "คำถาม: คอร์สเรียนนี้จำกัดเวลาเรียนไหม?"
+3. ใส่เนื้อหาอธิบายคำตอบในบรรทัดถัดไปโดยใช้แท็ก \`<p>\` เขียนคำตอบว่า "คำตอบ: เข้าเรียนได้ตลอดชีพ ไม่มีวันหมดอายุครับ"`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <!-- พิมพ์แท็ก details และ summary ที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <details>
+    <summary>คำถาม: คอร์สเรียนนี้จำกัดเวลาเรียนไหม?</summary>
+    <p>คำตอบ: เข้าเรียนได้ตลอดชีพ ไม่มีวันหมดอายุครับ</p>
+  </details>
+</body>
+</html>`,
+      starterCss: `details { font-family: sans-serif; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; width: 320px; }
+summary { font-weight: bold; cursor: pointer; padding: 5px; outline: none; }
+p { margin: 10px 0 0 0; padding: 5px; color: #475569; font-size: 14px; line-height: 1.5; }`,
+      targetCss: `details { font-family: sans-serif; padding: 10px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; width: 320px; }
+summary { font-weight: bold; cursor: pointer; padding: 5px; outline: none; }
+p { margin: 10px 0 0 0; padding: 5px; color: #475569; font-size: 14px; line-height: 1.5; }`,
+      validation: (doc) => {
+        const details = doc.querySelector('details');
+        const summary = doc.querySelector('summary');
+        const p = doc.querySelector('details p');
+
+        if (!details) return "กรุณาสร้างกล่องหลักด้วยแท็ก <details>";
+        if (!summary) return "กรุณาสร้างหัวเรื่องข้อความด้วยแท็ก <summary> ด้านในแท็ก <details>";
+        if (!summary.textContent.includes("จำกัดเวลาเรียนไหม")) {
+          return "กรุณาพิมพ์ข้อความคำถามใน <summary> ให้ตรงสเปก";
+        }
+        if (!p) return "กรุณาใส่แท็กคำตอบ <p> ไว้ใต้หัวเรื่องภายในแท็ก <details>";
+        if (!p.textContent.includes("เข้าเรียนได้ตลอดชีพ")) {
+          return "กรุณาพิมพ์ข้อความคำตอบ in <p> ให้ตรงสเปก";
+        }
+        return true;
+      },
+      hints: ["พิมพ์: <details><summary>คำถาม: คอร์สเรียนนี้จำกัดเวลาเรียนไหม?</summary><p>คำตอบ: เข้าเรียนได้ตลอดชีพ ไม่มีวันหมดอายุครับ</p></details>"]
+    },
+
+    // --- หมวดใหญ่ 3: CSS Basics (10 บทเรียนย่อย) ---
     {
       id: "css-selectors",
-      title: "16. ตัวเลือกเป้าหมายสไตล์ (CSS Selectors Syntax)",
+      title: "18. ตัวเลือกเป้าหมายสไตล์ (CSS Selectors Syntax)",
       category: "3. CSS Basics",
       description: `การเชื่อมโยงแต่งสไตล์ในจุดต่างๆ:
 - Tag Name Selector : \`h1\`
@@ -825,7 +967,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-colors",
-      title: "17. การเล่นสีและเงาตัวอักษร (Colors, BG & Shadow Styling)",
+      title: "19. การเล่นสีและเงาตัวอักษร (Colors, BG & Shadow Styling)",
       category: "3. CSS Basics",
       description: `การตกแต่งสีสันและเงาเพื่อเพิ่มความทันสมัยพรีเมียม:
 - \`color\` : สีตัวอักษร
@@ -898,7 +1040,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-fonts",
-      title: "18. รูปแบบตัวอักษรเชิงลึก (Font Styles & Line Spacing)",
+      title: "20. รูปแบบตัวอักษรเชิงลึก (Font Styles & Line Spacing)",
       category: "3. CSS Basics",
       description: `ตกแต่งความสวยงามของข้อความบทความระดับวิชาการ:
 - \`font-size\` : ขนาดความกว้างยาวของตัวอักษร
@@ -961,7 +1103,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-box-padding",
-      title: "19. กล่องและระยะห่างในกล่อง (Box Model - Width & Padding)",
+      title: "21. กล่องและระยะห่างในกล่อง (Box Model - Width & Padding)",
       category: "3. CSS Basics",
       description: `การตั้งความกว้างและการเว้นระยะห่างด้านในเพื่อไม่ให้กล่องดูอึดอัดเกินไป:
 - \`width\` : ขนาดความกว้าง
@@ -1019,8 +1161,10 @@ aside { color: #64748b; font-size: 13px; }`,
         if (!box) return "ไม่พบคลาส .box";
         const style = doc.defaultView.getComputedStyle(box);
         
-        if (style.width !== '260px') return "กำหนดความกว้างเป็น 260px";
-        if (style.padding !== '25px') return "กำหนด padding รอบด้านเป็น 25px";
+        const widthVal = parseFloat(style.width);
+        const paddingVal = parseFloat(style.paddingTop || style.padding);
+        if (isNaN(widthVal) || Math.round(widthVal) !== 260) return "กำหนดความกว้างเป็น 260px";
+        if (isNaN(paddingVal) || Math.round(paddingVal) !== 25) return "กำหนด padding รอบด้านเป็น 25px";
         if (style.boxSizing !== 'border-box') return "กำหนดกล่องเป็น box-sizing: border-box;";
         return true;
       },
@@ -1028,7 +1172,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-box-margin",
-      title: "20. กล่องและระยะห่างนอกกล่อง (Box Model - Margin & Border)",
+      title: "22. กล่องและระยะห่างนอกกล่อง (Box Model - Margin & Border)",
       category: "3. CSS Basics",
       description: `การจัดขอบมนและการเว้นช่องไฟเพื่อเว้นระยะห่างจากกล่องตัวตนอื่นๆ รอบข้าง:
 - \`margin\` : ระยะขยายช่องไฟรอบกล่องด้านนอก เพื่อไม่ให้กล่องชนกัน
@@ -1089,7 +1233,8 @@ aside { color: #64748b; font-size: 13px; }`,
         const style = doc.defaultView.getComputedStyle(el);
         
         if (style.borderRadius !== '16px') return "กรุณาใส่ขอบโค้งมน border-radius: 16px;";
-        if (style.borderWidth !== '3px' || !style.borderColor.includes('138') && !style.borderColor.includes('30')) {
+        const bWidth = parseFloat(style.borderTopWidth || style.borderWidth);
+        if (isNaN(bWidth) || Math.round(bWidth) !== 3 || (!style.borderColor.includes('138') && !style.borderColor.includes('30'))) {
           return "กรุณาใส่ขอบหนา 3px และใช้สีน้ำเงินเข้ม #1e3a8a";
         }
         if (style.marginBottom !== '30px') return "กรุณากำหนดระยะห่างภายนอกด้านล่าง margin-bottom: 30px;";
@@ -1097,10 +1242,601 @@ aside { color: #64748b; font-size: 13px; }`,
       },
       hints: ["พิมพ์ `border-radius: 16px;`, `border: 3px solid #1e3a8a;`, และ `margin-bottom: 30px;`"]
     },
-    // --- หมวดใหญ่ 4: CSS Layout Engineering (6 บทเรียนย่อย) ---
+    {
+      id: "css-display-property",
+      title: "30. รูปแบบการแสดงผลอิลิเมนต์ (CSS Display Property)",
+      category: "3. CSS Basics",
+      description: `การกำหนดพฤติกรรมการแสดงผลและการจองพื้นที่ของกล่องอิลิเมนต์ด้วยคุณสมบัติ \`display\`:
+- \`display: block;\` : กล่องจะกินพื้นที่เต็มความกว้างแนวนอน และบังคับตัวถัดไปขึ้นบรรทัดใหม่เสมอ (เช่น \`<div>\`, \`<p>\`, \`<h1>\`)
+- \`display: inline;\` : กล่องจะไหลต่อเนื่องตามตัวหนังสือ ไม่ขึ้นบรรทัดใหม่ และไม่สามารถระบุความกว้าง (\`width\`) หรือความสูง (\`height\`) ได้ (เช่น \`<span>\`, \`<a>\`, \`<strong>\`)
+- \`display: inline-block;\` : ไหลแนวนอนตามข้อความเหมือน inline แต่สามารถระบุขนาดความกว้าง ความสูง และระยะขอบได้อย่างสมบูรณ์ (เช่น \`<button>\`, \`<img>\`)
+- \`display: none;\` : สั่งซ่อนองค์ประกอบอย่างสมบูรณ์และนำออกจากเลย์เอาต์ (ไม่กินพื้นที่หน้าจอเลย)
+
+**เป้าหมาย:**
+1. กำหนดให้กล่อง \`.box-block\` แสดงผลเป็น \`block\`
+2. กำหนดให้กล่อง \`.box-inline-block\` แสดงผลเป็น \`inline-block\` และปรับขนาดความกว้างเป็น \`120px\`
+3. กำหนดให้กล่อง \`.box-none\` ซ่อนตัวล่องหนไปจากหน้าจอด้วย \`none\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="box-block">1. กล่องแบบ Block (กินเต็มแถว)</div>
+  <div class="box-inline-block">2. กล่องย่อย A</div>
+  <div class="box-inline-block">2. กล่องย่อย B</div>
+  <div class="box-none">3. กล่องนี้ควรจะล่องหนไป</div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="box-block">1. กล่องแบบ Block (กินเต็มแถว)</div>
+  <div class="box-inline-block">2. กล่องย่อย A</div>
+  <div class="box-inline-block">2. กล่องย่อย B</div>
+  <div class="box-none">3. กล่องนี้ควรจะล่องหนไป</div>
+</body>
+</html>`,
+      targetCss: `.box-block {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+  border-radius: 4px;
+  display: block;
+}
+.box-inline-block {
+  background-color: #10b981;
+  color: white;
+  padding: 10px;
+  font-family: sans-serif;
+  border-radius: 4px;
+  display: inline-block;
+  width: 120px;
+  text-align: center;
+}
+.box-none {
+  background-color: #ef4444;
+  color: white;
+  padding: 10px;
+  font-family: sans-serif;
+  display: none;
+}`,
+      starterCss: `.box-block {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+  border-radius: 4px;
+  /* 1. กำหนดรูปแบบการแสดงผลเป็น block */
+  
+}
+.box-inline-block {
+  background-color: #10b981;
+  color: white;
+  padding: 10px;
+  font-family: sans-serif;
+  border-radius: 4px;
+  text-align: center;
+  /* 2. กำหนดรูปแบบการแสดงผลเป็น inline-block และความกว้าง 120px */
+  
+}
+.box-none {
+  background-color: #ef4444;
+  color: white;
+  padding: 10px;
+  font-family: sans-serif;
+  /* 3. กำหนดรูปแบบการแสดงผลเป็น none เพื่อสั่งซ่อน */
+  
+}`,
+      validation: (doc) => {
+        const block = doc.querySelector('.box-block');
+        const inlineBlocks = doc.querySelectorAll('.box-inline-block');
+        const hidden = doc.querySelector('.box-none');
+
+        if (!block || inlineBlocks.length < 2 || !hidden) return "กรุณาห้ามลบแท็กใน HTML ดั้งเดิม";
+
+        const styleBlock = doc.defaultView.getComputedStyle(block);
+        const styleInlineBlock1 = doc.defaultView.getComputedStyle(inlineBlocks[0]);
+        const styleInlineBlock2 = doc.defaultView.getComputedStyle(inlineBlocks[1]);
+        const styleHidden = doc.defaultView.getComputedStyle(hidden);
+
+        if (styleBlock.display !== 'block') return "กรุณากำหนดให้ .box-block มี display: block;";
+        if (styleInlineBlock1.display !== 'inline-block' || styleInlineBlock2.display !== 'inline-block') {
+          return "กรุณากำหนดให้ .box-inline-block มี display: inline-block;";
+        }
+        if (styleInlineBlock1.width !== '120px' || styleInlineBlock2.width !== '120px') {
+          return "กรุณากำหนดความกว้าง width: 120px; ให้กับคลาส .box-inline-block";
+        }
+        if (styleHidden.display !== 'none') return "กรุณากำหนดให้ .box-none มี display: none; เพื่อซ่อนกล่อง";
+        return true;
+      },
+      hints: [
+        "คลาส `.box-block` ใช้ `display: block;`",
+        "คลาส `.box-inline-block` ใช้ `display: inline-block; width: 120px;`",
+        "คลาส `.box-none` ใช้ `display: none;`"
+      ]
+    },
+    {
+      id: "css-border-radius-advanced",
+      title: "31. ความโค้งมนและมุมย่อย (Advanced Border Radius)",
+      category: "3. CSS Basics",
+      description: `เจาะลึกการระบุความโค้งมนของขอบมุมกล่องในรูปแบบละเอียดต่างๆ:
+1. **กำหนดแยกมุมแต่ละด้าน** :
+   - \`border-top-left-radius\` : มุมบนซ้าย
+   - \`border-top-right-radius\` : มุมบนขวา
+   - \`border-bottom-right-radius\` : มุมล่างขวา
+   - \`border-bottom-left-radius\` : มุมล่างซ้าย
+2. **เขียนย่อรวม 4 ค่าในคำสั่งเดียว** (วนตามเข็มนาฬิกา: บนซ้าย -> บนขวา -> ล่างขวา -> ล่างซ้าย) :
+   - เช่น \`border-radius: 10px 20px 30px 40px;\`
+   - หรือหากคุมแบบคู่: \`border-radius: 20px 20px 0 0;\` (จะทำให้ขอบบนมนส่วนขอบล่างตัดตรงเป็นเหลี่ยม เหมาะสำหรับทำรูปภาพหัวการ์ด)
+3. **การทำวงกลมสมบูรณ์** : ใช้หน่วยเปอร์เซ็นต์ \`border-radius: 50%;\` ร่วมกับกล่องที่ความกว้างและความสูงเท่ากัน
+
+**เป้าหมาย:**
+1. กำหนดขอบมนให้กับการ์ด \`.custom-card\` โดยใช้คุณสมบัติย่อเพื่อให้มุมด้านบนซ้ายและบนขวาโค้งมน \`24px\` ส่วนมุมล่างทั้งสองด้านเป็น \`0px\` (\`border-radius: 24px 24px 0 0;\`)
+2. ตกแต่งภาพโปรไฟล์ \`.circle-avatar\` ให้เป็นวงกลมสมบูรณ์ด้วย \`border-radius: 50%;\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="custom-card">
+    <div class="avatar-container">
+      <div class="circle-avatar"></div>
+    </div>
+    <div style="padding: 15px; font-family: sans-serif;">
+      <h3>การ์ดข้อมูลผู้ใช้</h3>
+      <p>มุมด้านบนการ์ดจะโค้งมนสวยงาม ส่วนมุมด้านล่างจะเหลี่ยมตรง</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="custom-card">
+    <div class="avatar-container">
+      <div class="circle-avatar"></div>
+    </div>
+    <div style="padding: 15px; font-family: sans-serif;">
+      <h3>การ์ดข้อมูลผู้ใช้</h3>
+      <p>มุมด้านบนการ์ดจะโค้งมนสวยงาม ส่วนมุมด้านล่างจะเหลี่ยมตรง</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetCss: `.custom-card {
+  width: 250px;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  font-family: sans-serif;
+  border-radius: 24px 24px 0 0;
+}
+.avatar-container {
+  background-color: #3b82f6;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 22px 22px 0 0;
+}
+.circle-avatar {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  border-radius: 50%;
+}`,
+      starterCss: `.custom-card {
+  width: 250px;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  font-family: sans-serif;
+  /* 1. กำหนดขอบมนเฉพาะด้านบน 24px (บนซ้าย บนขวา) ด้านล่างเป็น 0 */
+  
+}
+.avatar-container {
+  background-color: #3b82f6;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 22px 22px 0 0;
+}
+.circle-avatar {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  /* 2. กำหนดขอบมน 50% เพื่อทำรูปวงกลม */
+  
+}`,
+      validation: (doc) => {
+        const card = doc.querySelector('.custom-card');
+        const avatar = doc.querySelector('.circle-avatar');
+
+        if (!card || !avatar) return "กรุณาห้ามลบแท็กใน HTML ดั้งเดิม";
+
+        const styleCard = doc.defaultView.getComputedStyle(card);
+        const styleAvatar = doc.defaultView.getComputedStyle(avatar);
+
+        if (styleAvatar.borderRadius !== '50%') return "กรุณากำหนดให้ .circle-avatar มี border-radius: 50%;";
+
+        const tl = styleCard.borderTopLeftRadius;
+        const tr = styleCard.borderTopRightRadius;
+        const br = styleCard.borderBottomRightRadius;
+        const bl = styleCard.borderBottomLeftRadius;
+
+        if (tl !== '24px' || tr !== '24px' || (br !== '0px' && br !== '0') || (bl !== '0px' && bl !== '0')) {
+          return "กรุณาระบุ border-radius ของการ์ดให้มุมบนซ้ายและบนขวาโค้ง 24px และมุมล่างทั้งสองเป็น 0 (เช่น border-radius: 24px 24px 0 0;)";
+        }
+        return true;
+      },
+      hints: [
+        "สำหรับการ์ดใช้ `border-radius: 24px 24px 0 0;` (หรือเขียนแยกคุณสมบัติ)",
+        "สำหรับภาพโปรไฟล์กลมใช้ `border-radius: 50%;`"
+      ]
+    },
+    {
+      id: "css-box-shorthands",
+      title: "32. การย่อเขียนระยะห่างหลายทิศทาง (Margins & Paddings Shorthands)",
+      category: "3. CSS Basics",
+      description: `เรียนรู้การย่อโค้ดสำหรับการกำหนดระยะห่าง (Margin และ Padding) รอบด้านของกล่องในรูปแบบย่อที่ใช้บ่อย:
+1. **แบบระบุค่าเดียว** : \`padding: 15px;\` (มีผลเท่ากันทั้ง 4 ทิศ บน-ขวา-ล่าง-ซ้าย)
+2. **แบบระบุ 2 ค่า** : \`padding: 10px 20px;\` (ค่าแรกคุม บน-ล่าง, ค่าที่สองคุม ซ้าย-ขวา)
+3. **แบบระบุ 3 ค่า** : \`padding: 10px 20px 30px;\` (บน=10px, ซ้าย/ขวา=20px, ล่าง=30px)
+4. **แบบระบุ 4 ค่า** : \`padding: 10px 20px 30px 40px;\` (เรียงตามเข็มนาฬิกา บน -> ขวา -> ล่าง -> ซ้าย)
+5. **เขียนเจาะจงรายด้าน (Longhand)** : เช่น \`margin-bottom: 24px;\` หรือ \`padding-left: 8px;\`
+
+**เป้าหมาย:**
+ตกแต่งกล่องคอนเทนเนอร์ \`.banner-card\` และปุ่ม \`.btn\` ดังนี้:
+1. กำหนดระยะขอบภายใน \`.banner-card\` โดยใช้รูปแบบย่อแบบ 2 ค่า เพื่อให้บน-ล่างมีระยะห่าง \`30px\` และซ้าย-ขวามีระยะห่าง \`40px\`
+2. กำหนดระยะขอบนอกด้านล่างให้ \`.banner-card\` เท่ากับ \`25px\` โดยใช้คำสั่งเจาะจงทิศทาง
+3. กำหนดระยะห่างภายในให้ปุ่ม \`.btn\` โดยใช้รูปแบบย่อแบบ 2 ค่า เพื่อให้บน-ล่างมีระยะห่าง \`8px\` และซ้าย-ขวามีระยะห่าง \`16px\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="banner-card">
+    <h3>ยินดีต้อนรับสู่สถาบัน</h3>
+    <p>เริ่มต้นเรียนรู้การย่อโค้ด CSS เพื่อจัดสเปกหน้าจออย่างมืออาชีพ</p>
+    <button class="btn">เริ่มต้นเรียนรู้</button>
+  </div>
+  <div style="background-color: #f1f5f9; height: 50px; text-align: center; line-height: 50px; font-family: sans-serif;">บล็อกอ้างอิงด้านล่าง</div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="banner-card">
+    <h3>ยินดีต้อนรับสู่สถาบัน</h3>
+    <p>เริ่มต้นเรียนรู้การย่อโค้ด CSS เพื่อจัดสเปกหน้าจออย่างมืออาชีพ</p>
+    <button class="btn">เริ่มต้นเรียนรู้</button>
+  </div>
+  <div style="background-color: #f1f5f9; height: 50px; text-align: center; line-height: 50px; font-family: sans-serif;">บล็อกอ้างอิงด้านล่าง</div>
+</body>
+</html>`,
+      targetCss: `.banner-card {
+  background-color: white;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: sans-serif;
+  padding: 30px 40px;
+  margin-bottom: 25px;
+}
+.btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 8px 16px;
+}`,
+      starterCss: `.banner-card {
+  background-color: white;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: sans-serif;
+  /* 1. กำหนด padding บน-ล่าง 30px และ ซ้าย-ขวา 40px ด้วยรูปแบบย่อ */
+  
+  /* 2. กำหนด margin ด้านล่าง 25px ด้วยคำสั่งเจาะจง */
+  
+}
+.btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  /* 3. กำหนด padding บน-ล่าง 8px และ ซ้าย-ขวา 16px ด้วยรูปแบบย่อ */
+  
+}`,
+      validation: (doc) => {
+        const card = doc.querySelector('.banner-card');
+        const btn = doc.querySelector('.btn');
+        if (!card || !btn) return "กรุณาห้ามลบแท็กใน HTML ดั้งเดิม";
+
+        const styleCard = doc.defaultView.getComputedStyle(card);
+        const styleBtn = doc.defaultView.getComputedStyle(btn);
+
+        if (styleCard.paddingTop !== '30px' || styleCard.paddingBottom !== '30px' || styleCard.paddingLeft !== '40px' || styleCard.paddingRight !== '40px') {
+          return "กรุณากำหนด padding ให้กับ .banner-card ให้ถูกต้อง (บน-ล่าง 30px, ซ้าย-ขวา 40px)";
+        }
+        if (styleCard.marginBottom !== '25px') {
+          return "กรุณากำหนด margin-bottom ให้กับ .banner-card เป็น 25px";
+        }
+        if (styleBtn.paddingTop !== '8px' || styleBtn.paddingBottom !== '8px' || styleBtn.paddingLeft !== '16px' || styleBtn.paddingRight !== '16px') {
+          return "กรุณากำหนด padding ให้กับ .btn ให้ถูกต้อง (บน-ล่าง 8px, ซ้าย-ขวา 16px)";
+        }
+        return true;
+      },
+      hints: [
+        "คลาส `.banner-card` ใช้ `padding: 30px 40px;` และ `margin-bottom: 25px;`",
+        "คลาส `.btn` ใช้ `padding: 8px 16px;`"
+      ]
+    },
+    {
+      id: "css-borders-detailed",
+      title: "33. เส้นขอบเฉพาะด้านและสไตล์ขอบ (Borders on Specific Sides)",
+      category: "3. CSS Basics",
+      description: `เรียนรู้การกำหนดเส้นขอบเจาะจงเฉพาะทิศทางและรูปแบบสไตล์ที่หลากหลาย:
+1. **กำหนดแยกทิศทาง** : 
+   - \`border-top\` : ขอบบน
+   - \`border-bottom\` : ขอบล่าง
+   - \`border-left\` : ขอบซ้าย
+   - \`border-right\` : ขอบขวา
+2. **คุณสมบัติย่อยของขอบ** : \`border: [ความหนา] [รูปแบบ] [สี];\`
+   - รูปแบบเส้นขอบ (\`border-style\`): \`solid\` (เส้นทึบ), \`dashed\` (เส้นประ), \`dotted\` (เส้นจุดไข่ปลา), \`double\` (เส้นคู่), \`none\` (ไม่มีเส้นขอบ)
+3. **การใช้งานยอดนิยม** : การทำขอบเน้นด้านข้างสำหรับกล่องแจ้งเตือน (Alert Box) หรือทำเส้นแบ่งใต้หัวข้อ (Underline Divider)
+
+**เป้าหมาย:**
+ตกแต่งกล่องแจ้งเตือนภัย \`.alert-box\` ดังนี้:
+1. ล้างขอบดีฟอลต์ทั้งหมดออก และตั้งค่าเส้นขอบเฉพาะ **ด้านซ้าย** (\`border-left\`) ให้หนา \`6px\` ชนิดเส้นทึบ (\`solid\`) ใช้สีแดง (\`#ef4444\`)
+2. ตั้งเส้นขอบเฉพาะ **ด้านล่าง** (\`border-bottom\`) ให้หนา \`1px\` ชนิดเส้นจุดไข่ปลา (\`dotted\`) ใช้สีเทาอ่อน (\`#cbd5e1\`)`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="alert-box">
+    <strong>คำเตือน:</strong> ข้อมูลการแก้ไขนี้จะถูกเก็บบันทึกในฐานข้อมูลทันที กรุณาตรวจสอบความถูกต้องก่อนกดบันทึก
+  </div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="alert-box">
+    <strong>คำเตือน:</strong> ข้อมูลการแก้ไขนี้จะถูกเก็บบันทึกในฐานข้อมูลทันที กรุณาตรวจสอบความถูกต้องก่อนกดบันทึก
+  </div>
+</body>
+</html>`,
+      targetCss: `.alert-box {
+  padding: 15px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  font-family: sans-serif;
+  border-radius: 4px;
+  border: none;
+  border-left: 6px solid #ef4444;
+  border-bottom: 1px dotted #cbd5e1;
+}`,
+      starterCss: `.alert-box {
+  padding: 15px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  font-family: sans-serif;
+  border-radius: 4px;
+  /* เริ่มต้นล้างขอบออก่อน */
+  border: none;
+  
+  /* 1. กำหนดขอบด้านซ้ายให้หนา 6px ชนิดทึบ (solid) สีแดง #ef4444 */
+  
+  /* 2. กำหนดขอบด้านล่างให้หนา 1px ชนิดจุดไข่ปลา (dotted) สีเทา #cbd5e1 */
+  
+}`,
+      validation: (doc) => {
+        const el = doc.querySelector('.alert-box');
+        if (!el) return "ไม่พบคลาส .alert-box";
+        const style = doc.defaultView.getComputedStyle(el);
+
+        const leftWidth = parseFloat(style.borderLeftWidth);
+        if (isNaN(leftWidth) || Math.round(leftWidth) !== 6 || style.borderLeftStyle !== 'solid') {
+          return "กรุณากำหนดขอบด้านซ้ายให้หนา 6px ชนิด solid";
+        }
+        if (!style.borderLeftColor.includes('239') && !style.borderLeftColor.includes('68')) {
+          return "กรุณาใช้สีแดง #ef4444 สำหรับขอบด้านซ้าย";
+        }
+        const bottomWidth = parseFloat(style.borderBottomWidth);
+        if (isNaN(bottomWidth) || Math.round(bottomWidth) !== 1 || style.borderBottomStyle !== 'dotted') {
+          return "กรุณากำหนดขอบด้านล่างให้หนา 1px ชนิด dotted (จุดไข่ปลา)";
+        }
+        if (!style.borderBottomColor.includes('203') && !style.borderBottomColor.includes('226')) {
+          return "กรุณาใช้สีเทา #cbd5e1 สำหรับขอบด้านล่าง";
+        }
+        if (parseFloat(style.borderTopWidth) > 0 || parseFloat(style.borderRightWidth) > 0) {
+          return "กรุณาล้างขอบด้านบนและด้านขวาออก (ให้คงเหลือเฉพาะด้านซ้ายและด้านล่าง)";
+        }
+        return true;
+      },
+      hints: ["พิมพ์ `border-left: 6px solid #ef4444;` และ `border-bottom: 1px dotted #cbd5e1;`"]
+    },
+    {
+      id: "css-backgrounds-advanced",
+      title: "34. ภาพพื้นหลังและการไล่โทนสี (Background Images & Gradients)",
+      category: "3. CSS Basics",
+      description: `เรียนรู้การตั้งค่าพื้นหลังด้วยรูปภาพและการปรับขนาดจัดวาง รวมถึงการสร้างสีพื้นหลังแบบไล่เฉดโทนสี (Gradients):
+1. **รูปภาพพื้นหลัง (\`background-image\`)** : ระบุผ่านฟังก์ชัน \`url('พิกัดที่อยู่รูป')\`
+2. **การปรับขนาดรูป (\`background-size\`)** :
+   - \`cover\` : ยืดรูปภาพให้เต็มพื้นที่กล่องพอดี (สัดส่วนรูปเดิม แต่อาจมีขอบบางส่วนถูกครอปตัดออก)
+   - \`contain\` : ย่อสเกลรูปให้เห็นรูปครบถ้วนที่สุดในกล่อง (อาจมีที่ว่างสีขาวเหลือข้างๆ)
+3. **การวางตำแหน่งรูป (\`background-position\`)** : ระบุเช่น \`center\`, \`top\`, \`bottom\`, \`left\`, \`right\`
+4. **การควบคุมการทำซ้ำ (\`background-repeat\`)** : ตั้งเป็น \`no-repeat\` เพื่อป้องกันไม่ให้รูปที่เล็กกว่ากล่องถูกนำมาต่อจิ๊กซอว์ซ้ำๆ
+5. **การไล่ระดับสีพื้นหลัง (Linear Gradients)** : เช่น \`background: linear-gradient(135deg, #3b82f6, #8b5cf6);\`
+
+**เป้าหมาย:**
+ตกแต่งกล่องโปรไฟล์ฮีโร่ \`.hero-banner\` ดังนี้:
+1. ระบุภาพพื้นหลังโดยใช้ภาพจากลิงก์: \`https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600\`
+2. สั่งให้ภาพขยายเต็มพื้นที่พอดีกล่อง (\`cover\`) โดยจุดศูนย์กลางของภาพอยู่กึ่งกลางกล่อง (\`center\`) และไม่มีการทำซ้ำภาพ (\`no-repeat\`)`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="hero-banner">
+    <div class="hero-content">
+      <h1>เทคโนโลยีสำหรับอนาคต</h1>
+      <p>เรียนรู้วิธีการเขียนโค้ดและพัฒนาแอปพลิเคชันด้วยเครื่องมือระดับสากล</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="hero-banner">
+    <div class="hero-content">
+      <h1>เทคโนโลยีสำหรับอนาคต</h1>
+      <p>เรียนรู้วิธีการเขียนโค้ดและพัฒนาแอปพลิเคชันด้วยเครื่องมือระดับสากล</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetCss: `.hero-banner {
+  width: 100%;
+  height: 220px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero-content {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 320px;
+}
+.hero-content h1 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+.hero-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.4;
+}`,
+      starterCss: `.hero-banner {
+  width: 100%;
+  height: 220px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  
+  /* 1. ใส่ภาพพื้นหลังด้วย URL: https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600 */
+  
+  /* 2. ตั้งค่าปรับสัดส่วนรูปภาพไม่ให้ซ้ำ จัดกึ่งกลาง และกว้างครอบคลุมกล่อง (cover) */
+  
+}
+.hero-content {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 320px;
+}
+.hero-content h1 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+.hero-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.4;
+}`,
+      validation: (doc) => {
+        const banner = doc.querySelector('.hero-banner');
+        if (!banner) return "ไม่พบคลาส .hero-banner";
+        const style = doc.defaultView.getComputedStyle(banner);
+
+        if (!style.backgroundImage || style.backgroundImage === 'none') {
+          return "กรุณาใส่ภาพพื้นหลัง background-image";
+        }
+        if (!style.backgroundImage.includes('1579546929518-9e396f3cc809')) {
+          return "กรุณาใช้ URL ภาพที่กำหนดให้ถูกต้อง";
+        }
+        if (style.backgroundSize !== 'cover') {
+          return "กรุณากำหนด background-size: cover;";
+        }
+        if (style.backgroundPosition.trim() !== 'center' && !style.backgroundPosition.includes('50%')) {
+          return "กรุณากำหนด background-position: center;";
+        }
+        if (style.backgroundRepeat !== 'no-repeat') {
+          return "กรุณากำหนด background-repeat: no-repeat;";
+        }
+        return true;
+      },
+      hints: [
+        "พิมพ์: background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600');",
+        "พิมพ์: background-size: cover; background-position: center; background-repeat: no-repeat;"
+      ]
+    },
+
+    // --- หมวดใหญ่ 4: CSS Layout Engineering (12 บทเรียนย่อย) ---
     {
       id: "css-layout-absolute",
-      title: "21. การจัดตำแหน่งซ้อนทับภาพ (Absolute Positioning)",
+      title: "28. การจัดตำแหน่งซ้อนทับภาพ (Absolute Positioning)",
       category: "4. CSS Layouts",
       description: `การจัดตำแหน่งแบบซ้อนทับช่วยวางเลเยอร์ของกล่องลูกลอยอยู่เหนือพื้นที่กล่องแม่:
 - กล่องแม่ต้องประกาศ \`position: relative;\`
@@ -1193,7 +1929,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-layout-sticky",
-      title: "22. แถบเกาะติดขอบหน้าจอ (Fixed & Sticky Elements)",
+      title: "29. แถบเกาะติดขอบหน้าจอ (Fixed & Sticky Elements)",
       category: "4. CSS Layouts",
       description: `การจัดองค์ประกอบแถวเมนูให้ค้างอยู่ที่หน้าจอเวลาเลื่อนสกอลบาร์ลง:
 - \`position: sticky;\` : ลอยเกาะขอบเมื่อถูกเลื่อนถึง และเคลื่อนตัวกลับเมื่อสกอลกลับ (ต้องระบุ \`top: 0;\` เสมอ)
@@ -1270,7 +2006,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-flex-direction",
-      title: "23. ทิศทางการเรียงกล่อง (Flex Direction & Wrapping)",
+      title: "30. ทิศทางการเรียงกล่อง (Flex Direction & Wrapping)",
       category: "4. CSS Layouts",
       description: `การจัดการเรียงกล่องลูกของระบบ Flexbox:
 - \`flex-direction: row;\` : จัดเรียงตามแนวนอน (เริ่มต้น)
@@ -1352,7 +2088,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-flex-align",
-      title: "24. การจัดกึ่งกลางและระยะจัด Flexbox (Flex Align & Justify)",
+      title: "31. การจัดกึ่งกลางและระยะจัด Flexbox (Flex Align & Justify)",
       category: "4. CSS Layouts",
       description: `การคุมระยะจัดแนวกล่องลูกภายในระบบ Flex:
 - \`justify-content\` : คุมขอบระยะแนวนอน เช่น \`center\` (ตรงกลาง), \`space-between\` (แยกซ้ายขวาสุด)
@@ -1426,7 +2162,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-grid-columns",
-      title: "25. โครงสร้างแถวตารางพื้นฐาน (CSS Grid Columns & Gap)",
+      title: "32. โครงสร้างแถวตารางพื้นฐาน (CSS Grid Columns & Gap)",
       category: "4. CSS Layouts",
       description: `การจัดวางตารางการ์ดข้อมูลแบบ 2 มิติ:
 - \`display: grid;\` : เปิดระบบกริด
@@ -1504,7 +2240,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-grid-areas",
-      title: "26. พื้นที่จัดโครงร่างกล่อง (Advanced CSS Grid Areas)",
+      title: "33. พื้นที่จัดโครงร่างกล่อง (Advanced CSS Grid Areas)",
       category: "4. CSS Layouts",
       description: `การกำหนดเลย์เอาต์ตามพื้นที่วาดแบบแผนผัง (Layout Grid Area Planning):
 - \`grid-template-areas: "side main";\`
@@ -1600,7 +2336,7 @@ aside { color: #64748b; font-size: 13px; }`,
     // --- หมวดใหญ่ 5: Advanced & Responsive CSS (5 บทเรียนย่อย) ---
     {
       id: "css-variables-scoping",
-      title: "27. ตัวแปรเก็บสีส่วนกลาง (CSS Variables Scoping)",
+      title: "34. ตัวแปรเก็บสีส่วนกลาง (CSS Variables Scoping)",
       category: "5. Responsive & Advanced",
       description: `การประกาศตัวแปรส่วนกลางของหน้าเพจเพื่อแก้ไขได้ง่ายในจุดเดียว:
 - มักประกาศไว้ในระดับขอบเขตสูงสุด \`:root { --primary-color: #3b82f6; }\`
@@ -1665,7 +2401,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-pseudo-classes",
-      title: "28. สถานะตอบสนองปุ่มเมาส์ (Pseudo-classes hover & active)",
+      title: "35. สถานะตอบสนองปุ่มเมาส์ (Pseudo-classes hover & active)",
       category: "5. Responsive & Advanced",
       description: `การดีไซน์การปฏิสัมพันธ์เมื่อผู้ใช้สั่งกดหรือชี้เมาส์:
 - \`:hover\` : เมื่อชี้เมาส์
@@ -1740,7 +2476,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-pseudo-elements",
-      title: "29. กล่องโครงสร้างตัวตนเสมือน (Pseudo-elements ::after)",
+      title: "36. กล่องโครงสร้างตัวตนเสมือน (Pseudo-elements ::after)",
       category: "5. Responsive & Advanced",
       description: `การวาดภาพหรือเส้นเสมือนออกมาด้วย CSS โดยไม่แตะต้องเอกสาร HTML:
 - แท็ก \`::after\` หรือ \`::before\`
@@ -1802,7 +2538,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-media-queries",
-      title: "30. ปรับขนาดสไตล์ตามหน้าต่างอุปกรณ์ (Media Queries)",
+      title: "37. ปรับขนาดสไตล์ตามหน้าต่างอุปกรณ์ (Media Queries)",
       category: "5. Responsive & Advanced",
       description: `การเขียนกติกาคัดกรองขอบกว้างหน้าจอ:
 - \`@media (max-width: 768px)\` ครอบคำสั่งสำหรับอุปกรณ์หน้าจอแคบ (เช่น ไอแพดหรือมือถือ)
@@ -1869,7 +2605,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-auto-grid",
-      title: "31. จัดตารางยืดหดยกกำลังไม่ต้องพึ่งคิวรี (Auto Grid minmax)",
+      title: "38. จัดตารางยืดหดยกกำลังไม่ต้องพึ่งคิวรี (Auto Grid minmax)",
       category: "5. Responsive & Advanced",
       description: `การผสานสูตรขั้นเทพคุมระยะช่องตารางให้เลื่อนไหลแบบ Responsive อัตโนมัติ:
 - \`grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\`
@@ -1951,7 +2687,7 @@ aside { color: #64748b; font-size: 13px; }`,
     // --- หมวดใหญ่ 6: Transitions & Animations (3 บทเรียนย่อย) ---
     {
       id: "css-transitions-timing",
-      title: "32. ระยะเวลาการเปลี่ยนผ่าน (Transition Timing)",
+      title: "39. ระยะเวลาการเปลี่ยนผ่าน (Transition Timing)",
       category: "6. Transitions & Animations",
       description: `การหน่วงสปีดเอฟเฟกต์การแสดงสไตล์เพื่อลบล้างความหยาบกระด้าง:
 - \`transition-duration\` : ระบุระยะเวลา เช่น \`0.3s\` (300 มิลลิวินาที)
@@ -2029,7 +2765,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-keyframes-infinite",
-      title: "33. อนิเมชันเคลื่อนไหวต่อเนื่อง (Keyframes Animation)",
+      title: "40. อนิเมชันเคลื่อนไหวต่อเนื่อง (Keyframes Animation)",
       category: "6. Transitions & Animations",
       description: `การทำแอนิเมชันเคลื่อนขยับหรือเต้นตามสัดส่วนคีย์เฟรมอย่างสมบูรณ์:
 - \`@keyframes ชื่องาน { 0% { ... } 100% { ... } }\`
@@ -2106,7 +2842,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-validation-states",
-      title: "34. สีเตือนเมื่อป้อนข้อมูลผิด (Form Validation States)",
+      title: "41. สีเตือนเมื่อป้อนข้อมูลผิด (Form Validation States)",
       category: "6. Transitions & Animations",
       description: `การตรวจสอบความถูกต้องของข้อมูล (Email format) สดๆ โดยแจ้งสีขอบกล่องอินพุตเป็นสีแดงเพื่อเตือนสายตา:
 - \`input:invalid\` : สเตทเมื่อคีย์ข้อมูลในอินพุตไม่ผ่านความถูกต้อง (เช่น พิมพ์เมลไม่มี @)
@@ -2178,7 +2914,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-specificity",
-      title: "35. น้ำหนักความสำคัญของตัวเลือก (CSS Specificity)",
+      title: "42. น้ำหนักความสำคัญของตัวเลือก (CSS Specificity)",
       category: "3. CSS Basics",
       description: `เรียนรู้กฎเหล็กเรื่องลำดับการประมวลผลและการเอาชนะของสไตล์ (Specificity) เมื่อองค์ประกอบมีหลายตัวเลือกสั่งการทับซ้อนกัน
 
@@ -2250,7 +2986,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-flex-grow",
-      title: "36. การขยายและยืดกล่องยืดหยุ่น (Flex Grow & Fill)",
+      title: "43. การขยายและยืดกล่องยืดหยุ่น (Flex Grow & Fill)",
       category: "4. CSS Layouts",
       description: `เรียนรู้การทำให้กล่องย่อยลูกยืดหยุ่นขยายพื้นที่เพื่อเติมช่องว่างที่เหลืออยู่ในแถว Flexbox container ด้วยคำสั่ง \`flex-grow\`
 
@@ -2367,7 +3103,7 @@ aside { color: #64748b; font-size: 13px; }`,
     },
     {
       id: "css-universal-reset",
-      title: "37. ตัวเลือกครอบจักรวาลและการล้างระยะขอบ (Universal Selector & Global Reset)",
+      title: "44. ตัวเลือกครอบจักรวาลและการล้างระยะขอบ (Universal Selector & Global Reset)",
       category: "3. CSS Basics",
       description: `เรียนรู้การล้างค่าดีฟอลต์ (Style Reset) ที่เบราว์เซอร์ติดตัวมาด้วย และบังคับให้การนับพื้นที่กล่องทั้งระบบเป็นแบบบอร์ดเดอร์บล็อกโดยใช้ตัวเลือกครอบจักรวาล \`*\`
 
@@ -2465,6 +3201,255 @@ body {
         return true;
       },
       hints: ["พิมพ์: * { box-sizing: border-box; margin: 0; padding: 0; } ที่บรรทัดแรกสุดของแท็บ CSS"]
+    },
+    {
+      id: "css-layout-float",
+      title: "45. การไหลของข้อความล้อมรอบรูปภาพ (CSS Float & Text Wrap)",
+      category: "4. CSS Layouts",
+      description: `เรียนรู้การใช้งานคุณสมบัติ \`float\` ซึ่งเป็นคำสั่งดั้งเดิมที่มีความสำคัญมากในการทำให้อักษรหรือข้อความต่าง ๆ ไหลโอบล้อมรอบรูปภาพ (Text Wrapping) เหมือนกับการจัดหน้าคอลัมน์ในนิตยสารหรือข่าวสารต่าง ๆ
+
+คุณสมบัติและพารามิเตอร์สำคัญ:
+- \`float: left;\` : สั่งให้กล่องหรือรูปภาพลอยไปเกาะติดขอบซ้าย และให้ข้อความย่อหน้าที่ตามมาไหลอ้อมรอบทางด้านขวาและด้านล่าง
+- \`float: right;\` : สั่งให้กล่องหรือรูปภาพลอยไปเกาะติดขอบขวา และให้ข้อความย่อหน้าที่ตามมาไหลอ้อมรอบทางด้านซ้ายและด้านล่าง
+- \`margin-left\` / \`margin-bottom\` / \`margin-right\` : ใช้ร่วมกับ float เพื่อเว้นระยะช่องไฟที่เหมาะสม ไม่ให้ตัวหนังสือไหลมาชนติดขอบรูปภาพจนอ่านยาก
+
+**เป้าหมาย:**
+ทำให้ภาพประกอบคลาส \`.avatar-float\` ลอยตัวไปติดขอบทางขวาของการ์ด และมีระยะช่องไฟที่เหมาะสม:
+1. กำหนดคุณสมบัติให้ภาพลอยชิดขวา (\`float: right;\`)
+2. กำหนดระยะห่างรอบภาพเพื่อเว้นขอบตัวหนังสือ (\`margin-left: 15px;\` และ \`margin-bottom: 10px;\`)`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="article-box">
+  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop" class="avatar-float" alt="Tutor Photo">
+  <p>ยินดีต้อนรับสู่หลักสูตรพัฒนาเว็บดีไซน์ ในบทเรียนย่อยนี้เราจะได้ลองจัดสเปกหน้าบทความที่แทรกรูปภาพ โดยการเปิดใช้งานคุณสมบัติ float เพื่อให้ข้อความตัวหนังสือไหลโอบล้อมรูปภาพอย่างเหมาะสม สวยงาม และดูมีระดับเป็นธรรมชาติ</p>
+  <p>หากไม่มีการสั่งค่า float รูปภาพจะจองพื้นที่เป็นแถวใหม่หรือเรียงซ้อนแบบผิดปกติ แต่เมื่อสั่ง float แล้ว บราว์เซอร์จะดันตัวหนังสือให้ไหลเข้ามาแชร์พื้นที่ว่างรอบๆ รูปภาพอย่างสวยงาม</p>
+</div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="article-box">
+  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop" class="avatar-float" alt="Tutor Photo">
+  <p>ยินดีต้อนรับสู่หลักสูตรพัฒนาเว็บดีไซน์ ในบทเรียนย่อยนี้เราจะได้ลองจัดสเปกหน้าบทความที่แทรกรูปภาพ โดยการเปิดใช้งานคุณสมบัติ float เพื่อให้ข้อความตัวหนังสือไหลโอบล้อมรูปภาพอย่างเหมาะสม สวยงาม และดูมีระดับเป็นธรรมชาติ</p>
+  <p>หากไม่มีการสั่งค่า float รูปภาพจะจองพื้นที่เป็นแถวใหม่หรือเรียงซ้อนแบบผิดปกติ แต่เมื่อสั่ง float แล้ว บราว์เซอร์จะดันตัวหนังสือให้ไหลเข้ามาแชร์พื้นที่ว่างรอบๆ รูปภาพอย่างสวยงาม</p>
+</div>
+</body>
+</html>`,
+      targetCss: `body {
+  font-family: sans-serif;
+  padding: 20px;
+  background-color: #f8fafc;
+}
+.article-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  line-height: 1.6;
+  color: #334155;
+}
+.avatar-float {
+  float: right;
+  margin-left: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+}`,
+      starterCss: `body {
+  font-family: sans-serif;
+  padding: 20px;
+  background-color: #f8fafc;
+}
+.article-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  line-height: 1.6;
+  color: #334155;
+}
+.avatar-float {
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+  /* 1. กำหนดให้รูปภาพลอยชิดขวา */
+  
+  /* 2. กำหนดระยะห่าง margin ด้านซ้าย 15px และด้านล่าง 10px */
+  
+}`,
+      validation: (doc, cssText) => {
+        const img = doc.querySelector('.avatar-float');
+        if (!img) return "ไม่พบรูปภาพคลาส .avatar-float";
+        
+        const style = doc.defaultView.getComputedStyle(img);
+        if (style.float !== 'right') {
+          return "กรุณากำหนดให้รูปภาพลอยชิดขวาด้วย float: right;";
+        }
+        
+        const ml = parseFloat(style.marginLeft);
+        const mb = parseFloat(style.marginBottom);
+        if (isNaN(ml) || ml < 14 || isNaN(mb) || mb < 9) {
+          return "อย่าลืมเว้นช่องไฟรอบภาพด้วย margin-left: 15px; และ margin-bottom: 10px;";
+        }
+        return true;
+      },
+      hints: ["เขียนสไตล์: `float: right; margin-left: 15px; margin-bottom: 10px;` ในคลาส .avatar-float"]
+    },
+    {
+      id: "css-text-overflow",
+      title: "46. การจัดข้อความล้นกล่องและจุดไข่ปลา (CSS Text Overflow & Ellipsis)",
+      category: "3. CSS Basics",
+      description: `เมื่อมีข้อความที่ยาวเกินขนาดความกว้างของกล่องคอนเทนเนอร์ (เช่น หัวข้อข่าวสาร, ชื่อสินค้า หรือชื่อผู้ใช้) ข้อความนั้นจะล้นขอบออกมานอกกล่องจนทำให้โครงสร้างหน้าเว็บเสียหาย วิธีแก้ปัญหายอดนิยมคือการตัดคำและแสดงจุดไข่ปลา (\`...\`) ที่ท้ายบรรทัด
+
+คุณสมบัติ CSS 3 ประการที่จำเป็นต้องทำงานร่วมกัน (ขาดอย่างใดอย่างหนึ่งไม่ได้):
+- \`white-space: nowrap;\` : บังคับให้ข้อความทั้งหมดอยู่ในบรรทัดเดียว ไม่ขึ้นบรรทัดใหม่
+- \`overflow: hidden;\` : ซ่อนข้อความส่วนที่ยื่นล้นออกนอกกล่อง
+- \`text-overflow: ellipsis;\` : ใส่จุดไข่ปลา (\`...\`) แทนข้อความส่วนที่ถูกซ่อน
+
+**เป้าหมาย:**
+ทำให้ข้อความในส่วนหัวเรื่องคลาส \`.title-truncate\` ถูกตัดขอบและแสดงจุดไข่ปลาเมื่อข้อความล้นกล่องการ์ดที่มีความกว้าง 280px
+1. กำหนด \`white-space: nowrap;\`
+2. กำหนด \`overflow: hidden;\`
+3. กำหนด \`text-overflow: ellipsis;\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="card">
+    <div class="card-image"></div>
+    <div class="card-content">
+      <h3 class="title-truncate">เรียนรู้วิธีการเขียนเว็บสไตล์โปรเพสชันนอลและเทคนิคการเขียน CSS ให้มีประสิทธิภาพสูงสุดสำหรับนักพัฒนาปี 2026</h3>
+      <p class="desc">บทเรียนการทำ Text Overflow ตัดคำแสดงจุดไข่ปลา</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ</title>
+</head>
+<body>
+  <div class="card">
+    <div class="card-image"></div>
+    <div class="card-content">
+      <h3 class="title-truncate">เรียนรู้วิธีการเขียนเว็บสไตล์โปรเพสชันนอลและเทคนิคการเขียน CSS ให้มีประสิทธิภาพสูงสุดสำหรับนักพัฒนาปี 2026</h3>
+      <p class="desc">บทเรียนการทำ Text Overflow ตัดคำแสดงจุดไข่ปลา</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetCss: `body {
+  font-family: sans-serif;
+  background-color: #f1f5f9;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+}
+.card {
+  background: white;
+  width: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+}
+.card-image {
+  height: 120px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+.card-content {
+  padding: 16px;
+}
+.title-truncate {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}`,
+      starterCss: `body {
+  font-family: sans-serif;
+  background-color: #f1f5f9;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+}
+.card {
+  background: white;
+  width: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+}
+.card-image {
+  height: 120px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+.card-content {
+  padding: 16px;
+}
+.title-truncate {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  
+  /* 1. สั่งห้ามข้อความขึ้นบรรทัดใหม่ */
+  
+  /* 2. ซ่อนข้อความส่วนที่ล้นออกไป */
+  
+  /* 3. แสดงจุดไข่ปลา (...) ท้ายข้อความ */
+  
+}
+.desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}`,
+      validation: (doc, cssText) => {
+        const title = doc.querySelector('.title-truncate');
+        if (!title) return "ไม่พบหัวเรื่องคลาส .title-truncate";
+        
+        const style = doc.defaultView.getComputedStyle(title);
+        
+        if (style.whiteSpace !== 'nowrap') {
+          return "กรุณากำหนดคุณสมบัติ white-space เป็น nowrap เพื่อบังคับให้อักษรเรียงบรรทัดเดียว";
+        }
+        if (style.overflow !== 'hidden') {
+          return "กรุณากำหนดคุณสมบัติ overflow เป็น hidden เพื่อซ่อนคำที่ล้นกล่อง";
+        }
+        if (style.textOverflow !== 'ellipsis') {
+          return "กรุณากำหนดคุณสมบัติ text-overflow เป็น ellipsis เพื่อเพิ่มจุดไข่ปลา (...) ปิดท้าย";
+        }
+        return true;
+      },
+      hints: ["เขียนสไตล์: `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` ในคลาส .title-truncate"]
     }
   ],
   challenges: [
@@ -4523,11 +5508,2088 @@ button { padding: 10px 20px; background: #2563eb; color: white; border: none; bo
         if (!media || !media.src.includes('photo')) return "กรุณาใส่รูปโพสต์หลักในคลาส .ig-media";
         
         const style = doc.defaultView.getComputedStyle(media);
-        if (style.height !== '400px' && style.height !== '100%') {
+        const heightVal = parseFloat(style.height);
+        if (isNaN(heightVal) || (Math.round(heightVal) !== 400 && style.height !== '100%')) {
           return "กรุณาตั้งความสูงของรูปโพสต์หลักให้เป็นสี่เหลี่ยมจัตุรัสสูง 400px";
         }
         return true;
       }
+    },
+    {
+      id: "challenge-midterm-exam",
+      title: "ภารกิจที่ 13: Mid-term Exam (ข้อสอบจำลองกลางภาค: ระบบลงทะเบียนเรียน)",
+      difficulty: "Intermediate",
+      points: 200,
+      description: `**ข้อสอบจำลองกลางภาค (Mid-term Mock Exam): ระบบลงทะเบียนเรียน**
+
+ยินดีต้อนรับเข้าสู่ข้อสอบจำลองกลางภาค! โจทย์นี้จะจำลองสภาพการออกสอบจริงที่ผสมผสานทั้งความรู้ทางโครงสร้างภาษา HTML และการควบคุมรูปลักษณ์ภายนอกด้วย CSS เพื่อสร้างแบบฟอร์มลงทะเบียนเรียนของนักศึกษาที่สมบูรณ์และสวยงาม
+
+**ข้อกำหนดทางด้าน HTML:**
+1. สร้างกลุ่มหัวข้อหลักด้วยแท็ก \`<main>\`
+2. ภายใน \`<main>\` ให้สร้างฟอร์ม \`<form class="exam-form">\`
+3. ภายในฟอร์ม ต้องประกอบด้วยแท็ก/คลาสและโครงสร้างข้อมูลดังต่อไปนี้:
+   - แท็กหัวข้อ \`<h2>\` เขียนข้อความว่า \`ลงทะเบียนสอบกลางภาค\`
+   - ช่องกรอก **ชื่อ-นามสกุล** โดยใช้ \`<input type="text" class="input-name" placeholder="ชื่อ-นามสกุลของคุณ" required>\`
+   - ช่องรับ **อีเมล** โดยใช้ \`<input type="email" class="input-email" placeholder="อีเมลสถาบัน" required>\`
+   - เมนูตัวเลือก **วิชาสอบ** โดยใช้แท็ก \`<select class="select-subject" required>\` ซึ่งมี 3 ตัวเลือกย่อยด้านใน:
+     - ตัวเลือกแรก (ดีฟอลต์): \`<option value="">-- เลือกวิชาสอบ --</option>\`
+     - ตัวเลือกเว็บเบสิก: \`<option value="web-basic">HTML5 & CSS3 Basics</option>\`
+     - ตัวเลือกดีไซน์: \`<option value="ui-design">UI/UX Design Concept</option>\`
+   - ช่องระบุ **วันลงทะเบียน** โดยใช้ \`<input type="date" class="input-date" required>\`
+   - ช่องระบุ **จำนวนวิชาที่เคยเรียน (ตัวเลข)** โดยใช้ \`<input type="number" class="input-count" min="1" max="5" value="1" required>\` (จำกัดระหว่าง 1 ถึง 5)
+   - แถบปรับ **ระดับความพร้อม** โดยใช้ \`<input type="range" class="input-level" min="1" max="5" value="3">\` (ระดับ 1 ถึง 5 ค่าเริ่มต้น 3)
+   - ปุ่มส่งข้อมูลลงทะเบียน โดยใช้ \`<button type="submit" class="btn-submit">ยืนยันการสมัครสอบ</button>\`
+
+**ข้อกำหนดทางด้าน CSS:**
+1. จัดกึ่งกลางหน้าจอและการตกแต่งฟอร์ม \`.exam-form\`:
+   - ตั้งความกว้างเป็น \`360px\` และจัดให้อยู่กึ่งกลางแนวนอนด้วย \`margin: 30px auto;\`
+   - ใส่แพดดิ้งย่อแบบ 2 ค่า: บน-ล่าง \`25px\`, ซ้าย-ขวา \`30px\`
+   - ใส่สีพื้นหลังเป็นขาวอมเทาอ่อน \`#f8fafc\` และขอบสีเทาเข้ม \`#cbd5e1\` ขนาด \`2px\` ชนิด \`solid\`
+   - ทำมุมโค้งมนแบบไล่ทิศทาง (Border Radius Shorthand): มุมบนซ้ายและบนขวาโค้งมน \`20px\` ส่วนมุมล่างซ้ายและล่างขวาเป็นตัดตรง \`0px\` (นั่นคือ \`20px 20px 0 0\`)
+   - มีเงาลอยตัวนุ่มนวล: \`box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);\`
+2. จัดการแสดงผลช่องกรอกข้อมูลและปุ่ม (ยึดหลักสัดส่วนสวยงาม):
+   - ช่องกรอกข้อมูลทุกตัว (\`.input-name\`, \`.input-email\`, \`.select-subject\`, \`.input-date\`, \`.input-count\`, \`.input-level\`) ต้องแสดงผลแบบบล็อก (\`display: block;\`), ความกว้างเต็มกรอบแม่ (\`width: 100%;\`), และระยะขอบภายนอกด้านล่างสำหรับเว้นช่องไฟ (\`margin-bottom: 15px;\`) พร้อมใส่แพดดิ้งภายในช่องกรอกขนาด (\`10px\`)
+   - ปุ่มยืนยันลงทะเบียน \`.btn-submit\`: แสดงผลแบบบล็อก (\`display: block;\`), ความกว้างเต็มกรอบแม่ (\`width: 100%;\`), ระยะขอบภายในแพดดิ้ง บน-ล่าง \`12px\` ซ้าย-ขวา \`20px\`, ขอบเป็นเหลี่ยมมนขนาด \`6px\`, ล้างเส้นขอบดีฟอลต์ออก (\`border: none;\`), สีตัวอักษรขาว, สีพื้นหลังเป็นสีน้ำเงินเข้มสถาบัน \`#1e3a8a\`
+   - สไตล์ปุ่มเมื่อเมาส์ชี้ทับ (\`.btn-submit:hover\`): เปลี่ยนสีพื้นหลังเป็นน้ำเงินสว่างขึ้น \`#2563eb\` และมีทรานซิชันเปลี่ยนผ่านนุ่มนวลเวลา 0.2 วินาที`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ - ข้อสอบจำลอง</title>
+</head>
+<body>
+  <!-- เริ่มสร้างแบบฟอร์มสมัครสอบที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ - ข้อสอบจำลอง</title>
+</head>
+<body>
+  <main>
+    <form class="exam-form">
+      <h2>ลงทะเบียนสอบกลางภาค</h2>
+      
+      <input type="text" class="input-name" placeholder="ชื่อ-นามสกุลของคุณ" required>
+      <input type="email" class="input-email" placeholder="อีเมลสถาบัน" required>
+      
+      <select class="select-subject" required>
+        <option value="">-- เลือกวิชาสอบ --</option>
+        <option value="web-basic">HTML5 & CSS3 Basics</option>
+        <option value="ui-design">UI/UX Design Concept</option>
+      </select>
+      
+      <input type="date" class="input-date" required>
+      <input type="number" class="input-count" min="1" max="5" value="1" required>
+      <input type="range" class="input-level" min="1" max="5" value="3">
+      
+      <button type="submit" class="btn-submit">ยืนยันการสมัครสอบ</button>
+    </form>
+  </main>
+</body>
+</html>`,
+      starterCss: `body {
+  background-color: #cbd5e1;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.exam-form {
+  /* 1. จัดแต่งกล่องฟอร์มตามข้อกำหนด (ขนาด, กึ่งกลาง, สีพื้นหลัง, ขอบเฉพาะมุม, เงา) */
+  
+}
+
+.input-name, .input-email, .select-subject, .input-date, .input-count, .input-level {
+  /* 2. จัดระเบียบช่องป้อนข้อมูลเป็น block, เต็มความกว้างแม่, และระยะห่าง */
+  
+}
+
+.btn-submit {
+  /* 3. ตกแต่งปุ่มยืนยันให้หนาสวยงาม พร้อมสีน้ำเงินเข้มและตัวหนังสือขาว */
+  
+}
+
+.btn-submit:hover {
+  /* 4. เพิ่มเอฟเฟกต์สีสว่างขึ้นเวลาเมาส์ชี้ทับ */
+  
+}`,
+      targetCss: `body {
+  background-color: #cbd5e1;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.exam-form {
+  width: 360px;
+  margin: 30px auto;
+  padding: 25px 30px;
+  background-color: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+}
+
+.exam-form h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  text-align: center;
+  color: #1e3a8a;
+}
+
+.input-name, .input-email, .select-subject, .input-date, .input-count, .input-level {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.btn-submit {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1e3a8a;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+  background-color: #2563eb;
+}`,
+      validation: (doc, cssText) => {
+        const form = doc.querySelector('.exam-form');
+        const name = doc.querySelector('.input-name');
+        const email = doc.querySelector('.input-email');
+        const subj = doc.querySelector('.select-subject');
+        const date = doc.querySelector('.input-date');
+        const count = doc.querySelector('.input-count');
+        const lvl = doc.querySelector('.input-level');
+        const submit = doc.querySelector('.btn-submit');
+
+        if (!form) return "ไม่พบฟอร์มสมัครสอบคลาส .exam-form";
+        if (!name || !email || !subj || !date || !count || !lvl || !submit) {
+          return "กรุณาใส่ช่องกรอกข้อมูลและปุ่มทั้งหมดให้ครบตามกำหนด";
+        }
+
+        const styleForm = doc.defaultView.getComputedStyle(form);
+        const styleSub = doc.defaultView.getComputedStyle(submit);
+
+        const formWidth = parseFloat(styleForm.width);
+        if (isNaN(formWidth) || Math.round(formWidth) !== 360) return "กรุณากำหนดความกว้างของฟอร์มเป็น 360px";
+        const tl = parseFloat(styleForm.borderTopLeftRadius);
+        const tr = parseFloat(styleForm.borderTopRightRadius);
+        if (isNaN(tl) || Math.round(tl) !== 20 || isNaN(tr) || Math.round(tr) !== 20 || parseFloat(styleForm.borderBottomLeftRadius) > 0) {
+          return "กรุณากำหนดขอบโค้งมนแบบย่อ border-radius: 20px 20px 0 0;";
+        }
+        if (!styleForm.boxShadow || styleForm.boxShadow === 'none') {
+          return "กรุณาใส่เงาขอบให้นุ่มนวลด้วย box-shadow";
+        }
+        if (styleSub.backgroundColor !== 'rgb(30, 58, 138)' && !styleSub.backgroundColor.includes('#1e3a8a')) {
+          return "กรุณาเลือกใช้สีน้ำเงินเข้ม #1e3a8a เป็นพื้นหลังปุ่มส่งข้อมูล";
+        }
+        
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes('.btn-submit:hover{background-color:#2563eb') && !cleaned.includes('.btn-submit:hover{background-color:rgb(37,99,235)')) {
+          return "กรุณากำหนดสไตล์เมาส์ชี้ทับ .btn-submit:hover ให้เปลี่ยนเป็นสีน้ำเงินสว่าง #2563eb";
+        }
+        return true;
+      }
+    },
+    {
+      id: "challenge-e-commerce-store",
+      title: "ภารกิจที่ 14: E-commerce Product Store (หน้าจอรายการสินค้าและตะกร้า)",
+      difficulty: "Hard",
+      points: 250,
+      description: `**ภารกิจประยุกต์ใช้งานจริง: E-commerce Product Store (หน้าจอรายการสินค้าและตะกร้าช็อปปิ้ง)**
+
+ภารกิจนี้ท้าทายให้คุณสร้างเว็บอินเตอร์เฟสร้านค้าออนไลน์ที่สมบูรณ์ ประกอบด้วยตารางกริดแสดงรายการสินค้า และสรุปยอดตะกร้าสินค้าในคอลัมน์ด้านข้าง โดยเน้นการจัดวางเลย์เอาต์ระบบ Flexbox และ Grid รวมถึงการกำหนดรูปลักษณ์ที่ดูหรูหราแบบพรีเมียม
+
+**ข้อกำหนดทางด้าน HTML:**
+1. สร้างโครงสร้างหน้าจอหลักด้วยแท็ก \`<div class="store-container">\`
+2. ด้านในประกอบด้วย 2 ส่วนย่อย:
+   - ส่วนแสดงกริดสินค้า \`<main class="product-grid">\`
+   - ส่วนตะกร้าสรุปยอด \`<aside class="cart-summary">\`
+3. ภายใน \`.product-grid\` ให้ใส่รายการสินค้าเป็นคลาส \`.product-card\` อย่างน้อย 2 ตัว แต่ละตัวมี:
+   - แท็กภาพ \`<img class="product-image">\` ดึงภาพจากลิงก์:
+     **\`https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300\`** (สินค้าตัวที่ 1) หรือ **\`https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300\`** (สินค้าตัวที่ 2)
+   - ป้ายข้อมูลสินค้าคลาส \`.product-info\`:
+     - หัวเรื่องย่อย \`<h3>\` แสดงชื่อสินค้า (เช่น "นาฬิกาสมาร์ทวอทช์" หรือ "รองเท้าผ้าใบสปอร์ต")
+     - แท็กราคา \`<span class="product-price">\` แสดงราคา (เช่น "฿2,900" หรือ "฿1,800")
+   - ปุ่มกดคลาส \`.btn-add-cart\` เขียนว่า "เพิ่มลงตะกร้า"
+4. ภายใน \`.cart-summary\` ประกอบด้วย:
+   - หัวข้อ \`<h2>\` เขียนข้อความ "ตะกร้าสินค้าของคุณ"
+   - รายชื่อสินค้าที่เลือก คลาส \`.cart-item\` แสดงชื่อสินค้าและราคา
+   - ส่วนสรุปยอดเงินทั้งหมดคลาส \`.cart-total\` แสดงข้อความ "ยอดรวมทั้งหมด: ฿4,700" (ใช้แท็ก \`<strong>\`)
+   - ปุ่มสั่งซื้อคลาส \`.btn-checkout\` เขียนว่า "สั่งซื้อสินค้า"
+
+**ข้อกำหนดทางด้าน CSS:**
+1. ระบบเลย์เอาต์หน้าจอหลักของร้านค้า \`.store-container\`:
+   - จัดวาง Layout ด้วยระบบ Grid โดยแบ่งออกเป็น 2 คอลัมน์ (สินค้ากว้าง \`1fr\` และตะกร้าสินค้ากว้าง \`300px\` มีระยะห่าง \`gap: 20px;\`)
+2. การ์ดสินค้าแต่ละใบ \`.product-card\`:
+   - พื้นหลังขาว, ขอบมนโค้งมนแบบ shorthand \`12px\`, มีขอบสีเทาอ่อนบางๆ
+   - รูปภาพ \`.product-image\` ต้องถูกล็อกสเกลสูง \`180px\`, ความกว้างเต็มกรอบ \`100%\` และใช้ \`object-fit: cover;\` เพื่อรักษาอัตราส่วนดั้งเดิม
+3. ส่วนสรุปยอดตะกร้า \`.cart-summary\`:
+   - ตั้งค่าให้มีความยืดหยุ่นเกาะขอบยามเลื่อน โดยใช้ตำแหน่ง \`position: sticky; top: 20px;\`
+   - พื้นหลังสีเทาอ่อนหรูหรา \`#f8fafc\`, ขอบมน \`8px\`, และแพดดิ้งรอบด้าน \`20px\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ - ร้านค้าออนไลน์</title>
+</head>
+<body>
+  <!-- สร้างโครงสร้างร้านค้า store-container ด้านล่างนี้ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฝึกหัดพัฒนาเว็บ - ร้านค้าออนไลน์</title>
+</head>
+<body>
+  <div class="store-container">
+    <main class="product-grid">
+      <div class="product-card">
+        <img class="product-image" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" alt="Smart Watch">
+        <div class="product-info">
+          <h3>นาฬิกาสมาร์ทวอทช์</h3>
+          <span class="product-price">฿2,900</span>
+        </div>
+        <button class="btn-add-cart">เพิ่มลงตะกร้า</button>
+      </div>
+      
+      <div class="product-card">
+        <img class="product-image" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" alt="Sneaker">
+        <div class="product-info">
+          <h3>รองเท้าผ้าใบสปอร์ต</h3>
+          <span class="product-price">฿1,800</span>
+        </div>
+        <button class="btn-add-cart">เพิ่มลงตะกร้า</button>
+      </div>
+    </main>
+    
+    <aside class="cart-summary">
+      <h2>ตะกร้าสินค้าของคุณ</h2>
+      <div class="cart-item">
+        <span>นาฬิกาสมาร์ทวอทช์</span>
+        <span>฿2,900</span>
+      </div>
+      <div class="cart-item">
+        <span>รองเท้าผ้าใบสปอร์ต</span>
+        <span>฿1,800</span>
+      </div>
+      <hr>
+      <div class="cart-total">
+        <span>ยอดรวมทั้งหมด:</span>
+        <strong>฿4,700</strong>
+      </div>
+      <button class="btn-checkout">สั่งซื้อสินค้า</button>
+    </aside>
+  </div>
+</body>
+</html>`,
+      starterCss: `body {
+  background-color: #f1f5f9;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.store-container {
+  /* 1. จัดเลย์เอาต์ระบบกริด 2 คอลัมน์ สินค้า 1fr และ ตะกร้า 300px ห่างกัน gap 20px */
+  
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.product-card {
+  /* 2. ออกแบบมุมโค้งมนการ์ดสินค้า 12px พื้นหลังขาว มีขอบเทาอ่อน */
+  
+}
+
+.product-image {
+  /* 3. ล็อกภาพความสูง 180px ปรับการครอปแบบปกป้องสัดส่วน cover */
+  
+}
+
+.cart-summary {
+  /* 4. กำหนดเป็นแถบแม่เหล็กเกาะติด position: sticky บาร์ด้านบนห่าง 20px */
+  
+}`,
+      targetCss: `body {
+  background-color: #f1f5f9;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.store-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.product-card {
+  background-color: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.product-info {
+  padding: 12px;
+  flex-grow: 1;
+}
+
+.product-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.product-price {
+  font-weight: bold;
+  color: #2563eb;
+  font-size: 15px;
+}
+
+.btn-add-cart {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-cart:hover {
+  background-color: #cbd5e1;
+}
+
+.cart-summary {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 20px;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  box-sizing: border-box;
+}
+
+.cart-summary h2 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.btn-checkout {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #10b981;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-checkout:hover {
+  background-color: #059669;
+}
+
+@media (max-width: 768px) {
+  .store-container {
+    grid-template-columns: 1fr;
+  }
+}`,
+      validation: (doc) => {
+        const container = doc.querySelector('.store-container');
+        const grid = doc.querySelector('.product-grid');
+        const cards = doc.querySelectorAll('.product-card');
+        const summary = doc.querySelector('.cart-summary');
+
+        if (!container) return "ไม่พบ Container หลักของร้านค้าคลาส .store-container";
+        if (!grid || cards.length < 2) return "กรุณาใส่รายการสินค้าอย่างน้อย 2 การ์ดในคลาส .product-grid";
+        if (!summary) return "ไม่พบกล่องสรุปตะกร้าสินค้าคลาส .cart-summary";
+
+        const styleContainer = doc.defaultView.getComputedStyle(container);
+        const styleSummary = doc.defaultView.getComputedStyle(summary);
+        const styleCard = doc.defaultView.getComputedStyle(cards[0]);
+
+        if (!styleContainer.display.includes('grid') && !styleContainer.display.includes('flex')) {
+          return "กรุณาจัดเลย์เอาต์หลัก .store-container ด้วยระบบ Grid หรือ Flexbox";
+        }
+        if (styleSummary.position !== 'sticky') {
+          return "กรุณากำหนดให้ .cart-summary มีสไตล์ตำแหน่งแบบเหนียวแน่น position: sticky;";
+        }
+        const br = parseFloat(styleCard.borderRadius);
+        if (isNaN(br) || Math.round(br) !== 12) {
+          return "กรุณากำหนดความโค้งมนของการ์ดสินค้า .product-card เป็น 12px";
+        }
+        return true;
+      }
+    },
+    {
+      id: "challenge-corporate-page",
+      title: "ภารกิจที่ 16: Corporate Landing Page (หน้าแรกของเว็บบริษัทโฮมเพจ)",
+      difficulty: "Intermediate",
+      points: 220,
+      description: `**ภารกิจจัดทำโครงร่างหน้าเว็บ: Corporate Landing Page (หน้าแรกของเว็บบริษัท)**
+
+ในการสร้างเว็บบริษัทหรือองค์กร โครงสร้างและเนื้อหาต้องมีความเป็นสัดส่วน ชัดเจน และอ่านง่าย เพื่อให้ผู้ใช้งานเข้าถึงข้อมูลบริการของบริษัทได้รวดเร็วที่สุด
+
+**ข้อกำหนดทางด้าน HTML:**
+1. ส่วนหัวของเว็บไซต์ใช้แท็ก \`<header class="company-header">\` ประกอบด้วย:
+   - หัวเรื่องหลัก \`<h1>\` เขียนชื่อบริษัท \`TechVanguard Solutions\`
+   - แถบนำทาง \`<nav class="company-nav">\` ที่มีลิงก์ 3 ลิงก์: "หน้าแรก", "บริการของเรา", "ติดต่อเรา"
+2. ส่วนเนื้อหาหลักใช้แท็ก \`<main class="company-main">\` ที่ครอบคลุม 2 ส่วนย่อย:
+   - ส่วนแนะนำบริษัท \`<section class="hero-section">\`:
+     - หัวเรื่องย่อย \`<h2>\` เขียนข้อความ \`นวัตกรรมเพื่อขับเคลื่อนธุรกิจของคุณ\`
+     - ย่อหน้าคำอธิบาย \`<p>\` เขียนข้อความ \`เราคือผู้นำในการพัฒนาเทคโนโลยีระดับองค์กร...\`
+     - รูปภาพประกอบ \`<img class="hero-image" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="สำนักงานบริษัท">\`
+   - ส่วนบริการย่อย \`<section class="services-grid">\`:
+     - บริการย่อย 2 คลาสย่อย \`.service-card\` แต่ละใบมี:
+       - หัวเรื่องย่อย \`<h3>\` แสดงชื่อบริการ (เช่น "Cloud Solutions" หรือ "AI Analytics")
+       - ย่อหน้าอธิบายคุณประโยชน์สั้นๆ
+3. ส่วนท้ายเพจใช้แท็ก \`<footer class="company-footer">\` บรรจุข้อความลิขสิทธิ์ \`© 2026 TechVanguard Solutions. สงวนลิขสิทธิ์.\`
+
+**ข้อกำหนดทางด้าน CSS:**
+1. การตกแต่งส่วนหัว \`.company-header\`:
+   - ใช้ระบบ **Flexbox** ในการจัดพื้นที่ให้ออกห่างกันในสองฝั่งแบบแนวนอน (\`justify-content: space-between; align-items: center;\`)
+   - มีเส้นแบ่งด้านล่างบางๆ สีเทาอ่อน \`1px solid #e2e8f0\` และแพดดิ้ง \`15px 30px\`
+2. การตกแต่งส่วนพื้นที่แนะนำและรูปภาพ \`.hero-section\`:
+   - พื้นหลังสีเทาอ่อนหรูหรา \`#f8fafc\` มีระยะห่างแพดดิ้งย่อ 2 ค่า: บน-ล่าง \`40px\` และซ้าย-ขวา \`20px\` จัดวางเนื้อหาอยู่กึ่งกลางหน้าจอ (\`text-align: center;\`)
+   - รูปภาพฮีโร่ \`.hero-image\`: ล็อกขนาดความกว้างสูงสุด \`100%\`, ความกว้างปกติ \`500px\`, ความสูง \`250px\`, มุมโค้งมน \`8px\`, และรักษาอัตราส่วนรูปภาพไม่ให้บิดเบี้ยวด้วย \`object-fit: cover;\`
+3. ระบบการจัดเรียงบริการแบบเคียงข้างกัน \`.services-grid\`:
+   - จัดรูปเลย์เอาต์ย่อยโดยใช้ **Flexbox หรือ Grid** แสดงการ์ดบริการแบบเคียงข้างกันในแนวนอน และมีระยะห่างช่องไฟ (\`gap: 20px;\`)
+   - การ์ดบริการแต่ละใบ \`.service-card\`: พื้นหลังขาว, ขอบรอบตัวสีเทาอ่อนบางๆ, แพดดิ้ง \`20px\`, มุมโค้งมนสี่มุมเท่ากัน \`6px\`
+4. ส่วนท้ายของเพจ \`.company-footer\`:
+   - พื้นหลังสีน้ำเงินเข้มขรึม \`#0f172a\`, ข้อความสีเทาอ่อน \`#94a3b8\`, จัดกึ่งกลางจอ และแพดดิ้ง \`15px\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechVanguard Solutions - หน้าแรก</title>
+</head>
+<body>
+  <!-- เริ่มสร้างหน้าแรกเว็บบริษัทที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechVanguard Solutions - หน้าแรก</title>
+</head>
+<body>
+  <header class="company-header">
+    <h1>TechVanguard Solutions</h1>
+    <nav class="company-nav">
+      <a href="#">หน้าแรก</a>
+      <a href="#">บริการของเรา</a>
+      <a href="#">ติดต่อเรา</a>
+    </nav>
+  </header>
+  
+  <main class="company-main">
+    <section class="hero-section">
+      <h2>นวัตกรรมเพื่อขับเคลื่อนธุรกิจของคุณ</h2>
+      <p>เราคือผู้นำในการพัฒนาเทคโนโลยีระดับองค์กร...</p>
+      <img class="hero-image" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="สำนักงานบริษัท">
+    </section>
+    
+    <section class="services-grid">
+      <div class="service-card">
+        <h3>Cloud Solutions</h3>
+        <p>บริการจัดเก็บและดูแลระบบฐานข้อมูลบนคลาวด์มาตรฐานสากลเพื่อความปลอดภัยสูงสุด</p>
+      </div>
+      <div class="service-card">
+        <h3>AI Analytics</h3>
+        <p>วิเคราะห์ประมวลผลข้อมูลทางธุรกิจและพฤติกรรมผู้บริโภคด้วยขุมพลังปัญญาประดิษฐ์</p>
+      </div>
+    </section>
+  </main>
+  
+  <footer class="company-footer">
+    © 2026 TechVanguard Solutions. สงวนลิขสิทธิ์.
+  </footer>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #334155;
+}
+
+.company-header {
+  /* 1. จัดพื้นที่หัวเว็บให้แยกฝั่งซ้ายขวาด้วย Flexbox และระยะห่าง */
+  
+}
+
+.hero-section {
+  /* 2. จัดพื้นที่แบนเนอร์กึ่งกลาง พื้นหลังเทาอ่อน และระยะห่าง */
+  
+}
+
+.hero-image {
+  /* 3. ปรับขนาดรูปฮีโร่ คุมสัดส่วน cover และโค้งมน */
+  
+}
+
+.services-grid {
+  /* 4. แสดงการ์ดบริการขนานกันในแนวนอนและเว้นช่องไฟ */
+  
+}
+
+.service-card {
+  /* 5. ตกแต่งการ์ดบริการขอบเทาอ่อน แพดดิ้ง และโค้งมน */
+  
+}
+
+.company-footer {
+  /* 6. ส่วนท้ายสีเข้มขรึมและจัดข้อความกึ่งกลาง */
+  
+}`,
+      targetCss: `body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #334155;
+}
+
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.company-header h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.company-nav a {
+  text-decoration: none;
+  color: #64748b;
+  margin-left: 20px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.company-nav a:hover {
+  color: #0f172a;
+}
+
+.company-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.hero-section {
+  background-color: #f8fafc;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.hero-section h2 {
+  font-size: 28px;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+}
+
+.hero-section p {
+  font-size: 16px;
+  color: #475569;
+  max-width: 600px;
+  margin: 0 auto 20px auto;
+  line-height: 1.6;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 500px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.services-grid {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.service-card {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 6px;
+}
+
+.service-card h3 {
+  margin: 0 0 10px 0;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.service-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.company-footer {
+  background-color: #0f172a;
+  color: #94a3b8;
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+}`,
+      validation: (doc) => {
+        const header = doc.querySelector('.company-header');
+        const main = doc.querySelector('.company-main');
+        const footer = doc.querySelector('.company-footer');
+        const img = doc.querySelector('.hero-image');
+        const cards = doc.querySelectorAll('.service-card');
+
+        if (!header) return "ไม่พบแท็กคลาส .company-header";
+        if (!main) return "ไม่พบแท็กคลาส .company-main";
+        if (!footer) return "ไม่พบแท็กคลาส .company-footer";
+        if (!img) return "ไม่พบรูปภาพฮีโร่คลาส .hero-image";
+        if (cards.length < 2) return "กรุณาสร้างการ์ดบริการคลาส .service-card อย่างน้อย 2 ใบ";
+
+        const styleHeader = doc.defaultView.getComputedStyle(header);
+        const styleImg = doc.defaultView.getComputedStyle(img);
+        const styleFooter = doc.defaultView.getComputedStyle(footer);
+
+        if (styleHeader.display !== 'flex') return "กรุณาจัดเลย์เอาต์ส่วนหัวด้วย Flexbox";
+        if (styleImg.objectFit !== 'cover') return "กรุณากำหนดการจัดเรียงรูปภาพด้วย object-fit: cover;";
+        if (styleFooter.textAlign !== 'center') return "กรุณากำหนดข้อความฟุตเตอร์ให้อยู่กึ่งกลาง";
+
+        return true;
+      }
+    }
+,
+    {
+      id: "challenge-streaming-dashboard",
+      title: "ภารกิจที่ 16: Premium Streaming Dashboard (แดชบอร์ดจัดการระบบไลฟ์และสื่อ)",
+      difficulty: "Hard",
+      points: 300,
+      description: `**ภารกิจระดับโหดหิน: Premium Streaming Dashboard (แดชบอร์ดสตรีมมิ่งรวมส่วนประกอบหนาแน่น)**
+
+ภารกิจนี้ต้องการให้คุณออกแบบหน้าจอการควบคุมระบบความบันเทิง (Streaming Portal Dashboard) ที่รวมแทบทุกกลไกของ HTML และ CSS ในหน้าเดียว ประกอบไปด้วยโครงสร้างและเลย์เอาต์ซับซ้อน ครบถ้วนทั้งส่วนหัว, แถบนำทาง, เนื้อหาหลัก และส่วนท้ายสุด (Footer):
+
+**ข้อกำหนดทางด้าน HTML:**
+1. กล่องนอกสุดหลัก: \`<div class="dashboard-wrapper">\`
+2. **ส่วนแถบด้านข้างนำทาง (Navigation Sidebar - คลาส \`.side-nav\`):**
+   - หัวข้อ \`<h2>\` เขียนว่า \`PORTAL\`
+   - รายการนำทาง \`<ul>\` มี 3 \`<li>\`: "หน้าหลัก", "ไลฟ์สตรีม", "การตั้งค่า"
+3. **ส่วนหัวด้านบน (Header - คลาส \`.top-bar\`):**
+   - ข้อความต้อนรับ \`<span>สวัสดี, สตรีมเมอร์</span>\`
+   - กล่องรับค่าค้นหาประเภท \`<input type="search" class="search-box" placeholder="ค้นหาคลิป...">\`
+   - กล่องเลือกสีประเภท \`<input type="color" class="theme-picker" value="#3b82f6">\`
+4. **ส่วนพื้นที่หลักและเนื้อหา (Main Content - คลาส \`.portal-main\`):**
+   - บล็อกแสดงสถานะไลฟ์ (Live Status Card - คลาส \`.status-card\`):
+     - มีป้ายไฟจุดกะพริบ คลาส \`.live-dot\`
+     - ข้อความสถานะ \`<span>LIVE STREAMING</span>\`
+     - ช่องตัวเลขผู้ชม: \`<input type="number" class="viewer-input" min="0" value="1500" required>\`
+   - แถบพับ FAQ เกี่ยวกับการตั้งค่า โดยใช้แท็ก \`<details>\` ด้านในมี \`<summary>\`เขียนว่า \`ดูค่าความคมชัดของไลฟ์\` และข้อความย่อหน้า \`<p>\`เขียนว่า \`ความละเอียดสตรีม 1080p Bitrate 6000kbps\`
+5. **ส่วนแถบเครื่องมือควบคุมการเล่น (Control Widget - คลาส \`.media-widget\`):**
+   - มีหัวข้อ \`<h3>\`เขียนว่า \`พรีวิวสตรีมสด\`
+   - ฝังวิดีโอจำลองด้วย \`<video class="video-preview" src="assets/preview.mp4" controls></video>\`
+   - แถบปรับระดับเสียงประเภทระดับแถบเลื่อน: \`<input type="range" class="volume-slider" min="0" max="100" value="70">\`
+6. **ส่วนท้ายของเพจ (Footer - คลาส \`.portal-footer\`):**
+   - มีข้อความย่อยบอกสถานะ \`<span>ระบบทำงานปกติ | Latency: 12ms</span>\`
+   - มีข้อความลิขสิทธิ์ \`<span>© 2026 Portal Stream. สงวนลิขสิทธิ์</span>\`
+
+**ข้อกำหนดทางด้าน CSS:**
+1. เลย์เอาต์และตารางตำแหน่ง \`.dashboard-wrapper\`:
+   - ใช้ระบบ **CSS Grid** ในการจัดกลุ่มพื้นที่: แบ่งแถบซ้ายเป็น Sidebar กว้าง \`220px\` และด้านขวา Content กว้าง \`1fr\` ห่างกัน \`gap: 20px;\`
+2. ขอบโค้งมนแบบไล่คู่และการเฉดสีการ์ด:
+   - การ์ดสถานะ \`.status-card\` และแท็บเครื่องมือควบคุม \`.media-widget\` ต้องมีขอบมนเฉพาะมุมบนซ้ายและบนขวา \`16px\` ส่วนมุมล่างเป็น \`0px\` (\`border-radius: 16px 16px 0 0;\`)
+   - ใช้สีกระจกใสสะท้อนเงามิติ (Glassmorphism): พื้นหลังขาวโปร่งแสง \`rgba(255, 255, 255, 0.7)\` และใช้ \`backdrop-filter: blur(8px);\` ร่วมกับเงา \`box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);\`
+3. เอฟเฟกต์และอนิเมชันคีย์เฟรม \`.live-dot\`:
+   - จุดไฟกะพริบ \`.live-dot\` ต้องมีขนาดกว้างสูง \`10px\`, ความโค้งมนเป็นวงกลมสมบูรณ์ (\`border-radius: 50%;\`), สีแดง \`#ef4444\`, และมีอนิเมชันชื่อ \`pulse\` ความเร็ว \`1s\` แบบวนซ้ำไม่มีที่สิ้นสุด (\`animation: pulse 1s infinite;\`)
+   - กำหนดเรื่องราวแอนิเมชัน \`@keyframes pulse\` เพื่อปรับการขยายขนาดจาก \`scale(0.95)\` เป็น \`scale(1.2)\` และปรับความโปร่งใสจาก \`opacity: 1\` เป็น \`opacity: 0.4\` เมื่อวนซ้ำ
+4. ส่วนท้ายสุด \`.portal-footer\`:
+   - ใช้ระบบจัดตำแหน่งแบบ **Flexbox** คุมให้เนื้อหาแยกไปสองฝั่ง (\`justify-content: space-between;\` และจัดให้อยู่กึ่งกลางแนวตั้ง \`align-items: center;\`) พร้อมแพดดิ้ง \`15px\` และสีตัวอักษรสีเทาอ่อน \`#94a3b8\`
+5. แถบตอบสนองจอโทรศัพท์:
+   - ตั้งค่า Media Query (เมื่อจอแคบกว่า \`768px\`) ให้ปิดการแสดงผลของ Sidebar (\`display: none;\`) และปรับให้คอลัมน์ขวาขยายกว้างเต็มหน้าจอ`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming Dashboard Portal</title>
+</head>
+<body>
+  <!-- ออกแบบแดชบอร์ดระดับโปรที่มีหัว เมนู เนื้อหา และท้ายสุดของคุณที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming Dashboard Portal</title>
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <aside class="side-nav">
+      <h2>PORTAL</h2>
+      <ul>
+        <li>หน้าหลัก</li>
+        <li>ไลฟ์สตรีม</li>
+        <li>การตั้งค่า</li>
+      </ul>
+    </aside>
+    
+    <div class="main-container">
+      <header class="top-bar">
+        <span>สวัสดี, สตรีมเมอร์</span>
+        <input type="search" class="search-box" placeholder="ค้นหาคลิป...">
+        <input type="color" class="theme-picker" value="#3b82f6">
+      </header>
+      
+      <main class="portal-main">
+        <div class="status-card">
+          <div class="live-status">
+            <div class="live-dot"></div>
+            <span>LIVE STREAMING</span>
+          </div>
+          <input type="number" class="viewer-input" min="0" value="1500" required>
+        </div>
+        
+        <details>
+          <summary>ดูค่าความคมชัดของไลฟ์</summary>
+          <p>ความละเอียดสตรีม 1080p Bitrate 6000kbps</p>
+        </details>
+      </main>
+      
+      <section class="media-widget">
+        <h3>พรีวิวสตรีมสด</h3>
+        <video class="video-preview" src="assets/preview.mp4" controls></video>
+        <input type="range" class="volume-slider" min="0" max="100" value="70">
+      </section>
+      
+      <footer class="portal-footer">
+        <span>ระบบทำงานปกติ | Latency: 12ms</span>
+        <span>© 2026 Portal Stream. สงวนลิขสิทธิ์</span>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>`,
+      starterCss: `body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.dashboard-wrapper {
+  /* 1. จัดตำแหน่งกริด 2 คอลัมน์ Sidebar กว้าง 220px และ Content กว้าง 1fr พร้อมช่องไฟ */
+  
+}
+
+.status-card, .media-widget {
+  /* 2. สไตล์ขอบมนเฉพาะด้านบน 16px และสูตรสะท้อนกระจกแก้ว Glassmorphism */
+  
+}
+
+.live-dot {
+  /* 3. สไตล์วงกลมสีแดงกว้างสูง 10px และผูกกับแอนิเมชันกะพริบ pulse */
+  
+}
+
+/* 4. เรื่องราวคีย์เฟรมสำหรับแอนิเมชันกะพริบ @keyframes pulse หมุนปรับความโปร่งแสงและขนาด */
+
+
+.portal-footer {
+  /* 5. จัดระเบียบข้อความฟุตเตอร์แยกไปสองฝั่งด้วย Flexbox และตกแต่งสี */
+  
+}
+
+@media (max-width: 768px) {
+  /* 6. จอมือถือ: ให้ซ่อนแถบด้านข้าง side-nav */
+  
+}`,
+      targetCss: `body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+.dashboard-wrapper {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.side-nav {
+  background-color: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+.side-nav h2 {
+  margin: 0 0 20px 0;
+  color: #3b82f6;
+  font-size: 20px;
+}
+
+.side-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.side-nav li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  transition: background 0.2s;
+}
+
+.side-nav li:hover {
+  background-color: #334155;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.top-bar {
+  background-color: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.search-box {
+  background-color: #334155;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: white;
+  outline: none;
+}
+
+.theme-picker {
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+}
+
+.portal-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.status-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+}
+
+.viewer-input {
+  background-color: #334155;
+  border: 1px solid #475569;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  width: 90px;
+}
+
+details {
+  background-color: #1e293b;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+summary {
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+
+details p {
+  margin: 10px 0 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.media-widget {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.media-widget h3 {
+  margin: 0 0 15px 0;
+}
+
+.video-preview {
+  width: 100%;
+  border-radius: 8px;
+  background-color: black;
+  margin-bottom: 15px;
+}
+
+.volume-slider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.portal-footer {
+  background-color: #1e293b;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #94a3b8;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .side-nav {
+    display: none;
+  }
+}`,
+      validation: (doc, cssText) => {
+        const wrapper = doc.querySelector('.dashboard-wrapper');
+        const sideNav = doc.querySelector('.side-nav');
+        const statusCard = doc.querySelector('.status-card');
+        const dot = doc.querySelector('.live-dot');
+        const details = doc.querySelector('details');
+        const widget = doc.querySelector('.media-widget');
+        const video = doc.querySelector('.video-preview');
+        const footer = doc.querySelector('.portal-footer');
+
+        if (!wrapper) return "ไม่พบ Container ครอบแดชบอร์ดหลักคลาส .dashboard-wrapper";
+        if (!sideNav || !statusCard || !dot || !details || !widget || !video || !footer) {
+          return "กรุณาประกอบส่วนโครงร่าง HTML ทุกชิ้นส่วนตามข้อกำหนดข้อสอบให้ครบถ้วน (หัว, แถบนำทาง, เนื้อหาหลัก, ฟุตเตอร์)";
+        }
+
+        const styleWrapper = doc.defaultView.getComputedStyle(wrapper);
+        const styleDot = doc.defaultView.getComputedStyle(dot);
+        const styleCard = doc.defaultView.getComputedStyle(statusCard);
+        const styleFooter = doc.defaultView.getComputedStyle(footer);
+
+        if (!styleWrapper.display.includes('grid')) return "กรุณาจัดวางเลย์เอาต์หลักด้วยระบบ Grid";
+        if (styleDot.borderRadius !== '50%') return "กรุณากำหนดความโค้งมนของป้ายกะพริบ .live-dot เป็นวงกลม 50%";
+        const tl = parseFloat(styleCard.borderTopLeftRadius);
+        const tr = parseFloat(styleCard.borderTopRightRadius);
+        if (isNaN(tl) || Math.round(tl) !== 16 || isNaN(tr) || Math.round(tr) !== 16 || parseFloat(styleCard.borderBottomLeftRadius) > 0) {
+          return "กรุณากำหนดมุมขอบมนของการ์ดสถานะ .status-card เป็น border-radius: 16px 16px 0 0;";
+        }
+        if (styleFooter.display !== 'flex') return "กรุณาจัดวางเลย์เอาต์ฟุตเตอร์ด้วย Flexbox";
+
+        const cleaned = cssText.replace(/\\s+/g, '');
+        if (!cleaned.includes('@keyframespulse')) {
+          return "กรุณาระบุรายละเอียดเรื่องราวแอนิเมชัน @keyframes pulse ให้ป้ายไฟสถานะสด";
+        }
+        if (!cleaned.includes('@media')) {
+          return "อย่าลืมกำหนดแถบตอบสนองหน้าต่างบราว์เซอร์ด้วย @media (max-width: 768px)";
+        }
+        return true;
+      }
+    },
+    {
+      id: "midterm-challenge-1",
+      title: "ภารกิจพิเศษ: ข้อสอบกลางภาค ตอนที่ 1 (Bento Grid & Glassmorphism)",
+      difficulty: "Hard",
+      points: 200,
+      description: `### 🌿 ภารกิจจำลองข้อสอบกลางภาค ตอนที่ 1: ข้อมูลร้านและแกลเลอรีเรือนกระจก
+      
+จงเขียน CSS เพื่อวางโครงสร้างและสไตล์ของหน้าข้อมูลร้าน **Flora & Fauna Glasshouse** ตามเงื่อนไขดังต่อไปนี้:
+
+1. **สไตล์นำทางกระจกฝ้า (.navbar)**:
+   - ตรึงเมนูไว้ด้านบนสุดเสมอเมื่อเลื่อนดูเนื้อหาลงมา (\`position: sticky; top: 0;\`)
+   - ตั้งค่าสไตล์โปร่งแสงและเบลอ (\`backdrop-filter: blur(10px); background-color: rgba(250, 248, 245, 0.85);\`)
+   - จัดวางโลโก้อยู่ซ้าย ลิงก์เมนูอยู่ขวาด้วย Flexbox ใน \`.nav-container\`
+2. **แบนเนอร์ Hero (.hero)**:
+   - จัดเนื้อหาให้อยู่ตรงกลางแบนเนอร์เป๊ะทั้งแนวตั้งและแนวนอน
+   - ตั้งสไตล์ \`.hero-overlay\` เคลือบสีดำโปร่งแสง (\`rgba(15, 27, 20, 0.55)\`) คลุมพื้นที่ให้ตัวหนังสือสีขาวอ่านง่าย
+3. **แกลเลอรี Bento (.gallery-grid)**:
+   - จัดวางแกลเลอรีเป็น Grid 3 คอลัมน์ (\`grid-template-columns: repeat(3, 1fr);\`)
+   - กำหนดการกินพื้นที่อย่างไม่สมมาตร (Grid Spanning) ให้สวยงาม:
+     - \`.item-1\`: กว้าง 2 คอลัมน์ และ สูง 2 แถว (\`grid-column: span 2; grid-row: span 2;\`)
+     - \`.item-2\`: สูง 2 แถว (\`grid-row: span 2;\`)
+     - \`.item-5\`: กว้าง 2 คอลัมน์ (\`grid-column: span 2;\`)
+   - ท้าทาย: เมื่อ Hover ที่การ์ดให้รูปภาพด้านในขยายขอบเขตเล็กน้อย (\`transform: scale(1.08);\`) โดยมี Transition นุ่มนวล
+4. **การรองรับมือถือ (@media (max-width: 768px))**:
+   - ยุบแกลเลอรีให้แสดงเป็น 1 คอลัมน์แนวตั้งทั้งหมด และเคลียร์สปันให้ภาพกว้างเต็มปกติ`,
+      starterHtml: `<!-- โครงสร้าง HTML หน้าข้อมูลร้าน (Midterm Shop Part 1) -->
+<header class="navbar">
+  <div class="nav-container">
+    <div class="logo">🌿 Flora & Fauna</div>
+    <nav class="nav-links">
+      <a href="#" class="nav-item active">ข้อมูลร้าน</a>
+      <a href="#" class="nav-item">เมนู & บริการ</a>
+      <a href="#" class="nav-item">จองโต๊ะสัมมนา</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="badge">Glasshouse Cafe</span>
+    <h1>สัมผัสรสชาติธรรมชาติใจกลางเมือง</h1>
+    <p>คาเฟ่เรือนกระจกที่รวมเครื่องดื่มและพื้นที่ทำงานท่ามกลางสวนป่าสีเขียว</p>
+    <a href="#" class="btn btn-primary">จองโต๊ะเลย</a>
+  </div>
+</section>
+
+<main class="container">
+  <section class="gallery-section">
+    <h2>คลังภาพบรรยากาศร้าน (Glasshouse Gallery)</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item item-1">
+        <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600" alt="Glasshouse Area"></div>
+        <div class="gallery-caption">Main Glasshouse Area</div>
+      </div>
+      <div class="gallery-item item-2">
+        <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=600" alt="Slow Bar"></div>
+        <div class="gallery-caption">Slow Bar & Specialty Coffee</div>
+      </div>
+      <div class="gallery-item item-3">
+        <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600" alt="Botanical"></div>
+        <div class="gallery-caption">Botanical Garden</div>
+      </div>
+      <div class="gallery-item item-4">
+        <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600" alt="Bakery"></div>
+        <div class="gallery-caption">Bakery Studio</div>
+      </div>
+      <div class="gallery-item item-5">
+        <div class="gallery-img-wrapper"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600" alt="Co-working"></div>
+        <div class="gallery-caption">Private Co-working Room</div>
+      </div>
+    </div>
+  </section>
+</main>`,
+      starterCss: `/* 🎨 สไตล์ชีตเริ่มต้นเขียนเลย์เอาต์ */
+:root {
+  --primary-color: #1b3b2b;
+  --accent-color: #c49a6c;
+  --accent-light: #f5efe6;
+  --bg-light: #faf8f5;
+  --text-dark: #1b2520;
+  --text-muted: #6c7870;
+  --white: #ffffff;
+  --border-color: #e5e0d8;
+  --border-radius: 12px;
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  font-family: sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.hero {
+  height: 500px;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--white);
+  max-width: 850px;
+  padding: 40px 24px 0 24px; /* ป้องกันการทับซ้อน */
+  margin: 0 auto; /* จัดให้อยู่กึ่งกลางแนวนอน */
+}
+
+/* --- เริ่มเขียนโค้ดของคุณด้านล่างนี้ --- */
+`,
+      targetHtml: ``,
+      targetCss: ``,
+      validation: (doc, cssText) => {
+        const navbar = doc.querySelector('.navbar');
+        const navContainer = doc.querySelector('.nav-container');
+        const hero = doc.querySelector('.hero');
+        const heroOverlay = doc.querySelector('.hero-overlay');
+        const galleryGrid = doc.querySelector('.gallery-grid');
+        const item1 = doc.querySelector('.item-1');
+        const item2 = doc.querySelector('.item-2');
+        const item5 = doc.querySelector('.item-5');
+
+        if (!navbar || !navContainer || !hero || !galleryGrid || !item1) {
+          return "กรุณาอย่าเปลี่ยนชื่อคลาส HTML หลักที่โจทย์กำหนดมา";
+        }
+
+        const styleNavbar = doc.defaultView.getComputedStyle(navbar);
+        const styleNavContainer = doc.defaultView.getComputedStyle(navContainer);
+        const styleHero = doc.defaultView.getComputedStyle(hero);
+        const styleHeroOverlay = doc.defaultView.getComputedStyle(heroOverlay);
+        const styleGrid = doc.defaultView.getComputedStyle(galleryGrid);
+
+        // 1. Navbar checks
+        if (styleNavbar.position !== 'sticky') {
+          return "กรุณากำหนดสไตล์แถบนำทางให้เป็น Sticky (position: sticky; top: 0;)";
+        }
+        if (styleNavContainer.display !== 'flex') {
+          return "กรุณาจัดวางเลย์เอาต์ของส่วนนำทางข้างใน .nav-container ด้วย Flexbox";
+        }
+
+        // 2. Hero checks
+        if (styleHero.display !== 'flex') {
+          return "กรุณาจัดวางข้อความกึ่งกลางของ Hero Banner ด้วยระบบ Flexbox";
+        }
+        if (styleHeroOverlay.position !== 'absolute') {
+          return "กรุณากำหนดสไตล์ .hero-overlay ให้มี position: absolute เพื่อเคลือบพื้นหลังแบนเนอร์";
+        }
+
+        // 3. Bento Grid checks
+        if (!styleGrid.display.includes('grid')) {
+          return "กรุณาจัดวางแกลเลอรีรูปภาพ .gallery-grid ด้วยระบบ CSS Grid";
+        }
+
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes('grid-column') && !cleaned.includes('grid-row')) {
+          return "กรุณาระบุ grid-column หรือ grid-row สปันให้กับ .item-1, .item-2 และ .item-5 เพื่อทำ Bento Grid";
+        }
+        
+        if (!cleaned.includes('@media')) {
+          return "อย่าลืมกำหนดการรองรับขนาดหน้าจอมือถือและการคืนค่าสปัน Grid Gallery บนมือถือด้วย @media (max-width: 768px)";
+        }
+
+        return true;
+      },
+      hints: [
+        "ใช้ position: sticky; top: 0; backdrop-filter: blur(10px); สำหรับแถบนำทาง",
+        "จัด Hero กลางจอโดยใช้ display: flex; justify-content: center; align-items: center; flex-direction: column;",
+        "บีบ Bento Grid สปันด้วย grid-column: span 2; ในคลาส .item-1 และ .item-5"
+      ]
+    },
+    {
+      id: "midterm-challenge-2",
+      title: "ภารกิจพิเศษ: ข้อสอบกลางภาค ตอนที่ 2 (Menu Catalog & Card Flexbox)",
+      difficulty: "Hard",
+      points: 200,
+      description: `### 🍰 ภารกิจจำลองข้อสอบกลางภาค ตอนที่ 2: เมนูและการจัด Flexbox ให้เท่ากัน
+      
+จงเขียน CSS เพื่อจัดวางเลย์เอาต์การ์ดเมนูอาหารและเครื่องดื่ม **Flora & Fauna Glasshouse** ตามเงื่อนไขดังต่อไปนี้:
+
+1. **เลย์เอาต์ Grid หมวดหมู่เมนู (.menu-grid)**:
+   - หน้าจอปกติแสดงผลเป็น 4 คอลัมน์ความกว้างเท่ากัน (\`grid-template-columns: repeat(4, 1fr);\`)
+   - มีระยะห่างที่สวยงาม (\`gap: 30px;\`)
+2. **การ์ดเมนูแบบดึงล่างสุดเสมอกัน (.menu-card)**:
+   - ตั้งค่าตัวการ์ดและเนื้อหาภายใน (\`.card-content\`) เป็นระบบ Flexbox แนวตั้ง (\`display: flex; flex-direction: column;\`)
+   - **โจทย์หลัก**: ดันกล่องราคาและปุ่มสั่งซื้อ (\`.card-footer\`) ให้ตกลงไปชิดขอบการ์ดข้างล่างสุดเสมอกันทุกใบเป๊ะ โดยห้ามกำหนดความสูงคงที่ให้กับตัวเนื้อหา (คำใบ้: กำหนดให้คำบรรยาย \`.card-desc\` ใส่ค่า \`flex-grow: 1;\` เพื่อยืดขยายดันปุ่มลงล่างสุด)
+3. **ป้ายโปรโมชันที่มุมการ์ด (.card-badge)**:
+   - จัดวางตำแหน่งของป้ายสถานะสินค้าให้อยู่มุมขวาบนของภาพการ์ด (\`position: absolute; top: 20px; right: 20px;\`)
+4. **เอฟเฟกต์แอนิเมชันลื่นไหล (Hover Transition)**:
+   - เมื่อผู้ใช้นำเมาส์ไปชี้ที่การ์ด (\`.menu-card:hover\`) ให้การ์ดยกตัวลอยขึ้นเบาๆ (\`transform: translateY(-10px);\`) และเงาการ์ดฟุ้งชัดขึ้น (\`box-shadow\`)`,
+      starterHtml: `<!-- โครงสร้างรายการเมนู (Midterm Menu Part 2) -->
+<main class="container">
+  <div class="menu-grid">
+    
+    <!-- เมนูที่ 1 -->
+    <article class="menu-card">
+      <div class="card-img-container">
+        <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400" alt="Matcha">
+        <span class="card-badge bestseller">Best Seller</span>
+      </div>
+      <div class="card-content">
+        <h3>Matcha Latte</h3>
+        <p class="card-desc">มัทฉะเข้มข้นนำเข้าจากเมืองอุจิ ประเทศญี่ปุ่น ปลูกใต้ร่มเงาอย่างดี คัดสรรเฉพาะสามใบแรกเพื่อรสชาติลึกซึ้งกลมกล่อมตามสไตล์สโลว์บาร์</p>
+        <div class="card-footer">
+          <span class="price">฿145</span>
+          <button class="btn">สั่งซื้อ</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- เมนูที่ 2 -->
+    <article class="menu-card">
+      <div class="card-img-container">
+        <img src="https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?w=400" alt="Cold Brew">
+      </div>
+      <div class="card-content">
+        <h3>Rose Cold Brew</h3>
+        <p class="card-desc">กาแฟอาราบิก้าสกัดเย็นบ่มนาน 18 ชั่วโมง ผสานกลิ่นกุหลาบสดชื่นเบาๆ</p>
+        <div class="card-footer">
+          <span class="price">฿160</span>
+          <button class="btn">สั่งซื้อ</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- เมนูที่ 3 -->
+    <article class="menu-card">
+      <div class="card-img-container">
+        <img src="https://images.unsplash.com/photo-1562376502-6f769499c886?w=400" alt="Waffle">
+      </div>
+      <div class="card-content">
+        <h3>Honey Waffle</h3>
+        <p class="card-desc">วาฟเฟิลสไตล์เบลเยียมอบร้อนเนื้อในเหนียวนุ่ม ขอบนอกบางกรอบหอมกรุ่นเนยสดแท้ ราดด้วยน้ำผึ้งเกสรดอกลำไยแท้ส่งตรงจากสวน</p>
+        <div class="card-footer">
+          <span class="price">฿185</span>
+          <button class="btn">สั่งซื้อ</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</main>`,
+      starterCss: `/* 🎨 สไตล์ชีตเริ่มต้นเขียนเลย์เอาต์ */
+:root {
+  --primary-color: #1b3b2b;
+  --accent-color: #c49a6c;
+  --border-color: #e5e0d8;
+  --border-radius: 12px;
+  --white: #ffffff;
+  --bestseller-color: #9e2a2b;
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #faf8f5;
+  margin: 0;
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.card-img-container {
+  height: 200px;
+  position: relative;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* --- เริ่มเขียนโค้ดของคุณด้านล่างนี้ --- */
+`,
+      targetHtml: ``,
+      targetCss: ``,
+      validation: (doc, cssText) => {
+        const menuGrid = doc.querySelector('.menu-grid');
+        const menuCard = doc.querySelector('.menu-card');
+        const cardBadge = doc.querySelector('.card-badge');
+        const cardContent = doc.querySelector('.card-content');
+        const cardDesc = doc.querySelector('.card-desc');
+
+        if (!menuGrid || !menuCard || !cardContent || !cardDesc) {
+          return "กรุณาตรวจสอบโครงสร้างการ์ดและคลาสของเนื้อหาเมนูตามแบบฝึกหัด";
+        }
+
+        const styleGrid = doc.defaultView.getComputedStyle(menuGrid);
+        const styleCard = doc.defaultView.getComputedStyle(menuCard);
+        const styleContent = doc.defaultView.getComputedStyle(cardContent);
+        const styleDesc = doc.defaultView.getComputedStyle(cardDesc);
+
+        if (!styleGrid.display.includes('grid')) {
+          return "กรุณากำหนดตัวครอบเมนู .menu-grid ให้แสดงผลแบบ Grid";
+        }
+        if (styleCard.display !== 'flex' || styleContent.display !== 'flex') {
+          return "การทำปุ่มสั่งซื้อให้ชิดล่างเท่ากันได้ ต้องกำหนด .menu-card และ .card-content ให้เป็น display: flex;";
+        }
+        if (styleContent.flexDirection !== 'column') {
+          return "กรุณากำหนดทิศทางของคอนเทนต์ด้านใน .card-content ให้เรียงในแนวตั้ง (flex-direction: column;)";
+        }
+        if (parseFloat(styleDesc.flexGrow) <= 0) {
+          return "กรุณากำหนดให้ .card-desc สามารถยืดตัวได้ (flex-grow: 1;) เพื่อผลักดันปุ่มสั่งซื้อให้ลงขอบล่างเสมอกัน";
+        }
+        if (cardBadge) {
+          const styleBadge = doc.defaultView.getComputedStyle(cardBadge);
+          if (styleBadge.position !== 'absolute') {
+            return "กรุณากำหนดสไตล์ให้ป้ายบอกโปรโมชัน .card-badge ให้เป็นแบบลอยทับรูปภาพ (position: absolute;)";
+          }
+        }
+
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes(':hover') || !cleaned.includes('translateY')) {
+          return "อย่าลืมระบุเอฟเฟกต์ยกตัวลอยของการ์ดเมื่อผู้ใช้ชี้เมาส์ในสเตท .menu-card:hover";
+        }
+
+        return true;
+      },
+      hints: [
+        "ใช้ display: flex; flex-direction: column; บนคลาส .menu-card และ .card-content",
+        "ใส่ค่า flex-grow: 1; ให้กับย่อหน้าบรรยายสินค้า .card-desc เพื่อขยายพื้นที่บีบขอบปุ่ม",
+        "จัดสไตล์ป้ายลอยโดยกำหนด .card-img-container ให้มี position: relative; และให้ .card-badge มี position: absolute; top: X; right: Y;"
+      ]
+    },
+    {
+      id: "midterm-challenge-3",
+      title: "ภารกิจพิเศษ: ข้อสอบกลางภาค ตอนที่ 3 (Visual Radio Cards & Switch Toggle)",
+      difficulty: "Hard",
+      points: 250,
+      description: `### 📅 ภารกิจจำลองข้อสอบกลางภาค ตอนที่ 3: ฟอร์มแบบจดจำสถานะผ่าน CSS
+      
+จงเขียน CSS เพื่อจัดระบบและสไตล์ของแบบฟอร์มการจอง **Flora & Fauna Glasshouse** ตามเงื่อนไขดังต่อไปนี้:
+
+1. **สปลิทเลย์เอาต์ 2 ฝั่ง (.split-layout)**:
+   - ฝั่งซ้ายเป็นข้อมูลห้อง แผนผังโซนที่นั่ง และฝั่งขวาเป็นแบบฟอร์ม จัดวางแยกกันคนละคอลัมน์กว้าง 35% และ 65% ตามลำดับ
+2. **จัดตำแหน่งช่องป้อนข้อมูลด้วย Grid (.form-grid)**:
+   - จัดช่องอินพุตกลุ่ม ชื่อ-นามสกุล และ อีเมล-เบอร์โทร ให้แบ่งกันครึ่งละ 50% ตกแต่งให้อยู่แถวเดียวกัน
+3. **ระบบปุ่มเลือกแพ็กเกจพื้นที่แบบ Custom Radio Cards (ความท้าทายสูง)**:
+   - **กติกา**: ซ่อนปุ่มกลมวิทยุแท้และดั้งเดิมของเบราว์เซอร์ออกไป
+   - จัดสไตล์ป้ายฉลาก \`.custom-radio-card\` ให้แสดงเป็นกรอบสี่เหลี่ยมคล้ายบัตรตัวเลือกสวยงาม
+   - เมื่อผู้ใช้เลือกแพ็กเกจ (\`input[type="radio"]:checked\`) ให้การ์ดที่อยู่ตามหลังที่เป็นฉลาก (\`+ .custom-radio-card\`) เปลี่ยนกรอบเป็นสีป่าไม้เข้มและพื้นสีกระดาษทองจางๆ เคลื่อนไหวยกลอยขึ้นเบาๆ
+4. **ปุ่มสวิตช์ปิดเปิดยอมรับข่าวสาร (Custom Toggle Switch)**:
+   - ออกแบบเช็คบ็อกซ์รับข่าวสารให้ออกมาในรูปสไลเดอร์เปิด-ปิด
+   - เมื่อผู้ใช้ติ๊กเลือก (\`:checked\`) ให้รางสวิตช์เปลี่ยนเป็นสีเขียวป่าไม้ และขยับเลื่อนลูกแก้วด้านในเลื่อนไปทางขวาด้วยคำสั่ง \`transform: translateX()\``,
+      starterHtml: `<!-- โครงสร้างหน้าจองโต๊ะและแพ็กเกจ (Midterm Booking Part 3) -->
+<main class="container">
+  <div class="split-layout">
+    
+    <!-- ส่วนข้อมูลด้านซ้าย -->
+    <aside class="info-sidebar">
+      <div class="info-card">
+        <h3>ระเบียบการสำรองที่นั่ง</h3>
+        <p>กรุณาจองล่วงหน้าอย่างน้อย 24 ชั่วโมงและเข้าใช้บริการตรงเวลา</p>
+      </div>
+    </aside>
+
+    <!-- ส่วนของฟอร์มจองด้านขวา -->
+    <section class="form-container">
+      <h2>แบบฟอร์มขอเข้าใช้บริการ</h2>
+      <form class="booking-form">
+        
+        <!-- ฟิลด์ชื่อ-นามสกุล -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstname">ชื่อจริง</label>
+            <input type="text" id="firstname" required>
+          </div>
+          <div class="form-group">
+            <label for="lastname">นามสกุล</label>
+            <input type="text" id="lastname" required>
+          </div>
+        </div>
+
+        <!-- Custom Radio Cards เลือกแพ็กเกจ -->
+        <div class="form-group">
+          <label>เลือกแพ็กเกจบริการ</label>
+          <div class="radio-cards-grid">
+            
+            <div class="radio-card-wrapper">
+              <input type="radio" id="pkg-a" name="pkg" checked required>
+              <label for="pkg-a" class="custom-radio-card">
+                <div class="radio-title">Hot Desk Pass</div>
+                <div class="radio-price">฿250 / วัน</div>
+              </label>
+            </div>
+
+            <div class="radio-card-wrapper">
+              <input type="radio" id="pkg-b" name="pkg">
+              <label for="pkg-b" class="custom-radio-card">
+                <div class="radio-title">Meeting Room</div>
+                <div class="radio-price">฿600 / 2 ชม.</div>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Custom Toggle Switch ยอมรับอีเมลข่าวสาร -->
+        <div class="toggle-group">
+          <label class="switch-container">
+            <input type="checkbox" id="subscribe">
+            <span class="switch-slider"></span>
+          </label>
+          <span class="toggle-label">รับข่าวสารเวิร์กชอปจากเรา</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">ยืนยันข้อมูลจอง</button>
+      </form>
+    </section>
+
+  </div>
+</main>`,
+      starterCss: `/* 🎨 สไตล์ชีตเริ่มต้นเขียนเลย์เอาต์ */
+:root {
+  --primary-color: #1b3b2b;
+  --accent-color: #c49a6c;
+  --accent-light: #f5efe6;
+  --border-color: #e5e0d8;
+  --border-radius: 12px;
+  --white: #ffffff;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #faf8f5;
+  margin: 0;
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.info-card, .form-container {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* --- เริ่มเขียนโค้ดของคุณด้านล่างนี้ --- */
+`,
+      targetHtml: ``,
+      targetCss: ``,
+      validation: (doc, cssText) => {
+        const splitLayout = doc.querySelector('.split-layout');
+        const formGrid = doc.querySelector('.form-grid');
+        const radioCardsGrid = doc.querySelector('.radio-cards-grid');
+        const switchSlider = doc.querySelector('.switch-slider');
+
+        if (!splitLayout || !formGrid || !radioCardsGrid || !switchSlider) {
+          return "กรุณาจัดวางโครงร่างและใช้ชื่อคลาสตามแบบฝึกหัดอย่างถูกต้อง";
+        }
+
+        const styleSplit = doc.defaultView.getComputedStyle(splitLayout);
+        const styleFormGrid = doc.defaultView.getComputedStyle(formGrid);
+
+        if (styleSplit.display !== 'grid' && styleSplit.display !== 'flex') {
+          return "กรุณาจัดวางเลย์เอาต์หน้าแบ่งฝั่ง .split-layout ด้วย Flexbox หรือ Grid";
+        }
+        if (styleFormGrid.display !== 'grid' && styleFormGrid.display !== 'flex') {
+          return "กรุณาจัดวางช่องกรอก ชื่อจริง-นามสกุล .form-grid ให้อยู่ระดับแนวนอนเดียวกันด้วย Flexbox หรือ Grid";
+        }
+
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes('checked+')) {
+          return "ต้องใช้คุณสมบัติสเตทเลือกของการ์ดวิทยุและสวิตช์ด้วย Selector ดักจับประเภท :checked + .custom-radio-card และ :checked + .switch-slider";
+        }
+        if (!cleaned.includes('translateX') && !cleaned.includes('transform:translate')) {
+          return "กรุณาส่งแอนิเมชันลูกแก้วในสวิตช์เปิดปิดสไลด์ด้วยคำสั่ง transform: translateX(ระยะทาง)";
+        }
+
+        return true;
+      },
+      hints: [
+        "จัด Grid 2 คอลัมน์ให้หน้าแบ่งฝั่งด้วย grid-template-columns: 35% 65%;",
+        "จัดสปันกรอบตัวเลือกด้วย input[type='radio']:checked + .custom-radio-card { border-color: var(--primary-color); background-color: var(--accent-light); }",
+        "เลื่อนตุ่มสวิตช์โดยสไตล์สไลเดอร์ตอนเช็ค: input[type='checkbox']:checked + .switch-slider::before { transform: translateX(27px); }"
+      ]
+    },
+    {
+      id: "challenge-sales-table",
+      title: "ภารกิจที่ 17: Premium Sales Report (ตารางสรุปยอดขายระดับโปร)",
+      difficulty: "Intermediate",
+      points: 150,
+      description: `### 📊 ภารกิจสร้างตารางสรุปยอดขายสินค้า
+
+จงสร้างตารางแสดงยอดขายที่มีดีไซน์สวยงาม อ่านง่าย และเป็นระเบียบตามเงื่อนไขต่อไปนี้:
+
+**1. โครงสร้าง HTML:**
+- สร้างแท็ก \`<table>\` และกำหนดคลาสเป็น \`.sales-table\`
+- ส่วนหัวตาราง \`<thead>\` มี 1 แถว (\`<tr>\`) ประกอบด้วยเซลล์หัวข้อ (\`<th>\`) 4 ช่องตามลำดับ: **\"สินค้า\"**, **\"หมวดหมู่\"**, **\"จำนวนที่ขายได้\"**, และ **\"ยอดขายรวม\"**
+- ส่วนเนื้อหาตาราง \`<tbody>\` มีแถวข้อมูล 3 แถวดังนี้:
+  1. กาแฟดริป | เครื่องดื่ม | 120 แก้ว | ฿9,600
+  2. เค้กช็อกโกแลต | เบเกอรี่ | 45 ชิ้น | ฿5,400
+  3. ครัวซองต์เนยสด | เบเกอรี่ | 80 ชิ้น | ฿7,200
+- ส่วนท้ายตาราง \`<tfoot>\` มีแถวสรุปยอดรวม 1 แถว โดยเซลล์แรกมีข้อความว่า **\"รวมทั้งหมด\"** และรวมเซลล์เข้าด้วยกัน 3 คอลัมน์ (ใช้แอตทริบิวต์ \`colspan=\"3\"\`) และเซลล์ที่สองมีข้อความว่า **\"฿22,200\"**
+
+**2. การตกแต่ง CSS:**
+- กำหนดให้ตารางมีความกว้างเต็มความกว้างของหน้าจอ (\`width: 100%\`) และใช้ขอบตารางแบบยุบรวมกัน (\`border-collapse: collapse;\`)
+- ส่วนเซลล์หัวตาราง (\`thead th\`) ต้องมีพื้นหลังสีเข้ม \`#1e293b\`, ข้อความสีขาว \`#ffffff\`, และชิดซ้าย (\`text-align: left;\`)
+- ทุกเซลล์ (\`th\` และ \`td\`) ต้องมีช่องไฟภายใน (\`padding: 12px 16px\`)
+- แถวข้อมูลใน \`tbody\` ทุกแถวต้องมีเส้นขอบด้านล่างสีเทาอ่อน (\`border-bottom: 1px solid #e2e8f0\`)
+- ทำสลับสีแถวตาราง (Zebra Striping) โดยแถวที่เป็นลำดับคู่ใน \`tbody\` (\`tbody tr:nth-child(even)\`) มีพื้นหลังสี \`#f8fafc\`
+- เพิ่มเอฟเฟกต์โฮเวอร์บนแถว (\`tbody tr:hover\`) ให้เปลี่ยนสีพื้นหลังเป็น \`#f1f5f9\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตารางสรุปยอดขาย</title>
+</head>
+<body>
+  <!-- 1. สร้างตารางคลาส sales-table พร้อม thead, tbody, tfoot และข้อมูลตามที่กำหนดที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตารางสรุปยอดขาย</title>
+</head>
+<body>
+  <table class="sales-table">
+    <thead>
+      <tr>
+        <th>สินค้า</th>
+        <th>หมวดหมู่</th>
+        <th>จำนวนที่ขายได้</th>
+        <th>ยอดขายรวม</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>กาแฟดริป</td>
+        <td>เครื่องดื่ม</td>
+        <td>120 แก้ว</td>
+        <td>฿9,600</td>
+      </tr>
+      <tr>
+        <td>เค้กช็อกโกแลต</td>
+        <td>เบเกอรี่</td>
+        <td>45 ชิ้น</td>
+        <td>฿5,400</td>
+      </tr>
+      <tr>
+        <td>ครัวซองต์เนยสด</td>
+        <td>เบเกอรี่</td>
+        <td>80 ชิ้น</td>
+        <td>฿7,200</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">รวมทั้งหมด</td>
+        <td>฿22,200</td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: sans-serif;
+  background-color: #fafafa;
+  padding: 40px;
+}
+
+.sales-table {
+  /* เริ่มต้นตกแต่งตารางของคุณที่นี่ */
+  
+}`,
+      targetCss: `body {
+  font-family: sans-serif;
+  background-color: #fafafa;
+  padding: 40px;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sales-table th {
+  background-color: #1e293b;
+  color: #ffffff;
+  text-align: left;
+}
+
+.sales-table th, .sales-table td {
+  padding: 12px 16px;
+}
+
+.sales-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s;
+}
+
+.sales-table tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.sales-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+.sales-table tfoot {
+  font-weight: bold;
+  background-color: #f8fafc;
+  border-top: 2px solid #e2e8f0;
+}`,
+      validation: (doc, cssText) => {
+        const table = doc.querySelector('table.sales-table');
+        if (!table) return "ไม่พบแท็ก table คลาส .sales-table";
+        
+        const thead = table.querySelector('thead');
+        const tbody = table.querySelector('tbody');
+        const tfoot = table.querySelector('tfoot');
+        
+        if (!thead || !tbody || !tfoot) {
+          return "กรุณาจัดโครงสร้างตารางให้มีครบทั้ง thead, tbody, และ tfoot";
+        }
+        
+        const rows = tbody.querySelectorAll('tr');
+        if (rows.length < 3) {
+          return "ข้อมูลใน tbody ต้องมีอย่างน้อย 3 แถวตามที่โจทย์ระบุ";
+        }
+        
+        const footerCells = tfoot.querySelectorAll('td');
+        const hasColspan = Array.from(footerCells).some(c => c.getAttribute('colspan') === '3');
+        if (!hasColspan) {
+          return "อย่าลืมรวมเซลล์ใน tfoot ให้มีขนาด 3 คอลัมน์ด้วย colspan=\"3\"";
+        }
+        
+        // CSS properties validation
+        const styleTable = doc.defaultView.getComputedStyle(table);
+        const th = thead.querySelector('th');
+        const td = tbody.querySelector('td');
+        
+        if (!th || !td) return "กรุณาเขียนแถวและเซลล์ข้อมูลตารางให้เรียบร้อย";
+        
+        const styleTh = doc.defaultView.getComputedStyle(th);
+        const styleTd = doc.defaultView.getComputedStyle(td);
+        
+        if (styleTable.borderCollapse !== 'collapse') {
+          return "กรุณากำหนด border-collapse: collapse; ให้กับคลาส .sales-table";
+        }
+        if (styleTable.width.indexOf('%') === -1 && parseFloat(styleTable.width) < 300) {
+          return "กรุณากำหนดให้ตารางมีความกว้างกว้างเต็มพื้นที่ด้วย width: 100%";
+        }
+        
+        const thBg = styleTh.backgroundColor.replace(/\s+/g, '');
+        if (thBg !== 'rgb(30,41,59)' && thBg !== '#1e293b') {
+          return "กรุณากำหนดสีพื้นหลังหัวตาราง th เป็นสี #1e293b";
+        }
+        
+        const paddingTh = parseFloat(styleTh.paddingTop);
+        const paddingTd = parseFloat(styleTd.paddingTop);
+        if (paddingTh < 10 || paddingTd < 10) {
+          return "กรุณากำหนดช่องไฟภายในเซลล์ด้วย padding: 12px 16px;";
+        }
+        
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes(':nth-child(even)') || !cleaned.includes(':hover')) {
+          return "อย่าลืมเขียน CSS สลับสีแถวด้วย :nth-child(even) และเอฟเฟกต์โฮเวอร์เมาส์ด้วย :hover";
+        }
+        
+        return true;
+      },
+      hints: [
+        "ใน HTML ใช้ <td colspan='3'>รวมทั้งหมด</td> เพื่อรวมช่องเซลล์",
+        "ใน CSS ใช้ .sales-table { width: 100%; border-collapse: collapse; }",
+        "สำหรับ Zebra-striping ใช้ .sales-table tbody tr:nth-child(even) { background-color: #f8fafc; }"
+      ]
+    },
+    {
+      id: "challenge-modern-form",
+      title: "ภารกิจที่ 18: Modern Newsletter & Survey Form (แบบฟอร์มสมัครข่าวสารและประเมินผล)",
+      difficulty: "Intermediate",
+      points: 150,
+      description: `### 📝 ภารกิจออกแบบและจัดแต่งแบบฟอร์มการรับข้อมูล
+
+จงสร้างแบบฟอร์มที่มีความทันสมัย สะอาดตา และมีการจัดหน้าอย่างถูกต้องตามเงื่อนไขต่อไปนี้:
+
+**1. โครงสร้าง HTML:**
+- สร้างแท็ก \`<form>\` และกำหนดคลาสเป็น \`.modern-form\`
+- ภายในฟอร์มมีหัวข้อ \`<h2>\` เขียนว่า **\"ร่วมเป็นสมาชิกและแสดงความคิดเห็น\"**
+- ช่องรับข้อมูลประกอบด้วยช่องเหล่านี้:
+  - **ชื่อผู้ใช้งาน:** ใช้แท็ก \`<input type=\"text\" placeholder=\"ระบุชื่อของคุณ\" required>\`
+  - **อีเมล:** ใช้แท็ก \`<input type=\"email\" placeholder=\"example@domain.com\" required>\`
+  - **สนใจเรียนภาษาใดเป็นพิเศษ:** ใช้แท็ก \`<select>\` ที่มีตัวเลือกด้านในสองตัวเลือกคือ \"HTML & CSS\" และ \"JavaScript\"
+  - **ข้อคิดเห็นเพิ่มเติม:** ใช้แท็ก \`<textarea placeholder=\"พิมพ์ข้อเสนอแนะที่นี่...\" required></textarea>\`
+  - **ยอมรับเงื่อนไข:** ใช้แท็ก \`<input type=\"checkbox\" id=\"agree\" required>\` พร้อมแท็ก \`<label for=\"agree\">\` เขียนว่า **\"ฉันยอมรับเงื่อนไขการให้บริการ\"**
+  - **ปุ่มยืนยันสมัคร:** ใช้แท็ก \`<button type=\"submit\" class=\"submit-btn\">\` มีข้อความด้านในเขียนว่า **\"ส่งข้อมูลสมัคร\"**
+
+**2. การตกแต่ง CSS:**
+- กล่องฟอร์ม \`.modern-form\`: กำหนดความกว้างสูงสุด \`max-width: 450px;\` จัดกึ่งกลางหน้าจอ (\`margin: 0 auto;\`), ใส่สีพื้นหลังขาว, ขอบมนมน \`12px\`, มีช่องไฟด้านใน \`24px\` และมีเงาด้านหลังบางเบา (\`box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1)\`)
+- ปรับสไตล์ช่องกรอกข้อมูล (\`input[type=\"text\"], input[type=\"email\"], select, textarea\`) ให้มีขนาดความกว้างเต็มกล่อง (\`width: 100%\`), ใส่ขอบมน \`6px\`, กรอบขอบสีเทาอ่อน \`#cbd5e1\`, และแพดดิ้ง \`10px\`
+- ใส่ลูกเล่นความน่าสนใจเมื่อผู้ใช้กดเลือกโฟกัสช่องกรอกข้อมูล (\`:focus\`) โดยกำหนดให้สีกรอบเปลี่ยนเป็นสีน้ำเงิน \`#3b82f6\` และแสดงวงแหวนเงาสีน้ำเงินจาง ๆ รอบกล่อง (\`box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\`) พร้อมใส่ Transition สั้น ๆ เพื่อให้ลื่นไหล
+- ปุ่มกดส่งใบสมัคร \`.submit-btn\`: สีพื้นหลังเป็นสีน้ำเงิน \`#2563eb\`, อักษรขาว, ไม่มีเส้นกรอบ, ขอบมน \`6px\`, แพดดิ้งพอเหมาะ และเมื่อชี้เมาส์ (\`:hover\`) สีจะเปลี่ยนเป็นเข้มขึ้นเป็น \`#1d4ed8\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมัครสมาชิกและแสดงความคิดเห็น</title>
+</head>
+<body>
+  <!-- 1. ออกแบบฟอร์มคลาส modern-form พร้อมหัวข้อ h2 และช่องรับข้อมูลต่างๆ ที่นี่ -->
+  
+</body>
+</html>`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมัครสมาชิกและแสดงความคิดเห็น</title>
+</head>
+<body>
+  <form class="modern-form">
+    <h2>ร่วมเป็นสมาชิกและแสดงความคิดเห็น</h2>
+    
+    <div class="form-group">
+      <label>ชื่อผู้ใช้งาน</label>
+      <input type="text" placeholder="ระบุชื่อของคุณ" required>
+    </div>
+    
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" placeholder="example@domain.com" required>
+    </div>
+    
+    <div class="form-group">
+      <label>สนใจเรียนภาษาใดเป็นพิเศษ</label>
+      <select required>
+        <option value="html-css">HTML & CSS</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>ข้อคิดเห็นเพิ่มเติม</label>
+      <textarea placeholder="พิมพ์ข้อเสนอแนะที่นี่..." required></textarea>
+    </div>
+    
+    <div class="checkbox-group">
+      <input type="checkbox" id="agree" required>
+      <label for="agree">ฉันยอมรับเงื่อนไขการให้บริการ</label>
+    </div>
+    
+    <button type="submit" class="submit-btn">ส่งข้อมูลสมัคร</button>
+  </form>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: sans-serif;
+  background-color: #f1f5f9;
+  padding: 40px;
+}
+
+.modern-form {
+  /* ตกแต่งกล่องฟอร์มหลักที่นี่ */
+  
+}
+
+.modern-form input[type="text"],
+.modern-form input[type="email"],
+.modern-form select,
+.modern-form textarea {
+  /* ตกแต่งความสวยงามของช่องป้อนข้อมูลที่นี่ */
+  
+}
+
+.submit-btn {
+  /* จัดแต่งสไตล์ปุ่มยืนยันส่งข้อมูลที่นี่ */
+  
+}`,
+      targetCss: `body {
+  font-family: sans-serif;
+  background-color: #f1f5f9;
+  padding: 40px;
+}
+
+.modern-form {
+  max-width: 450px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modern-form h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.modern-form input[type="text"],
+.modern-form input[type="email"],
+.modern-form select,
+.modern-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modern-form input[type="text"]:focus,
+.modern-form input[type="email"]:focus,
+.modern-form select:focus,
+.modern-form textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.checkbox-group {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-group label {
+  font-size: 14px;
+  color: #475569;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #1d4ed8;
+}`,
+      validation: (doc, cssText) => {
+        const form = doc.querySelector('form.modern-form');
+        if (!form) return "ไม่พบฟอร์มคลาส .modern-form";
+        
+        const h2 = form.querySelector('h2');
+        if (!h2 || !h2.textContent.includes("ร่วมเป็นสมาชิกและแสดงความคิดเห็น")) {
+          return "กรุณาใส่หัวข้อ <h2> ร่วมเป็นสมาชิกและแสดงความคิดเห็น ภายในฟอร์ม";
+        }
+        
+        const textInput = form.querySelector('input[type="text"]');
+        const emailInput = form.querySelector('input[type="email"]');
+        const select = form.querySelector('select');
+        const textarea = form.querySelector('textarea');
+        const checkbox = form.querySelector('input[type="checkbox"]');
+        const button = form.querySelector('.submit-btn');
+        
+        if (!textInput || !emailInput || !select || !textarea || !checkbox || !button) {
+          return "กรุณาตรวจสอบว่ามีกล่อง ชื่อ (text), อีเมล (email), ภาษา (select), ความคิดเห็น (textarea), ยอมรับเงื่อนไข (checkbox) และปุ่มกด (.submit-btn) ครบถ้วน";
+        }
+        
+        const styleForm = doc.defaultView.getComputedStyle(form);
+        const styleInput = doc.defaultView.getComputedStyle(textInput);
+        const styleBtn = doc.defaultView.getComputedStyle(button);
+        
+        if (parseFloat(styleForm.maxWidth) !== 450) {
+          return "กรุณากำหนดความกว้างสูงสุดของฟอร์มเป็น max-width: 450px;";
+        }
+        if (styleForm.backgroundColor.replace(/\s+/g, '') !== 'rgb(255,255,255)' && styleForm.backgroundColor !== 'white') {
+          return "กรุณากำหนดพื้นหลังของฟอร์มเป็นสีขาว";
+        }
+        if (styleInput.width.indexOf('%') === -1 && parseFloat(styleInput.width) < 300) {
+          return "กรุณากำหนดความกว้างของช่องป้อนข้อมูลเป็น width: 100% เพื่อให้กว้างเต็มหน้าต่างการใช้งาน";
+        }
+        
+        const cleaned = cssText.replace(/\s+/g, '');
+        if (!cleaned.includes(':focus') || !cleaned.includes('box-shadow')) {
+          return "อย่าลืมกำหนดการเปลี่ยนสีขอบและเงาเมื่อช่องป้อนข้อมูลถูกโฟกัสด้วย pseudo-class :focus";
+        }
+        
+        if (styleBtn.backgroundColor.replace(/\s+/g, '') !== 'rgb(37,99,235)' && styleBtn.backgroundColor !== '#2563eb') {
+          return "กรุณากำหนดสีพื้นหลังปุ่มส่งข้อมูลเป็นสี #2563eb";
+        }
+        
+        return true;
+      },
+      hints: [
+        "ใน HTML ครอบช่องป้อนข้อมูลด้วยกล่อง div เพื่อจัดระยะห่างเป็นระเบียบ",
+        "ใน CSS กำหนด .modern-form input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }",
+        "สำหรับปุ่ม โฮเวอร์ปุ่มโดยใช้ .submit-btn:hover { background-color: #1d4ed8; }"
+      ]
     }
   ]
 };
+
+

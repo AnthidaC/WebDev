@@ -1,11 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, Columns, Sliders, Sparkles } from 'lucide-react';
+import { Eye, Columns, Sliders, Sparkles, Terminal, Trash2 } from 'lucide-react';
 
-export default function PreviewContainer({ html, css, targetHtml, targetCss, showCompare }) {
-  const [activePreviewTab, setActivePreviewTab] = useState('live'); // 'live' or 'compare'
+export default function PreviewContainer({
+  html = '',
+  css = '',
+  js = '',
+  targetHtml = '',
+  targetCss = '',
+  targetJs = '',
+  showCompare = false
+}) {
+  const [activePreviewTab, setActivePreviewTab] = useState('live'); // 'live', 'console', 'target', 'compare'
   const [sliderVal, setSliderVal] = useState(50); // 0 to 100
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(400);
+  const [logs, setLogs] = useState([]);
+
+  // Listen for console logs sent from inside iframe sandbox
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'CONSOLE_LOG') {
+        const newLog = {
+          id: Date.now() + Math.random(),
+          level: event.data.level || 'log',
+          text: event.data.data,
+          time: new Date().toLocaleTimeString()
+        };
+        setLogs((prev) => [...prev.slice(-99), newLog]);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Clear logs when user explicitly changes code significantly or clears
+  const handleClearLogs = () => {
+    setLogs([]);
+  };
 
   // Measure container width dynamically on compare mode load/resize
   useEffect(() => {
@@ -23,14 +55,58 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
 
   // If compare is hidden (e.g. in lessons), fall back to live view
   useEffect(() => {
-    if (!showCompare) {
+    if (!showCompare && activePreviewTab === 'compare') {
       setActivePreviewTab('live');
     }
   }, [showCompare]);
 
-  // Build the compiled code injection document
-  const getSrcDoc = (htmlCode, cssCode) => {
-    // If htmlCode is already a full document, inject reset fonts and student css directly into <head>
+  // Build the compiled code injection document with console spy
+  const getSrcDoc = (htmlCode, cssCode, jsCode = '') => {
+    const consoleSpyScript = `
+      <script>
+        (function() {
+          const _log = console.log;
+          const _warn = console.warn;
+          const _error = console.error;
+          const _info = console.info;
+
+          function sendToParent(type, args) {
+            try {
+              const messages = Array.from(args).map(function(arg) {
+                if (arg === null) return "null";
+                if (arg === undefined) return "undefined";
+                if (typeof arg === "object") {
+                  try { return JSON.stringify(arg, null, 2); } catch (e) { return String(arg); }
+                }
+                return String(arg);
+              });
+              window.parent.postMessage({ type: 'CONSOLE_LOG', level: type, data: messages.join(' ') }, '*');
+            } catch (e) {}
+          }
+
+          console.log = function() { _log.apply(console, arguments); sendToParent('log', arguments); };
+          console.warn = function() { _warn.apply(console, arguments); sendToParent('warn', arguments); };
+          console.error = function() { _error.apply(console, arguments); sendToParent('error', arguments); };
+          console.info = function() { _info.apply(console, arguments); sendToParent('info', arguments); };
+
+          window.addEventListener('error', function(e) {
+            sendToParent('error', [e.message + ' (บรรทัด ' + e.lineno + ')']);
+          });
+        })();
+      </script>
+    `;
+
+    const userScript = `
+      <script>
+        try {
+          ${jsCode}
+        } catch(err) {
+          console.error(err.name + ": " + err.message);
+        }
+      </script>
+    `;
+
+    // If htmlCode is already a full document
     if (htmlCode.includes('<!DOCTYPE html>') || htmlCode.includes('<html')) {
       const injectionStyles = `
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -43,12 +119,21 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
           }
           ${cssCode}
         </style>
+        ${consoleSpyScript}
       `;
-      if (htmlCode.includes('</head>')) {
-        return htmlCode.replace('</head>', `${injectionStyles}</head>`);
+      let output = htmlCode;
+      if (output.includes('</head>')) {
+        output = output.replace('</head>', `${injectionStyles}</head>`);
       } else {
-        return htmlCode + injectionStyles;
+        output = injectionStyles + output;
       }
+
+      if (output.includes('</body>')) {
+        output = output.replace('</body>', `${userScript}</body>`);
+      } else {
+        output = output + userScript;
+      }
+      return output;
     }
 
     return `
@@ -58,7 +143,6 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
           <meta charset="utf-8">
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
           <style>
-            /* CSS reset custom to make sandbox robust */
             body {
               margin: 0;
               padding: 0;
@@ -67,16 +151,18 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
             }
             ${cssCode}
           </style>
+          ${consoleSpyScript}
         </head>
         <body>
           ${htmlCode}
+          ${userScript}
         </body>
       </html>
     `;
   };
 
-  const liveSrcDoc = getSrcDoc(html, css);
-  const targetSrcDoc = getSrcDoc(targetHtml || '', targetCss || '');
+  const liveSrcDoc = getSrcDoc(html, css, js);
+  const targetSrcDoc = getSrcDoc(targetHtml || '', targetCss || '', targetJs || '');
 
   return (
     <div className="preview-panel">
@@ -88,6 +174,17 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
           >
             <Eye size={14} />
             <span>ผลลัพธ์ของฉัน (Live Preview)</span>
+          </button>
+
+          <button
+            onClick={() => setActivePreviewTab('console')}
+            className={`preview-tab ${activePreviewTab === 'console' ? 'active' : ''}`}
+          >
+            <Terminal size={14} />
+            <span>คอนโซล (Console)</span>
+            {logs.length > 0 && (
+              <span className="log-count-badge">{logs.length}</span>
+            )}
           </button>
 
           {showCompare && (
@@ -125,6 +222,17 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
             />
           </div>
         )}
+
+        {activePreviewTab === 'console' && (
+          <button
+            onClick={handleClearLogs}
+            className="clear-console-btn"
+            title="ล้างข้อความในคอนโซล"
+          >
+            <Trash2 size={12} />
+            <span>ล้างคอนโซล</span>
+          </button>
+        )}
       </div>
 
       <div className="preview-body">
@@ -133,8 +241,32 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
             title="Live Preview"
             srcDoc={liveSrcDoc}
             className="preview-iframe"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
           />
+        )}
+
+        {activePreviewTab === 'console' && (
+          <div className="console-panel-inner">
+            {logs.length === 0 ? (
+              <div className="console-empty">
+                <Terminal size={32} style={{ opacity: 0.3, marginBottom: '8px' }} />
+                <p>ยังไม่มีข้อความส่งออกทาง Console</p>
+                <span style={{ fontSize: '12px', opacity: 0.6 }}>
+                  ลองใช้คำสั่ง <code>console.log(...)</code> ในไฟล์ script.js แล้วดูผลลัพธ์ที่นี่
+                </span>
+              </div>
+            ) : (
+              <div className="console-logs-list">
+                {logs.map((log) => (
+                  <div key={log.id} className={`console-log-row ${log.level}`}>
+                    <span className="log-time">[{log.time}]</span>
+                    <span className={`log-level-badge ${log.level}`}>{log.level.toUpperCase()}</span>
+                    <pre className="log-text">{log.text}</pre>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {activePreviewTab === 'target' && (
@@ -142,7 +274,7 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
             title="Target Preview Demo"
             srcDoc={targetSrcDoc}
             className="preview-iframe"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
           />
         )}
 
@@ -154,7 +286,7 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
                 title="Target Preview"
                 srcDoc={targetSrcDoc}
                 className="preview-iframe"
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
               />
               <div className="preview-watermark target">เฉลยต้นแบบ (Target)</div>
             </div>
@@ -164,13 +296,12 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
               className="live-frame-wrapper"
               style={{ width: `${sliderVal}%` }}
             >
-              {/* Force identical sizing for perfect alignment overlap */}
               <div style={{ width: `${containerWidth}px`, height: '100%' }}>
                 <iframe
                   title="Live Preview Overlap"
                   srcDoc={liveSrcDoc}
                   className="preview-iframe"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
                 />
               </div>
               <div className="preview-watermark live">โค้ดของคุณ (Your UI)</div>
@@ -184,7 +315,6 @@ export default function PreviewContainer({ html, css, targetHtml, targetCss, sho
               <div className="slider-handle-button">&lt;&gt;</div>
             </div>
 
-            {/* Invisible Range Overlay to capture mouse dragging smoothly */}
             <input
               type="range"
               min="0"

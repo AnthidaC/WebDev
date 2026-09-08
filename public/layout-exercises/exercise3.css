@@ -1,0 +1,226 @@
+/* ล้างค่าเริ่มต้น (Reset Styles) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* 💡 คอนเทนเนอร์หลักที่ครอบทั้ง Sidebar ซ้าย และ Main content ขวา */
+.dashboard-container {
+  /* เขียน CSS ของคุณตรงนี้:
+     1. กำหนดให้แสดงผลแบบ Flexbox หรือ Grid เพื่อวาง Sidebar และ content-body คู่กัน
+     2. กำหนด min-height: 100vh;
+  */
+}
+
+/* 💡 Sidebar ฝั่งซ้าย
+   เป้าหมาย: กว้างคงที่ 260px, สูงเต็มหน้าจอ 100vh และถูกล็อกไว้กับที่ห้ามขยับตาม scroll */
+.sidebar {
+  width: 260px;
+  background-color: #0f172a;
+  color: white;
+  padding: 20px;
+  
+  /* เขียน CSS เพิ่มเติมที่นี่:
+     - ทำให้ล็อกตำแหน่ง (คำใบ้: position: sticky; top: 0; height: 100vh;)
+     - จัดเมนูด้านในให้เรียงกันลงมา
+  */
+}
+
+.sidebar-brand {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #1e293b;
+  margin-bottom: 20px;
+}
+
+.sidebar-brand h2 {
+  font-size: 1.5rem;
+}
+
+.sidebar-menu {
+  list-style: none;
+}
+
+.sidebar-menu li {
+  margin-bottom: 8px;
+}
+
+.sidebar-menu a {
+  display: block;
+  padding: 12px 16px;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.sidebar-menu a:hover {
+  background-color: #1e293b;
+  color: white;
+}
+
+.sidebar-menu li.active a {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* 💡 ส่วนขวา: คอนเทนต์หลัก */
+.main-content {
+  /* เขียน CSS ของคุณตรงนี้:
+     1. กำหนดให้ขยายพื้นที่กินส่วนที่เหลือทั้งหมด (flex: 1;)
+     2. กำหนดทิศทางเนื้อหาเป็นแนวตั้ง (flex-direction: column)
+  */
+  background-color: #f1f5f9;
+}
+
+/* 🎨 Navigation ด้านบน (Header ขวา) */
+.top-nav {
+  height: 70px;
+  background-color: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 30px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* พื้นที่แสดงส่วนสถิติและตาราง */
+.content-body {
+  padding: 30px;
+  flex: 1; /* ขยายตัวเองเพื่อช่วยดัน footer ลงไปขอบล่าง */
+}
+
+/* การ์ดสถิติ (3 คอลัมน์) */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.stat-card h3 {
+  font-size: 0.875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.stat-trend {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.trend-up { color: #10b981; }
+.trend-down { color: #ef4444; }
+
+/* ส่วนแสดงผลตารางข้อมูล */
+.data-table-section {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.data-table-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+table th, table td {
+  padding: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+table th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-badge.success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* 🎨 Footer */
+.dashboard-footer {
+  background-color: white;
+  border-top: 1px solid #e2e8f0;
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* การรองรับ Responsive เบื้องต้น
+   เมื่อจอเล็กลง ให้คอนเทนเนอร์แสดงผลเป็นคอลัมน์เดียวแนวตั้ง */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    /* เปลี่ยนทิศทาง Layout */
+  }
+  
+  .sidebar {
+    /* ปรับความกว้างและความสูงของ sidebar */
+  }
+}

@@ -1,0 +1,127 @@
+/* ล้างค่าเริ่มต้น (Reset Styles) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  
+  /* 💡 คำใบ้โจทย์ที่ 1: กำหนดให้ body เป็น flex container
+     เพื่อดึง footer ให้แนบชิดล่างสุดเสมอ (Sticky Footer) */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🎨 ส่วนหัวเว็บ Header */
+.header {
+  background-color: #0f172a;
+  color: #ffffff;
+  padding: 20px;
+  text-align: center;
+}
+
+/* 🎨 เมนูนำทาง Nav */
+.nav {
+  background-color: #334155;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.nav a {
+  color: #f8fafc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+/* 💡 ส่วนจัดวางคอลัมน์ตรงกลาง (main-wrapper) */
+.main-wrapper {
+  /* เขียน CSS ของคุณตรงนี้:
+     1. กำหนดให้เป็น Flexbox เพื่อแบ่งคอลัมน์ Sidebar กับ Content
+     2. ใส่ flex: 1; เพื่อขยายขนาดพื้นที่ว่างที่เหลือในการดัน Footer ลงล่างสุด
+  */
+  
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* 🎨 ส่วนแถบข้าง Sidebar */
+.sidebar {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* กำหนดขนาดความกว้างพื้นฐานของ sidebar เช่น min-width: 250px; หรือ flex: 1; */
+}
+
+.sidebar ul {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.sidebar li {
+  margin-bottom: 10px;
+}
+
+.sidebar a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* 🎨 ส่วนเนื้อหาหลัก Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* กำหนดขนาดกว้างหลัก เช่น flex: 3; เพื่อให้โตกว่า sidebar */
+}
+
+.section {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+  margin-bottom: 12px;
+  color: #0f172a;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+/* 🎨 ส่วนท้ายเว็บ Footer */
+.footer {
+  background-color: #0f172a;
+  color: #94a3b8;
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+  /* 💡 ใช้ margin-top: auto; เพื่อให้ติดขอบล่าง */
+}
+
+/* 💡 Responsive Media Query
+   เมื่อขนาดหน้าจอน้อยกว่า 768px ให้ส่วนกลางแสดงผลเป็นแนวตั้งแทน */
+@media (max-width: 768px) {
+  .main-wrapper {
+    /* ปรับ flex-direction เพื่อให้เรียงเป็นแนวตั้ง */
+  }
+  
+  .sidebar {
+    /* ขยายความกว้างเต็มจอสำหรับจอมือถือ */
+  }
+}

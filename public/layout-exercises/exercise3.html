@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>โจทย์ที่ 3 - Sticky Admin Dashboard Layout (Starter)</title>
+  <link rel="stylesheet" href="exercise3.css">
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Sidebar ซ้าย (ต้องการให้ล็อกตำแหน่งไว้กับที่เสมอเมื่อ scroll) -->
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <h2>🛠️ AdminPanel</h2>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="#">📊 สถิติภาพรวม</a></li>
+        <li><a href="#">📦 คลังสินค้า</a></li>
+        <li><a href="#">👥 สมาชิกผู้ใช้งาน</a></li>
+        <li><a href="#">💳 รายการชำระเงิน</a></li>
+        <li><a href="#">⚙️ ตั้งค่าระบบ</a></li>
+      </ul>
+    </nav>
+
+    <!-- คอนเทนต์หลักฝั่งขวา -->
+    <div class="main-content">
+      
+      <header class="top-nav">
+        <div class="user-profile">
+          <span>ยินดีต้อนรับ, สมชาย มั่นคง</span>
+          <div class="avatar">SM</div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <section class="dashboard-cards">
+          <div class="stat-card">
+            <h3>ยอดขายรายเดือน</h3>
+            <p class="stat-value">฿125,400</p>
+            <span class="stat-trend trend-up">▲ +12% เทียบกับเดือนก่อน</span>
+          </div>
+          <div class="stat-card">
+            <h3>ผู้ใช้งานใหม่</h3>
+            <p class="stat-value">1,450 คน</p>
+            <span class="stat-trend trend-up">▲ +8% เทียบกับเดือนก่อน</span>
+          </div>
+          <div class="stat-card">
+            <h3>ออเดอร์ค้างส่ง</h3>
+            <p class="stat-value">12 รายการ</p>
+            <span class="stat-trend trend-down">▼ -3% เทียบกับสัปดาห์ก่อน</span>
+          </div>
+        </section>
+
+        <section class="data-table-section">
+          <h2>รายการสั่งซื้อล่าสุด</h2>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>รหัสสั่งซื้อ</th>
+                  <th>ชื่อลูกค้า</th>
+                  <th>สินค้า</th>
+                  <th>ราคา</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#ORD-9023</td>
+                  <td>คุณสมเกียรติ รักการเรียน</td>
+                  <td>คอร์สออนไลน์ CSS Masterclass</td>
+                  <td>฿2,900</td>
+                  <td><span class="status-badge success">สำเร็จ</span></td>
+                </tr>
+                <tr>
+                  <td>#ORD-9022</td>
+                  <td>คุณวิภาดา เรียนสนุก</td>
+                  <td>คอร์สออนไลน์ HTML5 Core Concept</td>
+                  <td>฿1,200</td>
+                  <td><span class="status-badge pending">กำลังดำเนินการ</span></td>
+                </tr>
+                <tr>
+                  <td>#ORD-9021</td>
+                  <td>คุณอนันต์ ขยันยิ่ง</td>
+                  <td>ชุดหนังสือคู่มือ Web Development</td>
+                  <td>฿850</td>
+                  <td><span class="status-badge success">สำเร็จ</span></td>
+                </tr>
+                <!-- ข้อมูลตัวอย่างเพิ่มเติม เพื่อให้หน้ายาวและทดสอบ Scrollbar -->
+                <tr>
+                  <td>#ORD-9020</td>
+                  <td>คุณอริศรา เพียรพยายาม</td>
+                  <td>คอร์สออนไลน์ CSS Masterclass</td>
+                  <td>฿2,900</td>
+                  <td><span class="status-badge success">สำเร็จ</span></td>
+                </tr>
+                <tr>
+                  <td>#ORD-9019</td>
+                  <td>คุณธีรวัฒน์ ใฝ่ความรู้</td>
+                  <td>ชุดหนังสือคู่มือ Web Development</td>
+                  <td>฿850</td>
+                  <td><span class="status-badge success">สำเร็จ</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="dashboard-footer">
+        <p>© 2026 AdminPanel. Powered by CSS Sticky System.</p>
+      </footer>
+      
+    </div>
+
+  </div>
+
+</body>
+</html>

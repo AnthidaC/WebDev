@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Lightbulb, CheckCircle2, XCircle, ChevronDown, ChevronUp, Play, Trophy } from 'lucide-react';
+import { Lightbulb, CheckCircle2, XCircle, ChevronDown, ChevronUp, Play, Trophy, Sparkles } from 'lucide-react';
 
-export default function InstructionPanel({ activeItem, onVerify, validationError, isSuccess, isChallenge }) {
+export default function InstructionPanel({ activeItem, onVerify, validationError, isSuccess, isChallenge, onLoadSolution }) {
   const [showHints, setShowHints] = useState(false);
 
   // Close hints when item changes
@@ -92,7 +92,7 @@ export default function InstructionPanel({ activeItem, onVerify, validationError
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Trophy size={16} className="text-yellow-500" />
             <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-secondary)' }}>
-              +{activeItem.points} คะแนน
+              +{activeItem.points || activeItem.xp || 100} คะแนน
             </span>
           </div>
         )}
@@ -122,10 +122,30 @@ export default function InstructionPanel({ activeItem, onVerify, validationError
             </div>
           )}
 
-          <button onClick={onVerify} className="verify-btn">
-            <Play size={14} fill="white" />
-            <span>ตรวจคำตอบ</span>
-          </button>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <button onClick={onVerify} className="verify-btn" style={{ flex: 1 }}>
+              <Play size={14} fill="white" />
+              <span>ตรวจคำตอบ</span>
+            </button>
+            {onLoadSolution && activeItem.targetHtml && (
+              <button
+                onClick={onLoadSolution}
+                className="verify-btn"
+                style={{
+                  background: 'linear-gradient(135deg, #059669, #10b981)',
+                  flex: '0 0 auto',
+                  padding: '0 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="โหลดโค้ดตัวอย่างที่ทำงานจริง 100% สำหรับทดลองเล่นและตรวจสอบระบบ"
+              >
+                <Sparkles size={14} />
+                <span>รันตัวอย่างจริง</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Hints Section */}

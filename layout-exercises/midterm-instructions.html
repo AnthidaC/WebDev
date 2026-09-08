@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือข้อสอบกลางภาคปฏิบัติ: Web Layout & CSS Advanced</title>
+  <style>
+    :root {
+      --primary: #1b4332;
+      --secondary: #2d6a4f;
+      --accent: #d4a373;
+      --dark: #1b263b;
+      --light: #f8f9fa;
+      --white: #ffffff;
+      --danger: #e63946;
+      --success: #2a9d8f;
+      --border: #e2e8f0;
+      --shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.7;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: var(--white);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    }
+    
+    .exam-header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--light);
+      padding-bottom: 30px;
+    }
+    
+    .exam-badge {
+      display: inline-block;
+      background-color: var(--danger);
+      color: var(--white);
+      font-weight: bold;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+    
+    .subtitle {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+    
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin: 25px 0;
+      background-color: var(--light);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .meta-item strong {
+      display: block;
+      color: var(--secondary);
+      font-size: 1.2rem;
+    }
+    
+    .meta-item span {
+      font-size: 0.9rem;
+      color: var(--dark);
+    }
+    
+    h2 {
+      font-size: 1.6rem;
+      color: var(--secondary);
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--accent);
+      padding-left: 15px;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-top: 25px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    p {
+      margin-bottom: 15px;
+      font-size: 1.05rem;
+    }
+    
+    ul, ol {
+      margin-bottom: 20px;
+      padding-left: 25px;
+    }
+    
+    li {
+      margin-bottom: 8px;
+    }
+    
+    .alert-box {
+      background-color: #fef2f2;
+      border-left: 4px solid var(--danger);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 25px 0;
+      color: #991b1b;
+    }
+    
+    .alert-box h4 {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tip-box {
+      background-color: #ecfdf5;
+      border-left: 4px solid var(--success);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 25px 0;
+      color: #065f46;
+    }
+    
+    .tip-box h4 {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+    }
+    
+    table th, table td {
+      padding: 12px 15px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    table th {
+      background-color: var(--light);
+      color: var(--primary);
+      font-weight: bold;
+    }
+    
+    .action-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+      border-top: 2px solid var(--light);
+      padding-top: 30px;
+    }
+    
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 12px 25px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+    }
+    
+    .btn-outline {
+      border: 2px solid var(--secondary);
+      color: var(--secondary);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--secondary);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    pre {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 15px 0;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div class="exam-header">
+      <span class="exam-badge">คำชี้แจงและรายละเอียดข้อสอบปฏิบัติกลางภาค</span>
+      <h1>🌿 Flora & Fauna Glasshouse</h1>
+      <p class="subtitle">ระบบเว็บโปรโมทร้าน เมนูอาหาร และฟอร์มจองห้องสัมมนาเรือนกระจก</p>
+      
+      <div class="meta-grid">
+        <div class="meta-item">
+          <strong>3 ชั่วโมง (แนะนำ)</strong>
+          <span>เวลาในการทำสอบ</span>
+        </div>
+        <div class="meta-item">
+          <strong>3 หน้าเว็บแยกกัน</strong>
+          <span>โครงสร้าง HTML & CSS</span>
+        </div>
+        <div class="meta-item">
+          <strong>30 คะแนนเต็ม</strong>
+          <span>สัดส่วนการประเมินผล</span>
+        </div>
+      </div>
+    </div>
+
+    <h2>📌 ข้อมูลแนะนำทั่วไป</h2>
+    <p>ข้อสอบปฏิบัติฉบับนี้มีวัตถุประสงค์เพื่อวัดทักษะในการเขียนโครงสร้างภาษา <strong>HTML5 Semantic Tags</strong> และการเขียนตกแต่งจัดหน้าเลย์เอาต์ด้วย <strong>Vanilla CSS</strong> (CSS Flexbox, CSS Grid, Advanced Selector, SVG styling, Responsive Web Design) จากความกว้างหน้าจอระดับพีซีจนถึงโทรศัพท์มือถือ โดยไม่มีการนำเข้า Frameworks (เช่น Bootstrap หรือ TailwindCSS) และไม่มีการใช้คำสั่ง JavaScript</p>
+    
+    <div class="alert-box">
+      <h4>⚠️ ข้อห้ามและกติกาสำคัญในการสอบ</h4>
+      <ul>
+        <li>ห้ามเชื่อมโยงไลบรารี CSS หรือไอคอนภายนอกใด ๆ ให้เขียน Vanilla CSS ลงใน <code>midterm.css</code> เท่านั้น</li>
+        <li>ห้ามใช้คำสั่ง JavaScript เพื่อสร้างการตอบสนอง ทุกพฤติกรรม เช่น การเปลี่ยนแท็บ การไฮไลท์ หรือการเลือกแพ็กเกจ จะต้องควบคุมผ่าน CSS ทั้งสิ้น</li>
+        <li>ไฟล์ HTML ทั้ง 3 ไฟล์เริ่มต้นได้รับการล้างข้อมูลจนเหลือเพียงโครงสร้างเอกสารเปล่า คุณต้องเขียนแท็กภายใน <code>&lt;body&gt;</code> เองทั้งหมด</li>
+      </ul>
+    </div>
+
+    <h2>🎨 ข้อกำหนดการออกแบบ สี และฟอนต์ (Design System Specs)</h2>
+    <p>ผู้เรียนต้องเลือกใช้รหัสสีและฟอนต์ตามเกณฑ์การออกแบบอัตลักษณ์ของคาเฟ่ (Brand Identity) ดังต่อไปนี้:</p>
+    
+    <h3>🖌️ จานสีธีมธรรมชาติระดับพรีเมียม (Color Tokens)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ชื่อตัวแปร CSS</th>
+          <th>รหัสสี Hex Code</th>
+          <th>การใช้งานหลักในข้อสอบ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--primary-color</code></td>
+          <td><code>#1b3b2b</code> (Deep Forest Green)</td>
+          <td>สีหลักของแบรนด์, พื้นหลังปุ่มหลัก, สีฟอนต์หัวข้อโลโก้, สีรางเลือกหลัก</td>
+        </tr>
+        <tr>
+          <td><code>--accent-color</code></td>
+          <td><code>#c49a6c</code> (Antique Gold)</td>
+          <td>สีทองประดับ, สีป้ายราคา, สีไฮไลท์เส้นขอบเมื่อโฟกัส หรือเมื่อ Hover/Checked</td>
+        </tr>
+        <tr>
+          <td><code>--accent-light</code></td>
+          <td><code>#f5efe6</code> (Sand Cream)</td>
+          <td>สีครีมพื้นหลังปุ่มรอง หรือสีจางสำหรับสถานะ Hover ของเมนูนำทาง</td>
+        </tr>
+        <tr>
+          <td><code>--bg-light</code></td>
+          <td><code>#faf8f5</code> (Ivory White)</td>
+          <td>สีพื้นหลังหลักของทุกหน้าจอ เพิ่มความรู้สึกสว่าง อุ่น และสะอาดแบบธรรมชาติ</td>
+        </tr>
+        <tr>
+          <td><code>--text-dark</code></td>
+          <td><code>#1b2520</code> (Charcoal Black)</td>
+          <td>สีข้อความหลักทั่วไป อ่านง่ายสบายตาบนพื้นสีครีมงาช้าง</td>
+        </tr>
+        <tr>
+          <td><code>--text-muted</code></td>
+          <td><code>#6c7870</code> (Sage Muted)</td>
+          <td>สีเทาอมเขียวจาง สำหรับข้อความอธิบายย่อย และเส้นกรอบทั่วไป</td>
+        </tr>
+        <tr>
+          <td><code>--bestseller-color</code></td>
+          <td><code>#9e2a2b</code> (Ruby Red)</td>
+          <td>สีแดงพิเศษสำหรับป้ายประดับกล่องสินค้าขายดี (Bestseller Badge)</td>
+        </tr>
+        <tr>
+          <td><code>--white</code></td>
+          <td><code>#ffffff</code> (Pure White)</td>
+          <td>สีขาวพื้นการ์ด และสีตัวอักษรของแบนเนอร์ Hero</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>✍️ แบบอักษรประจำแบรนด์ (Typography)</h3>
+    <ul>
+      <li><strong>ฟอนต์หัวเรื่องเด่น (Serif headings)</strong>: ใช้ <code>'Playfair Display', serif</code> สำหรับข้อความ <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code> และโลโก้ร้านเพื่อสื่ออารมณ์หรูหราคลาสสิก</li>
+      <li><strong>ฟอนต์เนื้อหาทั่วไป (Sans-serif body)</strong>: ใช้ <code>'Sarabun', 'Sora', sans-serif</code> สำหรับย่อหน้า <code>&lt;p&gt;</code>, ป้าย <code>&lt;label&gt;</code>, ตาราง และส่วนอื่น ๆ เพื่อให้อ่านข้อความและตัวเลขได้ชัดเจนในทุกขนาดอุปกรณ์</li>
+    </ul>
+
+    <h2>📊 รายละเอียดและเกณฑ์สัดส่วนคะแนนแยกแต่ละหน้า</h2>
+
+    <!-- ==========================================================
+       รายละเอียดหน้า 1: ข้อมูลร้าน (midterm-shop.html)
+       ========================================================== -->
+    <h2>1. หน้าข้อมูลร้าน <code>midterm-shop.html</code> (7 คะแนน)</h2>
+    <p>เขียนโครงสร้างหน้าหลักแสดงประวัติร้าน สถิติของคาเฟ่ และแกลเลอรี Bento Grid โชว์บรรยากาศ</p>
+    
+    <h3>🔍 โครงสร้าง HTML ที่ต้องเขียนขึ้นเองภายใน body:</h3>
+    <ol>
+      <li><strong>แถบเมนูนำทาง (navbar)</strong>:
+        <ul>
+          <li>ใช้โครงสร้างแท็ก <code>&lt;header class="navbar"&gt;</code> ครอบกล่องจัดแนวด้านใน <code>&lt;div class="nav-container"&gt;</code></li>
+          <li>ด้านซ้ายมีโลโก้ <code>&lt;div class="logo"&gt;🌿 Flora & Fauna&lt;/div&gt;</code></li>
+          <li>ด้านขวามีกลุ่มลิงก์เมนู <code>&lt;nav class="nav-links"&gt;</code> ประกอบด้วย <code>&lt;a&gt;</code> จำนวน 3 ลิงก์เชื่อมโยงไปยัง 3 หน้าปฏิบัติ โดยหน้าแรกต้องใส่คลาส <code>active</code></li>
+        </ul>
+      </li>
+      <li><strong>ส่วนฮีโร่แบนเนอร์ (hero)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;section class="hero"&gt;</code> ด้านในมีกล่องเคลือบพื้นสีเข้ม <code>&lt;div class="hero-overlay"&gt;&lt;/div&gt;</code></li>
+          <li>มีกล่องข้อความ <code>&lt;div class="hero-content"&gt;</code> บรรจุ <code>&lt;span class="badge"&gt;</code> หัวเรื่อง <code>&lt;h1&gt;</code> ข้อความคำโปรย <code>&lt;p&gt;</code> และปุ่มกดจองโต๊ะ <code>&lt;a class="btn btn-primary"&gt;</code></li>
+        </ul>
+      </li>
+      <li><strong>ประวัติร้านและตัวเลขสถิติ (about-section)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;main class="container"&gt;</code> คุมกรอบเนื้อหาถัดมา ด้านในสร้าง <code>&lt;section class="about-section"&gt;</code></li>
+          <li>ฝั่งซ้ายเป็นกล่องข้อความ <code>&lt;div class="about-text"&gt;</code> ประกอบด้วย <code>&lt;h2&gt;</code> ยินดีต้อนรับสู่ Flora & Fauna และคำอธิบายร้าน</li>
+          <li>ฝั่งขวาเป็นกล่องสถิติ <code>&lt;div class="stats-grid"&gt;</code> บรรจุข้อมูลสถิติย่อย 3 ชิ้นในกล่องคลาส <code>stat-item</code> (แต่ละกล่องมีค่าตัวเลข <code>.stat-number</code> และป้ายชื่อ <code>.stat-label</code>)</li>
+        </ul>
+      </li>
+      <li><strong>คลังภาพเรือนกระจก (gallery-section)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;section class="gallery-section"&gt;</code> มีกล่องครอบหัวเรื่อง <code>&lt;div class="section-header"&gt;</code></li>
+          <li>กล่องบอร์ดกริด <code>&lt;div class="gallery-grid"&gt;</code> ภายในประกอบด้วยรูปภาพ 5 ภาพครอบในคลาส <code>&lt;div class="gallery-item item-1"&gt;</code> ถึง <code>item-5</code></li>
+          <li>แต่ละภาพต้องมีโครงสร้างย่อย: <code>&lt;div class="gallery-img-wrapper"&gt;&lt;img src="..."&gt;&lt;/div&gt;</code> และ <code>&lt;div class="gallery-caption"&gt;...&lt;/div&gt;</code></li>
+        </ul>
+      </li>
+      <li><strong>ฟุตเตอร์ (footer)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;footer class="footer"&gt;</code> บรรจุกล่องคุมระยะ <code>.container</code> และข้อความลิขสิทธิ์ <code>&lt;p&gt;</code></li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>🖼️ ลิงก์รูปภาพสำหรับใช้ในแกลเลอรีหน้า 1 (คัดลอกไปใช้ใน src):</h3>
+    <ul>
+      <li><strong>ภาพแกลเลอรีที่ 1 (Main Glasshouse Area)</strong>: <br><code>https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80</code></li>
+      <li><strong>ภาพแกลเลอรีที่ 2 (Slow Bar & Specialty Coffee)</strong>: <br><code>https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=80</code></li>
+      <li><strong>ภาพแกลเลอรีที่ 3 (Botanical Garden)</strong>: <br><code>https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80</code></li>
+      <li><strong>ภาพแกลเลอรีที่ 4 (Bakery Studio)</strong>: <br><code>https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80</code></li>
+      <li><strong>ภาพแกลเลอรีที่ 5 (Private Co-working Room)</strong>: <br><code>https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80</code></li>
+    </ul>
+
+    <!-- ==========================================================
+       รายละเอียดหน้า 2: รายละเอียดเมนู (midterm-menu.html)
+       ========================================================== -->
+    <h2>2. หน้ารายละเอียดเมนู <code>midterm-menu.html</code> (10 คะแนน)</h2>
+    <p>เขียนโครงสร้างหน้าแสดงรายการเครื่องดื่ม เบเกอรี่ และบริการพื้นที่จองด้วยระบบ Grid Layout ที่มีการ์ดขนาดความสูงเท่ากัน และจัดปุ่มชิดล่างเสมอ</p>
+    
+    <h3>🔍 โครงสร้าง HTML ที่ต้องเขียนขึ้นเองภายใน body:</h3>
+    <ol>
+      <li><strong>ส่วนหัวข้อมูลแนะนำ (menu-intro)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;main class="container page-content"&gt;</code> ถัดจากแถบเมนูนำทาง</li>
+          <li>ด้านในใส่ <code>&lt;section class="menu-intro"&gt;</code> ประกอบด้วย <code>&lt;h1&gt;</code> เมนูและแพ็กเกจบริการ และย่อหน้า <code>&lt;p&gt;</code> อธิบายคำเชิญชวน</li>
+        </ul>
+      </li>
+      <li><strong>ปุ่มตัวเลือกหมวดหมู่ (category-nav)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;nav class="category-nav"&gt;</code> บรรจุ <code>&lt;a&gt;</code> จำนวน 4 ตัว ได้แก่ ทั้งหมด, เครื่องดื่มพิเศษ, เบเกอรี่โฮมเมด, แพ็กเกจพื้นที่ (มีคลาส <code>category-btn</code> และปุ่มแรกใส่คลาส <code>active</code>)</li>
+        </ul>
+      </li>
+      <li><strong>บล็อกสินค้ากริดการ์ด (menu-grid)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;section class="menu-grid"&gt;</code> ภายในประกอบด้วยสินค้า 6 ชิ้น ครอบด้วยแท็ก <code>&lt;article class="menu-card"&gt;</code></li>
+          <li>โครงสร้างในการ์ดแต่ละใบ:
+            <ul>
+              <li><code>&lt;div class="card-img-container"&gt;</code> บรรจุภาพ <code>&lt;img src="..."&gt;</code> และฉลากระบุโปรโมชันพิเศษ (ถ้ามี) <code>&lt;span class="card-badge [seasonal / bestseller / chef / hot]"&gt;</code></li>
+              <li><code>&lt;div class="card-content"&gt;</code> บรรจุหัวข้อ <code>&lt;h3&gt;</code>, คำอธิบายยาว <code>&lt;p class="card-desc"&gt;</code>, และ <code>&lt;div class="card-footer"&gt;</code> ที่ใส่ราคาสินค้า <code>.price</code> และปุ่มจอง <code>.btn</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>🖼️ ลิงก์รูปภาพอาหารและเมนู 6 รายการ:</h3>
+    <ul>
+      <li><strong>เมนูที่ 1 (Matcha Latte - Bestseller)</strong>: <br><code>https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80</code></li>
+      <li><strong>เมนูที่ 2 (Cold Brew - Seasonal)</strong>: <br><code>https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?auto=format&fit=crop&w=600&q=80</code></li>
+      <li><strong>เมนูที่ 3 (Waffle - ปกติ)</strong>: <br><code>https://images.unsplash.com/photo-1562376502-6f769499c886?auto=format&fit=crop&w=600&q=80</code></li>
+      <li><strong>เมนูที่ 4 (Carrot Cake - Chef's Choice)</strong>: <br><code>https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=600&q=80</code></li>
+      <li><strong>เมนูที่ 5 (Member Pass - ปุ่มเน้นสีป่าลึก)</strong>: <br><code>https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=600&q=80</code></li>
+      <li><strong>เมนูที่ 6 (Meeting Room - Hot Item)</strong>: <br><code>https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80</code></li>
+    </ul>
+
+    <!-- ==========================================================
+       รายละเอียดหน้า 3: ฟอร์มการจอง (midterm-booking.html)
+       ========================================================== -->
+    <h2>3. หน้าฟอร์มจองสัมมนา <code>midterm-booking.html</code> (10 คะแนน)</h2>
+    <p>เขียนโครงสร้างหน้าแบ่งฝั่งซ้ายขวา (Split Layout) ซีกซ้ายวางแผนผังร้านด้วยเวกเตอร์ SVG และฝั่งขวาทำแบบฟอร์มที่มีปุ่มตัวเลือกแบบ Custom Radio Cards และสวิตช์ Toggle Custom</p>
+    
+    <h3>🔍 โครงสร้าง HTML ที่ต้องเขียนขึ้นเองภายใน body:</h3>
+    <ol>
+      <li><strong>ส่วนสปลิทแบ่งข้าง (split-layout)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;main class="container page-content"&gt;</code> คุมด้านนอก ถัดมามี <code>&lt;div class="split-layout"&gt;</code></li>
+        </ul>
+      </li>
+      <li><strong>ฝั่งซ้าย: นโยบายและแผนผัง SVG (aside)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;aside class="info-sidebar"&gt;</code> ภายในมี <code>&lt;div class="info-card"&gt;</code> บรรจุหัวเรื่อง รายละเอียดนโยบายจอง และข้อมูลติดต่อ</li>
+          <li>มีกล่องครอบแผงจำลองที่นั่ง <code>&lt;div class="info-card map-card"&gt;</code> บรรจุข้อมูลและแผนผัง SVG โครงสร้างที่นั่งจริงด้านล่าง</li>
+        </ul>
+      </li>
+      <li><strong>ฝั่งขวา: กล่องกรอกแบบฟอร์มจอง (form-container)</strong>:
+        <ul>
+          <li>ใช้แท็ก <code>&lt;section class="form-container"&gt;</code> บรรจุแท็กฟอร์มหลัก <code>&lt;form action="#" method="GET" class="booking-form"&gt;</code></li>
+          <li>ช่องกรอกจัดระเบียบแบ่งครึ่งด้วยกริดแถว <code>&lt;div class="form-grid"&gt;</code> สำหรับครอบข้อมูล:
+            <ul>
+              <li>คู่ที่ 1: ชื่อจริง <code>#firstname</code> + นามสกุล <code>#lastname</code></li>
+              <li>คู่ที่ 2: อีเมล <code>#email</code> + เบอร์โทรศัพท์ <code>#phone</code></li>
+            </ul>
+          </li>
+          <li><strong>กลุ่มตัวเลือกแบบวิทยุการ์ด (radio-cards-grid)</strong>:
+            <ul>
+              <li>สร้างกล่องหุ้ม <code>&lt;div class="radio-cards-grid"&gt;</code> ด้านในมีตัวเลือก 3 บล็อกคลาส <code>radio-card-wrapper</code></li>
+              <li>โครงสร้างย่อย: แท็กอินพุตวิทยุจริง <code>&lt;input type="radio" id="pkg-desk" name="package-option" value="hotdesk" checked required&gt;</code> และแท็กแสดงการ์ด <code>&lt;label for="pkg-desk" class="custom-radio-card"&gt;</code> (ในฉลากมีกล่องใส่ไอคอนอารมณ์ <code>.radio-icon</code>, ชื่อเรื่อง <code>.radio-title</code>, ราคา <code>.radio-price</code> และรายละเอียดสั้น <code>.radio-desc</code>)</li>
+            </ul>
+          </li>
+          <li><strong>แถววันเวลาแบบ 3 ช่องย่อย</strong>:
+            <ul>
+              <li>ใช้คลาส <code>&lt;div class="form-grid col-3"&gt;</code> บรรจุวันจอง <code>#book-date</code> (ชนิด date) + เวลาจอง <code>#book-time</code> (ชนิด time) + จำนวนแขก <code>#guests</code> (แท็ก select)</li>
+            </ul>
+          </li>
+          <li><strong>สวิตช์เลื่อนปุ่ม (Custom Toggle Switch)</strong>:
+            <ul>
+              <li>จัดรวมในกล่องคลาส <code>&lt;div class="toggle-group"&gt;</code></li>
+              <li>มีรางควบคุมสไลด์ <code>&lt;label class="switch-container"&gt;</code> บรรจุอินพุตตรวจสอบ <code>&lt;input type="checkbox" id="subscribe"&gt;</code> และรางสไลด์ <code>&lt;span class="switch-slider"&gt;&lt;/span&gt;</code></li>
+              <li>ป้ายข้อความข้างกัน <code>&lt;label for="subscribe" class="toggle-label"&gt;</code> ต้องการรับข้อมูลข่าวสารผ่านทางอีเมล</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>🗺&nbsp;โค้ดโครงสร้างแผนผังที่นั่งเวกเตอร์ SVG (สำหรับคัดลอกไปวางใส่ Aside หน้า 3):</h3>
+    <p>ให้คัดลอกกลุ่มแท็ก SVG ด้านล่างนี้ไปวางใสในการ์ดจำลองที่นั่งแผนผังของหน้า 3 เพื่อให้ระบบแสดงผังที่นั่งสำหรับจัดแต่ง Hover ไฮไลท์:</p>
+    
+    <pre><code>&lt;svg viewBox="0 0 400 220" class="floor-svg"&gt;
+  &lt;!-- กำแพงกรอบรอบนอก --&gt;
+  &lt;rect x="5" y="5" width="390" height="210" rx="12" fill="#FAF8F5" stroke="#C49A6C" stroke-width="2"/&gt;
+  
+  &lt;!-- โซน A: Slow Bar --&gt;
+  &lt;g class="floor-zone" id="zone-a"&gt;
+    &lt;rect x="20" y="20" width="100" height="180" rx="8" fill="#FFFFFF" stroke="#E5E0D8" stroke-width="2"/&gt;
+    &lt;text x="70" y="95" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1B3B2B" text-anchor="middle"&gt;โซน A&lt;/text&gt;
+    &lt;text x="70" y="115" font-family="sans-serif" font-size="9" fill="#6C757D" text-anchor="middle"&gt;Slow Bar Area&lt;/text&gt;
+    &lt;text x="70" y="130" font-family="sans-serif" font-size="8" fill="#C49A6C" text-anchor="middle"&gt;Hot Desk Pass&lt;/text&gt;
+    &lt;line x1="110" y1="30" x2="110" y2="190" stroke="#1B3B2B" stroke-width="3" stroke-linecap="round"/&gt;
+  &lt;/g&gt;
+
+  &lt;!-- โซน B: ห้องประชุมกระจก --&gt;
+  &lt;g class="floor-zone" id="zone-b"&gt;
+    &lt;rect x="140" y="20" width="120" height="180" rx="8" fill="#FFFFFF" stroke="#E5E0D8" stroke-width="2"/&gt;
+    &lt;text x="200" y="95" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1B3B2B" text-anchor="middle"&gt;โซน B&lt;/text&gt;
+    &lt;text x="200" y="115" font-family="sans-serif" font-size="9" fill="#6C757D" text-anchor="middle"&gt;Meeting Room&lt;/text&gt;
+    &lt;text x="200" y="130" font-family="sans-serif" font-size="8" fill="#C49A6C" text-anchor="middle"&gt;ห้องกระจกส่วนตัว&lt;/text&gt;
+    &lt;rect x="175" y="150" width="50" height="30" rx="4" fill="#E5E0D8"/&gt;
+    &lt;circle cx="170" cy="165" r="4" fill="#C49A6C"/&gt;
+    &lt;circle cx="230" cy="165" r="4" fill="#C49A6C"/&gt;
+  &lt;/g&gt;
+
+  &lt;!-- โซน C: สวนกระจกด้านนอก Terrace --&gt;
+  &lt;g class="floor-zone" id="zone-c"&gt;
+    &lt;rect x="280" y="20" width="100" height="180" rx="8" fill="#FFFFFF" stroke="#E5E0D8" stroke-width="2"/&gt;
+    &lt;text x="330" y="95" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1B3B2B" text-anchor="middle"&gt;โซน C&lt;/text&gt;
+    &lt;text x="330" y="115" font-family="sans-serif" font-size="9" fill="#6C757D" text-anchor="middle"&gt;Terrace Zone&lt;/text&gt;
+    &lt;text x="330" y="130" font-family="sans-serif" font-size="8" fill="#C49A6C" text-anchor="middle"&gt;Glasshouse Area&lt;/text&gt;
+    &lt;circle cx="330" cy="50" r="10" fill="#D8F3DC" opacity="0.7"/&gt;
+    &lt;circle cx="330" cy="155" r="8" fill="#D8F3DC" opacity="0.7"/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+
+    <!-- ==========================================================
+       ลิงก์ผลลัพธ์พรีวิวเฉลยตัวอย่างเว็บสมบูรณ์แบบ
+       ========================================================== -->
+    <h3 style="margin-top: 40px; text-align: center; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary);">🖥️ หน้าตัวอย่างผลลัพธ์ฉบับสมบูรณ์ (Perfect Reference Preview Pages)</h3>
+    <p style="text-align: center; color: #64748b; margin-bottom: 20px; font-size: 0.95rem;">คุณสามารถเปิดดูผลลัพธ์ของเฉลยที่สมบูรณ์แบบ 100% ทั้งโครงสร้างและดีไซน์ในการนำมาเปรียบเทียบเทียบสัดส่วนและหน้าตาเว็บจริงได้:</p>
+    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px;">
+      <a href="midterm-shop-solution.html" class="btn btn-outline" target="_blank" style="padding: 10px 20px; font-size: 0.9rem;">🌟 พรีวิวหน้าแรก (ข้อมูลร้าน)</a>
+      <a href="midterm-menu-solution.html" class="btn btn-outline" target="_blank" style="padding: 10px 20px; font-size: 0.9rem;">🌟 พรีวิวหน้าสอง (รายการเมนู)</a>
+      <a href="midterm-booking-solution.html" class="btn btn-outline" target="_blank" style="padding: 10px 20px; font-size: 0.9rem;">🌟 พรีวิวหน้าสาม (จองสัมมนา)</a>
+    </div>
+
+    <div class="action-links" style="margin-top: 20px;">
+      <a href="midterm-shop.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px 35px;">🚀 เริ่มทำข้อสอบจากหน้าว่าง (Start Starter HTML)</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

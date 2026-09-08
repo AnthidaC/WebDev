@@ -1,0 +1,945 @@
+/* ==========================================================
+   CSS LAYOUT MIDTERM EXAM: FLORA & FAUNA BOTANICAL CAFE
+   ไฟล์เฉลยฉบับสมบูรณ์ (Solution Reference) - ฉบับท้าทาย & Premium Design
+   ========================================================== */
+
+/* 🌌 โหลดฟอนต์พรีเมียม (Serif + Sans-serif) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Sarabun:ital,wght@0,100..800;1,100..800&family=Sora:wght@100..800&display=swap');
+
+/* 🎨 1. ตัวแปรและสีธีมพรีเมียม (Luxury Botanical Palette) */
+:root {
+  --primary-color: #1b3b2b;      /* เขียวป่าลึกสุดพรีเมียม (Deep Forest) */
+  --primary-hover: #11251b;      /* เขียวป่าลึกพิเศษ */
+  --accent-color: #c49a6c;       /* ทองโบราณหรูหรา (Antique Gold) */
+  --accent-light: #f5efe6;       /* ครีมผืนทรายอ่อนนุ่ม (Sand Cream) */
+  --bg-light: #faf8f5;           /* พื้นหลังสีงาช้างหรูหรา (Luxury Ivory) */
+  --text-dark: #1b2520;          /* ดำถ่านเจือเขียวป่าไม้ (Charcoal Forest) */
+  --text-muted: #6c7870;         /* เขียวอมเทาสบายตา (Sage Muted) */
+  --white: #ffffff;
+  --bestseller-color: #9e2a2b;   /* แดงทับทิมหรูหรา (Ruby Red) */
+  --border-color: #e5e0d8;       /* เส้นขอบอุ่นเบาบาง (Warm Soft Border) */
+  --border-radius: 16px;         /* ขอบมนแบบการ์ดพรีเมียม */
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* แอนิเมชันลื่นไหลเป็นธรรมชาติ */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Sarabun', 'Sora', sans-serif;
+}
+
+/* 🧹 2. ล้างค่าเริ่มต้น (CSS Reset & Base Rules) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.7;
+}
+
+h1, h2, h3, .logo {
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================
+   ตอนที่ 1: ระบบนำทางส่วนกลาง (Shared Navigation Bar)
+   ========================================================== */
+.navbar {
+  height: 90px;
+  background-color: rgba(250, 248, 245, 0.85);
+  border-bottom: 1px solid var(--border-color);
+  
+  /* 💻 เฉลย: Sticky & Glassmorphism */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.nav-container {
+  /* 💻 เฉลย: Flexbox จัดซ้ายขวา */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.logo {
+  font-size: 1.7rem;
+  color: var(--primary-color);
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  /* 💻 เฉลย: เรียงแถวแนวนอน */
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  padding: 10px 20px;
+  border-radius: 30px;
+  transition: var(--transition);
+}
+
+.nav-item:hover {
+  color: var(--primary-color);
+  background-color: var(--accent-light);
+}
+
+.nav-item.active {
+  /* 💻 เฉลย: ปุ่มเพจปัจจุบัน */
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+
+/* ==========================================================
+   ตอนที่ 2: หน้าข้อมูลร้าน (midterm-shop.html)
+   ========================================================== */
+
+/* 2.1 ส่วนหัวแบนเนอร์ยักษ์ (Hero Section) */
+.hero {
+  height: 600px;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  
+  /* 💻 เฉลย: จัดตรงกลาง Hero */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-overlay {
+  /* 💻 เฉลย: แผ่นโปร่งแสงสีดำทับหน้า */
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(15, 27, 20, 0.65);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--white);
+  max-width: 850px;
+  padding: 40px 24px 0 24px; /* ป้องกันการทับซ้อน */
+  margin: 0 auto; /* จัดให้อยู่กึ่งกลางแนวนอน */
+}
+
+.hero-content h1 {
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  margin-bottom: 24px;
+  line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เพิ่มเงาให้อ่านง่าย */
+}
+
+.hero-content p {
+  font-size: 1.15rem;
+  margin-bottom: 35px;
+  color: #f1f1f1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* เพิ่มเงาให้อ่านง่าย */
+}
+
+.hero-content .badge {
+  background-color: var(--accent-color);
+  color: var(--primary-color);
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+/* 2.2 โครงสร้างเนื้อหาและสถิติ (About & Stats) */
+.about-section {
+  padding: 100px 0;
+  /* 💻 เฉลย: เลย์เอาต์แยก 2 ฝั่ง */
+  display: flex;
+  gap: 50px;
+  align-items: center;
+}
+
+.about-text {
+  flex: 1.3;
+}
+
+.about-text h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 24px;
+}
+
+.stats-grid {
+  flex: 1;
+  /* 💻 เฉลย: Grid ย่อยกล่องสถิติ */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.stat-item {
+  background-color: var(--white);
+  padding: 30px 20px;
+  border-radius: var(--border-radius);
+  text-align: center;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.02);
+}
+
+.stat-number {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 2.3 แกลเลอรีรูปภาพเรือนกระจกอสมมาตร (Asymmetrical Bento Grid & Zoom) */
+.gallery-section {
+  padding-bottom: 100px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-size: 2.3rem;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.gallery-grid {
+  /* 💻 เฉลย: จัดแกลเลอรีแบบ Grid 3 คอลัมน์ */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  height: 280px; /* ความสูงตั้งต้น */
+  box-shadow: 0 10px 35px rgba(27, 59, 43, 0.04);
+}
+
+/* 💻 เฉลยท้าทายพิเศษ: Bento Grid Spanning แบบไม่สมมาตร */
+.item-1 {
+  grid-column: span 2;
+  grid-row: span 2;
+  height: 584px; /* เท่ากับสูงแถว 2 แถวบวก gap */
+}
+
+.item-2 {
+  grid-row: span 2;
+  height: 584px;
+}
+
+.item-3 {
+  /* กว้าง 1 สูง 1 ปกติ */
+}
+
+.item-4 {
+  /* กว้าง 1 สูง 1 ปกติ */
+}
+
+.item-5 {
+  grid-column: span 2;
+}
+
+.gallery-img-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gallery-img-wrapper img {
+  /* 💻 เฉลยท้าทาย: ตั้งค่า Transition เผื่อทำ Hover Zoom */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 💻 เฉลยท้าทาย: เมื่อ Hover ที่ภาพแกลเลอรี */
+.gallery-item:hover .gallery-img-wrapper img {
+  transform: scale(1.08);
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(27, 59, 43, 0.95));
+  color: var(--white);
+  padding: 24px;
+  font-weight: bold;
+  z-index: 2;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.gallery-item:hover .gallery-caption {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+
+/* ==========================================================
+   ตอนที่ 3: หน้ารายละเอียดเมนูและบริการ (midterm-menu.html)
+   ========================================================== */
+
+.menu-intro {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.menu-intro h1 {
+  font-size: 2.8rem;
+  color: var(--primary-color);
+  margin-bottom: 12px;
+}
+
+/* 3.1 ปุ่มหมวดหมู่การเลือก (Category Selectors) */
+.category-nav {
+  /* 💻 เฉลย: จัด Flexbox แนวนอนกลางจอ */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+}
+
+.category-btn {
+  text-decoration: none;
+  color: var(--text-dark);
+  padding: 12px 28px;
+  border-radius: 30px;
+  border: 1px solid var(--border-color);
+  background-color: var(--white);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.category-btn.active, .category-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(27, 59, 43, 0.15);
+}
+
+/* 3.2 สไตล์ Grid รายการการ์ดอาหารเครื่องดื่ม */
+.menu-grid {
+  /* 💻 เฉลย: Grid 4 คอลัมน์เดสก์ท็อป */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+/* 3.3 โครงสร้างการ์ด และ Flexbox ดันขอบสูงเท่ากัน (Equal Height Alignment) */
+.menu-card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.03);
+  transition: var(--transition);
+  
+  /* 💻 เฉลย: ตั้งค่า Flexbox เพื่อรองรับการยืดตัว */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-img-container {
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img-container img {
+  transition: var(--transition);
+}
+
+.menu-card:hover .card-img-container img {
+  transform: scale(1.06);
+}
+
+/* ป้ายกำกับแบบพรีเมียม (Absolute Badge) */
+.card-badge {
+  /* 💻 เฉลย: แปะป้ายมุมขวาบน */
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--white);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.card-badge.bestseller { background-color: var(--bestseller-color); }
+.card-badge.seasonal { background-color: #e59866; }
+.card-badge.chef { background-color: #27ae60; }
+.card-badge.hot { background-color: #8e44ad; }
+
+.card-content {
+  padding: 24px;
+  
+  /* 💻 เฉลยท้าทาย: จัด Flex ให้เนื้อหาการ์ดเพื่อดัน footer */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.card-content h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: var(--primary-color);
+}
+
+.card-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  
+  /* 💻 เฉลยท้าทาย: บรรยายยาวต่างกัน ให้ยืดตรงนี้เพื่อเบียดดัน footer ลงล่าง */
+  flex-grow: 1;
+}
+
+.card-footer {
+  /* 💻 เฉลย: จัดราคาอยู่ซ้าย ปุ่มอยู่ขวา */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 20px;
+  margin-top: auto; /* ล็อกความมั่นคง */
+}
+
+.price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+/* 💻 เฉลยท้าทาย: เมื่อชี้เมาส์ที่การ์ดเมนู */
+.menu-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(27, 59, 43, 0.08);
+  border-color: var(--accent-color);
+}
+
+
+/* ==========================================================
+   ตอนที่ 4: หน้าแบบฟอร์มการจองโต๊ะ (midterm-booking.html)
+   ========================================================== */
+
+/* 4.1 สปลิทเลย์เอาต์ 2 คอลัมน์ (Split Layout) */
+.split-layout {
+  /* 💻 เฉลย: แยกซ้ายขวา 35% : 65% */
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 40px;
+  align-items: start;
+}
+
+.info-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.info-card {
+  background-color: var(--white);
+  padding: 35px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.02);
+}
+
+.info-card h2 {
+  font-size: 1.6rem;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.policy-list {
+  list-style: none;
+}
+
+.policy-list li {
+  margin-bottom: 16px;
+  padding-left: 24px;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.policy-list li::before {
+  content: "✦";
+  color: var(--accent-color);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+/* 🗺️ สไตล์ของแผนผังที่นั่งจำลอง (SVG Seating Plan Layout) */
+.map-card {
+  border-color: var(--border-color);
+}
+
+.floor-svg {
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+}
+
+.floor-zone {
+  cursor: pointer;
+}
+
+.floor-zone rect {
+  transition: var(--transition);
+}
+
+/* 💻 เฉลยท้าทายของแผนผัง: เมื่อ Hover ที่กลุ่มโซน */
+.floor-zone:hover rect {
+  fill: var(--accent-light);
+  stroke: var(--accent-color);
+  filter: drop-shadow(0 4px 8px rgba(196, 154, 108, 0.15));
+}
+
+/* 🌟 สไตล์ของพรีวิวโซนเมื่อเลือกหรือชี้เมาส์ */
+.zone-preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px rgba(27, 59, 43, 0.05);
+  transition: var(--transition);
+  text-align: left;
+}
+
+.zone-preview-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: calc(var(--border-radius) - 4px);
+  transition: opacity 0.3s ease;
+}
+
+.zone-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zone-preview-info h4 {
+  font-size: 0.95rem;
+  color: var(--primary-color);
+  margin: 0;
+  font-weight: bold;
+}
+
+.zone-preview-info p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0 0 4px 0;
+}
+
+.zone-preview-price {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+
+
+.contact-card {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+}
+
+.contact-card h3 {
+  color: var(--accent-color);
+  margin-bottom: 15px;
+}
+
+.contact-card p {
+  color: #dfdfdf;
+  margin-bottom: 10px;
+}
+
+.form-container {
+  background-color: var(--white);
+  padding: 45px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 40px rgba(27, 59, 43, 0.03);
+}
+
+.form-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+/* 4.2 การจัดโครงร่างอินพุตด้วย Grid */
+.form-grid {
+  /* 💻 เฉลย: แบ่งครึ่ง 2 คอลัมน์ */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.form-grid.col-3 {
+  /* 💻 เฉลย: แบ่งเป็น 3 คอลัมน์ */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+.required {
+  color: var(--bestseller-color);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  outline: none;
+  background-color: var(--bg-light);
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+/* 💻 เฉลย: Focus effects */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  background-color: var(--white);
+  box-shadow: 0 0 0 4px rgba(27, 59, 67, 0.1);
+}
+
+/* 4.3 ระบบปุ่มเลือกบริการจองพื้นที่จำลอง (Visual Radio Cards) */
+.radio-cards-grid {
+  /* 💻 เฉลย: 3 คอลัมน์ */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* ซ่อนปุ่มกลมดั้งเดิม */
+.radio-card-wrapper input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+.custom-radio-card {
+  display: block;
+  background-color: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 20px 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.radio-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.radio-title {
+  font-family: var(--font-serif);
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin-bottom: 6px;
+}
+
+.radio-price {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.radio-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* 💻 เฉลยท้าทายระดับยาก:
+   เมื่อ Radio Button มีสถานะเป็น :checked ให้ตัวการ์ดที่เป็นพี่น้องที่ตามหลังมา (+) เปลี่ยนสไตล์
+*/
+.radio-card-wrapper input[type="radio"]:checked + .custom-radio-card {
+  border-color: var(--primary-color);
+  background-color: var(--accent-light);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(27, 59, 43, 0.08);
+}
+
+
+/* 4.4 การสวิตช์ปิดเปิดแบบสไลด์ (Custom Toggle Switch) */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.switch-container {
+  position: relative;
+  display: inline-block;
+  width: 55px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch-container input {
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border-color);
+  transition: .4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 34px;
+}
+
+.switch-slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 💻 เฉลยท้าทาย:
+   1. เมื่ออินพุตถูกเลือก (:checked) ให้สไลเดอร์เปลี่ยนเป็นสีกรองป่าลึก
+   2. ดันลูกกลมให้เยื้องขวา 27px
+*/
+.switch-container input:checked + .switch-slider {
+  background-color: var(--primary-color);
+}
+
+.switch-container input:checked + .switch-slider::before {
+  transform: translateX(27px);
+}
+
+.toggle-label {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  user-select: none;
+}
+
+
+/* ==========================================================
+   ปุ่มทั่วไป (Common Button Utilities)
+   ========================================================== */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  padding: 14px 32px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: 0 4px 15px rgba(27, 59, 43, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(27, 59, 43, 0.3);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+
+/* ==========================================================
+   ส่วนท้ายเว็บ (Shared Footer Area)
+   ========================================================== */
+.footer {
+  background-color: var(--primary-color);
+  color: #c7d2cc;
+  text-align: center;
+  padding: 50px 0;
+  margin-top: 100px;
+  font-size: 0.85rem;
+  border-top: 5px solid var(--accent-color);
+}
+
+
+/* ==========================================================
+   การตอบสนองตามขนาดหน้าจอ (Responsive Media Queries)
+   ========================================================== */
+
+/* 💻 5.1 ขนาดหน้าจอแท็บเล็ต (หน้าจอน้อยกว่า 992px) */
+@media (max-width: 992px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 📱 5.2 ขนาดหน้าจอมือถือ (หน้าจอน้อยกว่า 768px) */
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    height: auto;
+    padding: 20px 0;
+    gap: 15px;
+  }
+  
+  .navbar {
+    height: auto;
+  }
+
+  .hero {
+    height: 480px;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .about-section {
+    flex-direction: column;
+    padding: 60px 0;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* คืนค่าไม่ให้เกิด Span ภาพยาวเมื่อใช้บนจอมือถือ */
+  .item-1, .item-2, .item-3, .item-4, .item-5 {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+    height: 260px !important;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid, .form-grid.col-3, .radio-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
