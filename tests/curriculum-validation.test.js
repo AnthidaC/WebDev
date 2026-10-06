@@ -6,8 +6,8 @@ import { jsCurriculum } from '../src/data/jsCurriculum.js';
 describe('JavaScript Lessons Validation Auto-Tests', () => {
   const { lessons } = jsCurriculum;
 
-  it('curriculum should have all 14 structured lessons', () => {
-    assert.strictEqual(lessons.length, 14, 'Should contain exactly 14 lessons across 3 chapters');
+  it('curriculum should have all 18 structured lessons', () => {
+    assert.strictEqual(lessons.length, 18, 'Should contain exactly 18 lessons across 3 chapters');
   });
 
   lessons.forEach((lesson) => {

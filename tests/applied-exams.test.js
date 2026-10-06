@@ -6,9 +6,9 @@ import { jsCurriculum } from '../src/data/jsCurriculum.js';
 describe('Applied Full-Stack Practical Exams Automated Tests', () => {
   const { appliedExams } = jsCurriculum;
 
-  it('curriculum should have 9 applied practical exams (diversified APIs & Games)', () => {
+  it('curriculum should have 12 applied practical exams (diversified APIs & Games)', () => {
     assert.ok(Array.isArray(appliedExams), 'appliedExams array must exist in jsCurriculum');
-    assert.strictEqual(appliedExams.length, 9, 'Must have 9 applied full-stack practical exams');
+    assert.strictEqual(appliedExams.length, 12, 'Must have 12 applied full-stack practical exams');
   });
 
   it('all applied exams should have complete full-stack assets and schemas', () => {
@@ -121,7 +121,7 @@ describe('Applied Full-Stack Practical Exams Automated Tests', () => {
 
     const doc = dom.window.document;
     const cards = doc.querySelectorAll('.memory-card');
-    assert.strictEqual(cards.length, 4, 'Must have 4 memory cards');
+    assert.strictEqual(cards.length, 16, 'Must have 16 memory cards (4x4 grid)');
 
     const movesEl = doc.getElementById('moves-count');
     const restartBtn = doc.getElementById('btn-restart-game');
@@ -129,6 +129,10 @@ describe('Applied Full-Stack Practical Exams Automated Tests', () => {
     // Flip first card
     cards[0].click();
     assert.ok(cards[0].classList.contains('flipped'), 'Card 0 should be flipped');
+
+    // Verify cards have shuffle order applied
+    const hasOrder = Array.from(cards).some((c) => c.style.order !== '');
+    assert.ok(hasOrder, 'Cards must have style.order assigned for random shuffling');
 
     // Restart game
     restartBtn.click();
@@ -338,5 +342,102 @@ describe('Applied Full-Stack Practical Exams Automated Tests', () => {
 
     const validResult = exam.validation(doc);
     assert.strictEqual(validResult, true, 'Wordle validation must pass');
+  });
+
+  it('Exam 10: HTML5 Drag & Drop Kanban Board', () => {
+    const exam = appliedExams.find((e) => e.id === 'exam-drag-drop-board');
+    assert.ok(exam, 'Drag & Drop exam must exist');
+
+    const dom = new JSDOM(exam.targetHtml, { runScripts: 'dangerously' });
+    dom.window.eval(exam.targetJs);
+
+    const doc = dom.window.document;
+    const colTodo = doc.getElementById('col-todo');
+    const colDone = doc.getElementById('col-done');
+    const countTodo = doc.getElementById('count-todo');
+    const countDone = doc.getElementById('count-done');
+    const cards = doc.querySelectorAll('.kanban-card');
+
+    assert.ok(cards.length >= 2, 'Should have at least 2 cards');
+    assert.strictEqual(countTodo.textContent, '2', 'Initial todo count should be 2');
+    assert.strictEqual(countDone.textContent, '0', 'Initial done count should be 0');
+
+    // Simulate drag and drop: move card-1 to colDone
+    const card1 = doc.getElementById('card-1');
+    colDone.appendChild(card1);
+    // Trigger update
+    const todoCards = colTodo.querySelectorAll('.kanban-card');
+    const doneCards = colDone.querySelectorAll('.kanban-card');
+    countTodo.textContent = todoCards.length;
+    countDone.textContent = doneCards.length;
+
+    assert.strictEqual(countTodo.textContent, '1', 'Todo count should decrease to 1');
+    assert.strictEqual(countDone.textContent, '1', 'Done count should increase to 1');
+
+    const validResult = exam.validation(doc, exam.targetCss, exam.targetJs);
+    assert.strictEqual(validResult, true, 'Kanban Drag & Drop validation must pass');
+  });
+
+  it('Exam 11: Payroll & Object Constructor with this Explicit Binding', () => {
+    const exam = appliedExams.find((e) => e.id === 'exam-this-constructor-payroll');
+    assert.ok(exam, 'Payroll & this binding exam must exist');
+
+    const dom = new JSDOM(exam.targetHtml, { runScripts: 'dangerously' });
+    dom.window.eval(exam.targetJs);
+
+    const doc = dom.window.document;
+    const list = doc.getElementById('payroll-list');
+    const calcBtn = doc.getElementById('btn-calc-payroll');
+    const totalBudget = doc.getElementById('total-payroll-budget');
+
+    assert.ok(list, 'Payroll list element must exist');
+    const cards = list.querySelectorAll('.emp-card');
+    assert.strictEqual(cards.length, 2, 'Should render 2 employees initially');
+
+    calcBtn.click();
+    assert.notStrictEqual(totalBudget.textContent, '0', 'Total budget should be calculated');
+
+    const validResult = exam.validation(doc, exam.targetCss, exam.targetJs);
+    assert.strictEqual(validResult, true, 'Payroll & this binding validation must pass');
+  });
+
+  it('Exam 12: Priority Queue DOM Node Tree (insertBefore & replaceChild)', () => {
+    const exam = appliedExams.find((e) => e.id === 'exam-dom-node-queue');
+    assert.ok(exam, 'Queue DOM Node exam must exist');
+
+    const dom = new JSDOM(exam.targetHtml, { runScripts: 'dangerously' });
+    dom.window.eval(exam.targetJs);
+
+    const doc = dom.window.document;
+    const queueList = doc.getElementById('queue-list');
+    const inputPatient = doc.getElementById('input-patient');
+    const btnVip = doc.getElementById('btn-insert-vip');
+    const btnEmergency = doc.getElementById('btn-replace-emergency');
+    const btnNext = doc.getElementById('btn-call-next');
+    const countEl = doc.getElementById('queue-count');
+    const servingEl = doc.getElementById('serving-now');
+
+    assert.strictEqual(queueList.children.length, 3, 'Initial queue count should be 3');
+    assert.strictEqual(countEl.textContent, '3');
+
+    // Test insert VIP (insertBefore)
+    inputPatient.value = 'คุณหญิงสุดสวย';
+    btnVip.click();
+    assert.strictEqual(queueList.children.length, 4, 'Queue should grow to 4');
+    assert.ok(queueList.firstElementChild.textContent.includes('คุณหญิงสุดสวย'), 'First child must be VIP');
+
+    // Test replace emergency (replaceChild)
+    inputPatient.value = 'คนไข้หัวใจวิกฤต';
+    btnEmergency.click();
+    assert.strictEqual(queueList.children.length, 4, 'Queue count unchanged after replaceChild');
+    assert.ok(queueList.firstElementChild.textContent.includes('คนไข้หัวใจวิกฤต'), 'First child replaced');
+
+    // Test call next (removeChild)
+    btnNext.click();
+    assert.strictEqual(queueList.children.length, 3, 'Queue reduced to 3 after call next');
+    assert.ok(servingEl.textContent.includes('คนไข้หัวใจวิกฤต'), 'Serving should now be the emergency patient');
+
+    const validResult = exam.validation(doc, exam.targetCss, exam.targetJs);
+    assert.strictEqual(validResult, true, 'Queue DOM Node validation must pass');
   });
 });

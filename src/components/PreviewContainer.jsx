@@ -8,9 +8,13 @@ export default function PreviewContainer({
   targetHtml = '',
   targetCss = '',
   targetJs = '',
-  showCompare = false
+  showCompare = false,
+  activePreviewTab: controlledTab,
+  setActivePreviewTab: controlledSetTab
 }) {
-  const [activePreviewTab, setActivePreviewTab] = useState('live'); // 'live', 'console', 'target', 'compare'
+  const [internalTab, setInternalTab] = useState('live'); // 'live', 'console', 'target', 'compare'
+  const activePreviewTab = controlledTab !== undefined ? controlledTab : internalTab;
+  const setActivePreviewTab = controlledSetTab || setInternalTab;
   const [sliderVal, setSliderVal] = useState(50); // 0 to 100
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(400);
@@ -193,7 +197,7 @@ export default function PreviewContainer({
               className={`preview-tab ${activePreviewTab === 'target' ? 'active' : ''}`}
             >
               <Sparkles size={14} className="text-yellow-500" />
-              <span>ตัวโชว์เฉลยต้นแบบ (Demo Preview)</span>
+              <span>ตัวอย่างการทำงานจริง (Demo)</span>
             </button>
           )}
           
@@ -236,14 +240,13 @@ export default function PreviewContainer({
       </div>
 
       <div className="preview-body">
-        {activePreviewTab === 'live' && (
-          <iframe
-            title="Live Preview"
-            srcDoc={liveSrcDoc}
-            className="preview-iframe"
-            sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
-          />
-        )}
+        <iframe
+          title="Live Preview"
+          srcDoc={liveSrcDoc}
+          className="preview-iframe"
+          style={{ display: activePreviewTab === 'live' ? 'block' : 'none' }}
+          sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
+        />
 
         {activePreviewTab === 'console' && (
           <div className="console-panel-inner">
@@ -270,12 +273,43 @@ export default function PreviewContainer({
         )}
 
         {activePreviewTab === 'target' && (
-          <iframe
-            title="Target Preview Demo"
-            srcDoc={targetSrcDoc}
-            className="preview-iframe"
-            sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{
+              padding: '6px 12px',
+              background: 'rgba(2, 132, 199, 0.1)',
+              borderBottom: '1px solid rgba(2, 132, 199, 0.2)',
+              color: 'var(--text-secondary, #0284c7)',
+              fontSize: '11.5px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px'
+            }}>
+              <span>🎮 <strong>โหมดทดลองตัวอย่างจริง:</strong> คุณสามารถคลิกทดสอบและดูผลลัพธ์ของระบบได้ที่นี่ (ไม่มีการเฉลยซอร์สโค้ดใน Editor)</span>
+              <button
+                onClick={() => setActivePreviewTab('live')}
+                style={{
+                  background: '#0284c7',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '3px 9px',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                กลับไปโค้ดของฉัน
+              </button>
+            </div>
+            <iframe
+              title="Target Preview Demo"
+              srcDoc={targetSrcDoc}
+              className="preview-iframe"
+              style={{ flex: 1, border: 'none' }}
+              sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
+            />
+          </div>
         )}
 
         {activePreviewTab === 'compare' && (

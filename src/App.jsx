@@ -19,7 +19,10 @@ import {
   Download,
   HelpCircle,
   Code2,
-  Layers
+  Layers,
+  Code,
+  Eye,
+  Play
 } from 'lucide-react';
 
 export default function App() {
@@ -46,6 +49,9 @@ export default function App() {
     return course === 'js' ? 'js' : 'html';
   });
 
+  // Active Preview Tab: 'live', 'console', 'target', 'compare'
+  const [activePreviewTab, setActivePreviewTab] = useState('live');
+
   // Sandbox code cache: { [itemId]: { html, css, js } }
   const [codeCache, setCodeCache] = useState(() => {
     const key = course === 'js' ? 'webdev-code-cache-js' : 'webdev-code-cache';
@@ -71,7 +77,22 @@ export default function App() {
   });
 
   // Layout states
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+  const [mobileTab, setMobileTab] = useState('instruction'); // 'instruction' | 'editor' | 'preview'
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [topHeight, setTopHeight] = useState(40); // percentage
   const [isDraggingH, setIsDraggingH] = useState(false);
@@ -141,10 +162,11 @@ export default function App() {
       setCss(activeItem.starterCss || '');
       setJs(activeItem.starterJs || '');
     }
-    // Reset validations
+    // Reset validations & preview tab
     setValidationError(null);
     setIsSuccess(false);
     setShowSuccessModal(false);
+    setActivePreviewTab('live');
 
     // Set editor tab
     if (activeItem && activeItem.id && activeItem.id.startsWith('exam-')) {
@@ -302,18 +324,55 @@ export default function App() {
 
   // Run Code Verification
   const handleVerify = async () => {
-    const iframe =
+    if (!activeItem || typeof activeItem.validation !== 'function') return;
+
+    let iframe =
       document.querySelector('iframe[title="Live Preview"]') ||
       document.querySelector('iframe[title="Live Preview Overlap"]');
 
-    if (!iframe) {
+    let doc = null;
+    let tempIframe = null;
+
+    if (iframe) {
+      try {
+        doc = iframe.contentDocument || iframe.contentWindow?.document;
+      } catch (e) {
+        doc = null;
+      }
+    }
+
+    // Ultra-reliable fallback: if live preview iframe is not found or inaccessible,
+    // dynamically spin up a headless sandbox frame to evaluate the code
+    if (!doc || !doc.body) {
+      try {
+        tempIframe = document.createElement('iframe');
+        tempIframe.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;pointer-events:none;';
+        tempIframe.sandbox = 'allow-scripts allow-same-origin';
+        document.body.appendChild(tempIframe);
+
+        const tDoc = tempIframe.contentDocument || tempIframe.contentWindow.document;
+        tDoc.open();
+        tDoc.write(`<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}<script>${js}<\/script></body></html>`);
+        tDoc.close();
+        doc = tDoc;
+      } catch (err) {
+        console.warn('Fallback iframe error, attempting DOMParser:', err);
+        try {
+          const parser = new DOMParser();
+          doc = parser.parseFromString(`<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}</body></html>`, 'text/html');
+        } catch (e2) {}
+      }
+    }
+
+    if (!doc) {
+      if (tempIframe) {
+        try { document.body.removeChild(tempIframe); } catch (e) {}
+      }
       setValidationError('เกิดข้อผิดพลาดในการโหลดระบบแสดงผล กรุณาลองใหม่อีกครั้ง');
       return;
     }
 
     try {
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      
       // Run validation function with doc, css, js
       const result = await activeItem.validation(doc, css, js);
 
@@ -346,6 +405,12 @@ export default function App() {
       console.error(err);
       setValidationError('ตรวจพบข้อผิดพลาดในโค้ดของคุณ: ' + err.message);
       setIsSuccess(false);
+    } finally {
+      if (tempIframe) {
+        try {
+          document.body.removeChild(tempIframe);
+        } catch (e) {}
+      }
     }
   };
 
@@ -365,14 +430,12 @@ export default function App() {
     setShowSuccessModal(false);
   };
 
-  // Load full working solution for live demonstration
-  const handleLoadSolution = () => {
-    if (!activeItem) return;
-    if (activeItem.targetHtml) setHtml(activeItem.targetHtml);
-    if (activeItem.targetCss) setCss(activeItem.targetCss);
-    if (activeItem.targetJs !== undefined) setJs(activeItem.targetJs);
-    setValidationError(null);
-    setIsSuccess(false);
+  // View interactive working demo in preview without injecting solution code to editor
+  const handleViewDemo = () => {
+    setActivePreviewTab('target');
+    if (isMobile) {
+      setMobileTab('preview');
+    }
   };
 
   // Calculate Progress Stats
@@ -449,26 +512,34 @@ export default function App() {
               </button>
             </div>
           )}
-
-          {activeMode === 'learn' && (
-            <div className="progress-group">
-              <span className="progress-label">
-                ผ่านแล้ว: {completedCount}/{totalItems} ({percentCompleted}%)
-              </span>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${percentCompleted}%` }}></div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Header Right Actions */}
         <div className="header-right">
           {activeMode === 'learn' && (
             <>
+              {/* Sleek Compact Progress Indicator */}
+              <div
+                className="header-progress-compact"
+                title={`ผ่านแล้ว ${completedCount} จาก ${totalItems} (${percentCompleted}%)`}
+              >
+                <span className="progress-compact-text">
+                  {completedCount}/{totalItems}
+                </span>
+                <div className="progress-compact-track">
+                  <div
+                    className="progress-compact-fill"
+                    style={{ width: `${percentCompleted}%` }}
+                  />
+                </div>
+                <span className="progress-compact-percent">
+                  {percentCompleted}%
+                </span>
+              </div>
+
               <button
                 onClick={handleResetAll}
-                className="icon-btn"
+                className="icon-btn btn-header-trash"
                 style={{ borderColor: 'var(--danger-color)', color: 'var(--danger-color)' }}
                 title="ล้างประวัติการเรียนและโค้ดของคอร์สนี้ทั้งหมด"
               >
@@ -477,7 +548,7 @@ export default function App() {
 
               <button
                 onClick={handleResetCode}
-                className="icon-btn"
+                className="icon-btn btn-header-reset"
                 title="รีเซ็ตโค้ดของบทเรียนปัจจุบัน"
               >
                 <RotateCcw size={16} />
@@ -485,7 +556,7 @@ export default function App() {
 
               <button
                 onClick={handleDownloadProject}
-                className="icon-btn"
+                className="icon-btn btn-header-download"
                 style={{ borderColor: 'var(--accent-color)', color: 'var(--accent-color)' }}
                 title="ดาวน์โหลดไฟล์งาน (HTML, CSS, JS)"
               >
@@ -515,7 +586,10 @@ export default function App() {
           challenges={currentCurriculum.challenges}
           appliedExams={currentCurriculum.appliedExams}
           activeId={activeId}
-          setActiveId={setActiveId}
+          setActiveId={(id) => {
+            setActiveId(id);
+            if (isMobile) setSidebarOpen(false);
+          }}
           progress={progress}
           isOpen={sidebarOpen}
           course={course}
@@ -523,6 +597,15 @@ export default function App() {
           setActiveMode={setActiveMode}
           onOpenCheatSheet={() => setShowCheatSheet(true)}
         />
+
+        {/* Mobile Backdrop when Sidebar is Open */}
+        {isMobile && sidebarOpen && (
+          <div
+            className="sidebar-backdrop"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="ปิดเมนูข้าง"
+          />
+        )}
 
         {/* Workspace Content: Quiz Arena or Interactive Code Splitter */}
         {activeMode === 'quiz' && course === 'js' ? (
@@ -532,9 +615,105 @@ export default function App() {
               onBackToLessons={() => setActiveMode('learn')}
             />
           </main>
+        ) : isMobile ? (
+          /* Mobile Workspace with Segmented Tabs */
+          <main className="app-workspace mobile-workspace">
+            <div className="mobile-view-tabs">
+              <button
+                className={`mobile-view-tab ${mobileTab === 'instruction' ? 'active' : ''}`}
+                onClick={() => setMobileTab('instruction')}
+              >
+                <BookOpen size={15} />
+                <span>คำอธิบาย</span>
+                {validationError && <span className="mobile-tab-dot error" />}
+                {isSuccess && <span className="mobile-tab-dot success" />}
+              </button>
+
+              <button
+                className={`mobile-view-tab ${mobileTab === 'editor' ? 'active' : ''}`}
+                onClick={() => setMobileTab('editor')}
+              >
+                <Code size={15} />
+                <span>โค้ด ({activeEditorTab})</span>
+              </button>
+
+              <button
+                className={`mobile-view-tab ${mobileTab === 'preview' ? 'active' : ''}`}
+                onClick={() => setMobileTab('preview')}
+              >
+                <Eye size={15} />
+                <span>ผลลัพธ์</span>
+                {activePreviewTab === 'target' && <span className="mobile-demo-pill">Demo</span>}
+              </button>
+            </div>
+
+            <div className="mobile-content-container">
+              <div
+                className="mobile-pane-full"
+                style={{ display: mobileTab === 'instruction' ? 'flex' : 'none' }}
+              >
+                <InstructionPanel
+                  activeItem={activeItem}
+                  onVerify={handleVerify}
+                  validationError={validationError}
+                  isSuccess={isSuccess}
+                  isChallenge={isChallenge || isAppliedExam}
+                  onViewDemo={handleViewDemo}
+                />
+              </div>
+
+              <div
+                className="mobile-pane-full mobile-editor-wrapper"
+                style={{ display: mobileTab === 'editor' ? 'flex' : 'none' }}
+              >
+                <EditorContainer
+                  html={html}
+                  setHtml={setHtml}
+                  css={css}
+                  setCss={setCss}
+                  js={js}
+                  setJs={setJs}
+                  activeTab={activeEditorTab}
+                  setActiveTab={setActiveEditorTab}
+                  theme={theme}
+                  activeItem={activeItem}
+                  fontSize={editorFontSize}
+                  setFontSize={setEditorFontSize}
+                />
+                <div className="mobile-editor-actions-bar">
+                  <button onClick={handleVerify} className="mobile-action-btn primary">
+                    <Play size={14} fill="white" />
+                    <span>ตรวจคำตอบ</span>
+                  </button>
+                  <button onClick={() => setMobileTab('preview')} className="mobile-action-btn secondary">
+                    <Eye size={14} />
+                    <span>ดูผลลัพธ์</span>
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className="mobile-pane-full"
+                style={{ display: mobileTab === 'preview' ? 'flex' : 'none' }}
+              >
+                <PreviewContainer
+                  html={html}
+                  css={css}
+                  js={js}
+                  targetHtml={activeItem.targetHtml}
+                  targetCss={activeItem.targetCss}
+                  targetJs={activeItem.targetJs}
+                  showCompare={!!activeItem.targetHtml}
+                  activePreviewTab={activePreviewTab}
+                  setActivePreviewTab={setActivePreviewTab}
+                />
+              </div>
+            </div>
+          </main>
         ) : (
+          /* Desktop Workspace with Draggable Splitters */
           <main
-            className="app-workspace"
+            className="app-workspace desktop-workspace"
             style={{ gridTemplateColumns: `${leftWidth}% 6px 1fr` }}
           >
             {/* Left Area (Instruction + Monaco Editor) */}
@@ -548,7 +727,7 @@ export default function App() {
                 validationError={validationError}
                 isSuccess={isSuccess}
                 isChallenge={isChallenge || isAppliedExam}
-                onLoadSolution={handleLoadSolution}
+                onViewDemo={handleViewDemo}
               />
 
               {/* Vertical Split Drag Bar */}
@@ -588,6 +767,8 @@ export default function App() {
               targetCss={activeItem.targetCss}
               targetJs={activeItem.targetJs}
               showCompare={!!activeItem.targetHtml}
+              activePreviewTab={activePreviewTab}
+              setActivePreviewTab={setActivePreviewTab}
             />
           </main>
         )}

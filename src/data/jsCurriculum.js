@@ -283,8 +283,93 @@ document.getElementById("car-display").innerHTML = car.getInfo();`,
     },
 
     {
+      id: "js-object-constructors",
+      title: "5. คอนสตรัคเตอร์ออบเจกต์ (Object Constructors & new)",
+      category: "1. พื้นฐาน JavaScript",
+      slideRef: "ch4 JavaScript.pdf (หน้า 57)",
+      description: `เมื่อต้องการสร้าง Object หลายชิ้นที่มีโครงสร้าง (Properties & Methods) เหมือนกัน เช่น ข้อมูลพนักงาน หรือนักศึกษา สไลด์แนะนำให้ใช้ **Object Constructor Function**:
+
+\`\`\`javascript
+function Person(first, last, age, eye) {
+  this.firstName = first;
+  this.lastName = last;
+  this.age = age;
+  this.eyeColor = eye;
+  this.getFullName = function() {
+    return this.firstName + " " + this.lastName;
+  };
+}
+
+// สร้าง Instance ด้วยคีย์เวิร์ด new
+const father = new Person("John", "Doe", 50, "blue");
+\`\`\`
+
+**หัวใจสำคัญ:**
+1. นิยมตั้งชื่อฟังก์ชันด้วยตัวพิมพ์ใหญ่ขึ้นต้น (PascalCase) เช่น \`Student\`, \`Person\`
+2. คีย์เวิร์ด \`this\` ภายใน Constructor ชี้ไปยัง Object ตัวใหม่ที่ถูกสร้างขึ้น
+3. คีย์เวิร์ด \`new\` ทำหน้าที่สร้าง Object เปล่าแล้วผูก \`this\` ให้กับคอนสตรัคเตอร์
+
+**เป้าหมายการฝึกฝน:**
+1. ประกาศ Constructor Function ชื่อ \`Student(name, score)\`
+2. กำหนดคุณสมบัติ \`this.name = name;\` และ \`this.score = score;\`
+3. เพิ่มเมธอด \`this.getGrade = function() { return this.score >= 50 ? "Pass" : "Fail"; };\`
+4. สร้าง Instance ใหม่ชื่อ \`s1\` ด้วยคำสั่ง:
+   \`const s1 = new Student("สมชาย", 85);\`
+5. นำข้อมูลมาแสดงผลใน \`#student-card\`:
+   \`document.getElementById("student-card").innerHTML = \`\${s1.name} - คะแนน \${s1.score} (\${s1.getGrade()})\`;\``,
+      starterHtml: `<div class="card">
+  <h3>บัตรรายงานผลคะแนนนักศึกษา</h3>
+  <p id="student-card">รอดำเนินการสร้างข้อมูล...</p>
+</div>`,
+      starterCss: `body { font-family: sans-serif; padding: 25px; background: #f8fafc; }
+.card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 400px; border-left: 5px solid #3b82f6; }
+#student-card { font-size: 18px; font-weight: bold; color: #1e40af; margin-top: 10px; }`,
+      starterJs: `// 1. ประกาศ Constructor Function: Student(name, score)
+// 2. กำหนด this.name, this.score และ this.getGrade()
+// 3. สร้าง instance s1 ด้วย new Student("สมชาย", 85)
+// 4. แสดงผลใน #student-card
+`,
+      targetHtml: `<div class="card">
+  <h3>บัตรรายงานผลคะแนนนักศึกษา</h3>
+  <p id="student-card">สมชาย - คะแนน 85 (Pass)</p>
+</div>`,
+      targetCss: `body { font-family: sans-serif; padding: 25px; background: #f8fafc; } .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 400px; border-left: 5px solid #3b82f6; } #student-card { font-size: 18px; font-weight: bold; color: #1e40af; margin-top: 10px; }`,
+      targetJs: `function Student(name, score) {
+  this.name = name;
+  this.score = score;
+  this.getGrade = function() {
+    return this.score >= 50 ? "Pass" : "Fail";
+  };
+}
+
+const s1 = new Student("สมชาย", 85);
+document.getElementById("student-card").innerHTML = \`\${s1.name} - คะแนน \${s1.score} (\${s1.getGrade()})\`;`,
+      validation: (doc, css, js) => {
+        const el = doc.getElementById('student-card');
+        if (!el || !el.textContent.includes("สมชาย") || !el.textContent.includes("85") || !el.textContent.includes("Pass")) {
+          return "ข้อความใน #student-card ต้องแสดง 'สมชาย - คะแนน 85 (Pass)'";
+        }
+        if (!js.includes("function Student") && !js.includes("Student = function")) {
+          return "ต้องประกาศ Constructor Function ชื่อ Student(name, score)";
+        }
+        if (!js.includes("this.name") || !js.includes("this.score")) {
+          return "ภายใน Constructor Function ต้องผูกค่าด้วย this.name และ this.score";
+        }
+        if (!js.includes("new Student")) {
+          return "ต้องสร้าง Instance ด้วยคีย์เวิร์ด new Student(...)";
+        }
+        return true;
+      },
+      hints: [
+        "function Student(name, score) { this.name = name; this.score = score; this.getGrade = function() { return this.score >= 50 ? 'Pass' : 'Fail'; }; }",
+        "const s1 = new Student('สมชาย', 85);",
+        "document.getElementById('student-card').innerHTML = `${s1.name} - คะแนน ${s1.score} (${s1.getGrade()})`;"
+      ]
+    },
+
+    {
       id: "js-arrays",
-      title: "5. อาร์เรย์และเมธอดจัดการข้อมูล (Arrays & Methods)",
+      title: "6. อาร์เรย์และเมธอดจัดการข้อมูล (Arrays & Methods)",
       category: "1. พื้นฐาน JavaScript",
       slideRef: "ch4 JavaScript.pdf (หน้า 62-67)",
       description: `Array ใช้เก็บรายการข้อมูลแบบลำดับ (Index เริ่มจาก 0)
@@ -345,7 +430,7 @@ document.getElementById("tech-stack").innerHTML = tech.join(" ➔ ");`,
 
     {
       id: "js-control-loops",
-      title: "6. การควบคุมทิศทางและลูปวนซ้ำ (Control Flow & Loops)",
+      title: "7. การควบคุมทิศทางและลูปวนซ้ำ (Control Flow & Loops)",
       category: "1. พื้นฐาน JavaScript",
       slideRef: "ch4 JavaScript.pdf (หน้า 68-77)",
       description: `การทำซ้ำ (Loops) ใน JavaScript มีหลายรูปแบบ:
@@ -405,7 +490,7 @@ document.getElementById("result").innerHTML = \`ผ่านเกณฑ์ท�
 
     {
       id: "js-functions-arrow",
-      title: "7. ฟังก์ชันและ Arrow Functions (Functions & Scope)",
+      title: "8. ฟังก์ชันและ Arrow Functions (Functions & Scope)",
       category: "1. พื้นฐาน JavaScript",
       slideRef: "ch4 JavaScript.pdf (หน้า 78-81)",
       description: `ฟังก์ชันคือบล็อกคำสั่งที่เขียนไว้เพื่อให้เรียกใช้ซ้ำได้
@@ -470,7 +555,7 @@ document.getElementById("temp-result").innerHTML = \`เท่ากับ \${to
     // ==========================================
     {
       id: "js-dom-selectors",
-      title: "8. การเข้าถึง HTML Elements (DOM Selectors)",
+      title: "9. การเข้าถึง HTML Elements (DOM Selectors)",
       category: "2. การจัดการ DOM & ฟอร์ม",
       slideRef: "ch4 JavaScript_2.pdf (หน้า 1-8)",
       description: `DOM (Document Object Model) คือโครงสร้างต้นไม้ออบเจกต์ที่เบราว์เซอร์สร้างขึ้นเมื่อโหลดหน้าเว็บ
@@ -526,7 +611,7 @@ el.innerHTML = "ค้นพบและเปลี่ยนสไตล์ส�
 
     {
       id: "js-event-listeners",
-      title: "9. การดักจับเหตุการณ์ (addEventListener & Events)",
+      title: "10. การดักจับเหตุการณ์ (addEventListener & Events)",
       category: "2. การจัดการ DOM & ฟอร์ม",
       slideRef: "ch4 JavaScript_2.pdf (หน้า 12-17)",
       description: `การผูก Event ในเว็บยุคปัจจุบัน แนะนำให้ใช้ \`addEventListener\` เสมอ เพราะรองรับการผูกหลายฟังก์ชันและลบออกได้ง่าย (\`removeEventListener\`)
@@ -606,7 +691,7 @@ btn.click();`,
 
     {
       id: "js-form-validation",
-      title: "10. การตรวจสอบข้อมูลในฟอร์ม (Form Validation)",
+      title: "11. การตรวจสอบข้อมูลในฟอร์ม (Form Validation)",
       category: "2. การจัดการ DOM & ฟอร์ม",
       slideRef: "ch4 JavaScript_2.pdf (หน้า 18-23)",
       description: `การ Validate ข้อมูลฟอร์มด้วย JavaScript ช่วยป้องกันข้อมูลที่ไม่สมบูรณ์ก่อนส่งไป Server
@@ -710,7 +795,7 @@ form.addEventListener("submit", (e) => {
 
     {
       id: "js-dom-crud-elements",
-      title: "11. การสร้างและลบ Element ใน DOM (createElement & appendChild)",
+      title: "12. การสร้างและลบ Element ใน DOM (createElement & appendChild)",
       category: "2. การจัดการ DOM & ฟอร์ม",
       slideRef: "ch4 JavaScript_2.pdf (หน้า 30-35)",
       description: `การสร้าง Element ขึ้นมาใหม่ด้วย JavaScript และนำไปแทรกในหน้าเว็บ:
@@ -806,12 +891,119 @@ addBtn.addEventListener("click", () => {
       ]
     },
 
+    {
+      id: "js-dom-tree-advanced",
+      title: "13. โครงสร้าง DOM Tree ขั้นสูง (insertBefore & replaceChild)",
+      category: "2. การจัดการ DOM & ฟอร์ม",
+      slideRef: "ch4 JavaScript_2.pdf (หน้า 24-29, 34-35)",
+      description: `นอกจากการใช้ \`appendChild()\` เพื่อต่อท้าย Element แล้ว เอกสาร DOM ในภาษา JavaScript ยังมีเมธอดทรงพลังในการแทรกและแทนที่โหนดตามตำแหน่งที่ต้องการ:
+
+\`\`\`javascript
+// 1. parentNode.insertBefore(newNode, referenceNode)
+// แทรก newNode ไว้ข้างหน้า referenceNode
+list.insertBefore(newItem, list.firstChild);
+
+// 2. parentNode.replaceChild(newChild, oldChild)
+// นำ newChild มาแทนที่ oldChild ตัวเดิม
+list.replaceChild(newBadge, oldBadge);
+\`\`\`
+
+**คุณสมบัติการท่องต้นไม้ DOM (DOM Navigation):**
+- \`parentNode\` : โหนดแม่
+- \`children\` / \`childNodes\` : รายการโหนดลูก
+- \`firstElementChild\` / \`lastElementChild\` : ลูกคนแรก / ลูกคนสุดท้าย
+
+**เป้าหมายการฝึกฝน:**
+ในระบบคิวงานบริการ:
+1. สร้าง \`<li>\` ใหม่สำหรับงานด่วน VIP:
+   - กำหนดข้อความ: \`"🔥 งานด่วน VIP: กู้ระบบ Server"\`
+   - กำหนดคลาส: \`"urgent-item"\`
+   - แทรกไว้เป็น **รายการแรกสุดของคิว** ก่อนหน้าลูกคนแรก โดยใช้คำสั่ง:
+     \`list.insertBefore(urgentLi, list.firstElementChild);\`
+2. สร้าง \`<li>\` ใหม่สำหรับงานที่อนุมัติแล้ว:
+   - กำหนดข้อความ: \`"✅ ตรวจสอบสัญญาเรียบร้อย (Approved)"\`
+   - กำหนดคลาส: \`"approved-item"\`
+   - แทนที่รายการรอตรวจ (\`#pending-item\`) ด้วยคำสั่ง:
+     \`list.replaceChild(approvedLi, document.getElementById("pending-item"));\``,
+      starterHtml: `<div class="queue-card">
+  <h3>คิวการดำเนินงาน (Task Queue)</h3>
+  <ul id="task-list">
+    <li id="pending-item" class="pending-item">⏳ รอการตรวจสอบสัญญา</li>
+    <li class="regular-item">📄 จัดทำรายงานประจำเดือน</li>
+  </ul>
+</div>`,
+      starterCss: `body { font-family: sans-serif; padding: 25px; background: #f1f5f9; }
+.queue-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 450px; }
+ul { list-style: none; padding: 0; margin: 15px 0 0; display: flex; flex-direction: column; gap: 8px; }
+li { padding: 12px; border-radius: 8px; font-weight: 500; font-size: 15px; }
+.urgent-item { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+.pending-item { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.regular-item { background: #e2e8f0; color: #334155; }
+.approved-item { background: #dcfce7; color: #166534; border: 1px solid #86efac; }`,
+      starterJs: `const list = document.getElementById("task-list");
+
+// 1. สร้าง <li> งานด่วน VIP แล้วแทรกไว้บนสุดด้วย list.insertBefore(urgentLi, list.firstElementChild)
+// 2. สร้าง <li> งานอนุมัติแล้ว และแทนที่ #pending-item ด้วย list.replaceChild(approvedLi, oldItem)
+`,
+      targetHtml: `<div class="queue-card">
+  <h3>คิวการดำเนินงาน (Task Queue)</h3>
+  <ul id="task-list">
+    <li class="urgent-item">🔥 งานด่วน VIP: กู้ระบบ Server</li>
+    <li class="approved-item">✅ ตรวจสอบสัญญาเรียบร้อย (Approved)</li>
+    <li class="regular-item">📄 จัดทำรายงานประจำเดือน</li>
+  </ul>
+</div>`,
+      targetCss: `body { font-family: sans-serif; padding: 25px; background: #f1f5f9; } .queue-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 450px; } ul { list-style: none; padding: 0; margin: 15px 0 0; display: flex; flex-direction: column; gap: 8px; } li { padding: 12px; border-radius: 8px; font-weight: 500; font-size: 15px; } .urgent-item { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; } .pending-item { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; } .regular-item { background: #e2e8f0; color: #334155; } .approved-item { background: #dcfce7; color: #166534; border: 1px solid #86efac; }`,
+      targetJs: `const list = document.getElementById("task-list");
+
+// 1. insertBefore
+const urgentLi = document.createElement("li");
+urgentLi.className = "urgent-item";
+urgentLi.textContent = "🔥 งานด่วน VIP: กู้ระบบ Server";
+list.insertBefore(urgentLi, list.firstElementChild);
+
+// 2. replaceChild
+const pendingItem = document.getElementById("pending-item");
+if (pendingItem) {
+  const approvedLi = document.createElement("li");
+  approvedLi.className = "approved-item";
+  approvedLi.textContent = "✅ ตรวจสอบสัญญาเรียบร้อย (Approved)";
+  list.replaceChild(approvedLi, pendingItem);
+}`,
+      validation: (doc, css, js) => {
+        const list = doc.getElementById('task-list');
+        if (!list) return "ไม่พบ #task-list ในโครงสร้างเอกสาร";
+        if (!list.firstElementChild || !list.firstElementChild.textContent.includes("งานด่วน VIP")) {
+          return "รายการแรกสุดของ #task-list ต้องเป็นงานด่วน VIP (ใช้ list.insertBefore(urgentLi, list.firstElementChild))";
+        }
+        const pending = doc.getElementById('pending-item');
+        if (pending) {
+          return "ต้องแทนที่ #pending-item ด้วยโหนดที่อนุมัติแล้ว โดยใช้ list.replaceChild(...)";
+        }
+        if (!list.textContent.includes("อนุมัติเรียบร้อย") && !list.textContent.includes("Approved")) {
+          return "ต้องมีรายการงานที่อนุมัติแล้ว (Approved) แทนที่รายการเดิม";
+        }
+        if (!js.includes("insertBefore")) {
+          return "กรุณาใช้คำสั่ง insertBefore ในการแทรกโหนดตามโจทย์";
+        }
+        if (!js.includes("replaceChild")) {
+          return "กรุณาใช้คำสั่ง replaceChild ในการแทนที่โหนดตามโจทย์";
+        }
+        return true;
+      },
+      hints: [
+        "list.insertBefore(urgentLi, list.firstElementChild);",
+        "const pendingItem = document.getElementById('pending-item');",
+        "list.replaceChild(approvedLi, pendingItem);"
+      ]
+    },
+
     // ==========================================
     // หมวดที่ 3: Advanced JS & Web APIs (สไลด์เล่ม 3)
     // ==========================================
     {
       id: "js-this-binding",
-      title: "12. คีย์เวิร์ด this และการผูกค่า (this & Explicit Binding)",
+      title: "14. คีย์เวิร์ด this และการผูกค่า (this & Explicit Binding)",
       category: "3. เทคนิคขั้นสูงและ Web APIs",
       slideRef: "ch4 JavaScript_3.pptx.pdf (หน้า 1-6)",
       description: `คีย์เวิร์ด \`this\` มีค่าขึ้นอยู่กับ **วิธีการที่ฟังก์ชันถูกเรียกใช้ (How it is invoked)**:
@@ -824,7 +1016,7 @@ addBtn.addEventListener("click", () => {
    - \`bind(thisArg)\` : สร้างฟังก์ชันใหม่ที่มีค่า \`this\` ถูกตรึงไว้ถาวร
 
 **เป้าหมายการฝึกฝน:**
-1. มี Object ชื่อ \`person1 = { firstName: "Duangpen", lastName: "Jet" }\`
+1. มี Object ชื่อ \`person1 = { firstName: "Somchai", lastName: "Jaidee" }\`
 2. มีฟังก์ชัน \`function getFullName() { return this.firstName + " " + this.lastName; }\`
 3. ใช้ \`getFullName.call(person1)\` เพื่อเรียกใช้ฟังก์ชันโดยผูกกับ \`person1\`
 4. นำผลลัพธ์ไปใส่ใน element id \`"name-output"\``,
@@ -836,8 +1028,8 @@ addBtn.addEventListener("click", () => {
 .card { background: #faf5ff; border: 1px solid #e9d5ff; padding: 20px; border-radius: 8px; }
 #name-output { font-size: 20px; font-weight: bold; color: #7e22ce; }`,
       starterJs: `const person1 = {
-  firstName: "Duangpen",
-  lastName: "Jet"
+  firstName: "Somchai",
+  lastName: "Jaidee"
 };
 
 function getFullName() {
@@ -848,16 +1040,16 @@ function getFullName() {
 `,
       targetHtml: `<div class="card">
   <h3>ผลลัพธ์การเรียกใช้ฟังก์ชันด้วย .call()</h3>
-  <p id="name-output">Duangpen Jet</p>
+  <p id="name-output">Somchai Jaidee</p>
 </div>`,
       targetCss: `body { font-family: sans-serif; padding: 25px; } .card { background: #faf5ff; border: 1px solid #e9d5ff; padding: 20px; border-radius: 8px; } #name-output { font-size: 20px; font-weight: bold; color: #7e22ce; }`,
-      targetJs: `const person1 = { firstName: "Duangpen", lastName: "Jet" };
+      targetJs: `const person1 = { firstName: "Somchai", lastName: "Jaidee" };
 function getFullName() { return this.firstName + " " + this.lastName; }
 document.getElementById("name-output").innerHTML = getFullName.call(person1);`,
       validation: (doc, css, js) => {
         const el = doc.getElementById('name-output');
-        if (!el || !el.textContent.includes("Duangpen Jet")) {
-          return "ข้อความใน #name-output ต้องเป็น 'Duangpen Jet'";
+        if (!el || !el.textContent.includes("Somchai Jaidee")) {
+          return "ข้อความใน #name-output ต้องเป็น 'Somchai Jaidee'";
         }
         if (!js.includes(".call")) {
           return "ต้องใช้เมธอด .call() เพื่อส่ง person1 เป็นค่า this";
@@ -872,7 +1064,7 @@ document.getElementById("name-output").innerHTML = getFullName.call(person1);`,
 
     {
       id: "js-timers-interval",
-      title: "13. การจับเวลาและการทำงานแบบอะซิงโครนัส (setTimeout & setInterval)",
+      title: "15. การจับเวลาและการทำงานแบบอะซิงโครนัส (setTimeout & setInterval)",
       category: "3. เทคนิคขั้นสูงและ Web APIs",
       slideRef: "ch4 JavaScript_3.pptx.pdf (หน้า 7-14)",
       description: `JavaScript มีคำสั่งตั้งเวลา (Timers) 2 ตัวหลัก:
@@ -927,8 +1119,123 @@ const timer = setInterval(() => {
     },
 
     {
+      id: "js-drag-and-drop-api",
+      title: "16. การลากและวางข้อมูล (HTML5 Drag and Drop API)",
+      category: "3. เทคนิคขั้นสูงและ Web APIs",
+      slideRef: "ch4 JavaScript_3.pptx.pdf (หน้า 18-19)",
+      description: `HTML5 มี Drag and Drop API ในตัว ทำให้สามารถลาก Element ใดก็ได้ไปวางในเป้าหมายที่กำหนด:
+
+**ขั้นตอนการทำงานตามสไลด์:**
+1. **ทำให้ Element สามารถลากได้:**
+   กำหนดแอตทริบิวต์ \`draggable="true"\`
+2. **ดักจับจังหวะเริ่มลาก (\`dragstart\`):**
+   ใช้ \`ev.dataTransfer.setData("text/plain", ev.target.id)\` เพื่อฝาก id หรือข้อมูลของ Element ไว้
+3. **อนุญาตให้วางบน Drop Zone (\`dragover\`):**
+   โดยปกติเบราว์เซอร์จะไม่อนุญาตให้วาง ต้องดักจับ \`dragover\` แล้วเรียก \`ev.preventDefault()\` เพื่อเปิดรับ
+4. **จังหวะที่ปล่อยวาง (\`drop\`):**
+   เรียก \`ev.preventDefault()\` และดึงข้อมูลด้วย \`const data = ev.dataTransfer.getData("text/plain")\` จากนั้นนำ Element ย้ายเข้าไปด้วย \`ev.target.appendChild(document.getElementById(data))\`
+
+**เป้าหมายการฝึกฝน:**
+1. ให้กล่อง \`#drag-item\` ดักจับอีเวนต์ \`dragstart\` และส่ง id ของตนเองด้วย \`e.dataTransfer.setData("text/plain", e.target.id)\`
+2. ให้โซนวาง \`#drop-zone\` ดักจับอีเวนต์ \`dragover\` และเรียก \`e.preventDefault()\`
+3. ให้โซนวาง \`#drop-zone\` ดักจับอีเวนต์ \`drop\`:
+   - เรียก \`e.preventDefault()\`
+   - อ่าน id ด้วย \`const itemId = e.dataTransfer.getData("text/plain");\`
+   - ย้าย Element ไปวางด้วย \`dropZone.appendChild(document.getElementById(itemId));\`
+   - เปลี่ยนข้อความใน \`#status-msg\` เป็น **"สถานะ: วางวัตถุสำเร็จ!"**`,
+      starterHtml: `<div class="dnd-container">
+  <h3>HTML5 Drag & Drop Playground</h3>
+  <div class="zones">
+    <div id="source-zone" class="zone">
+      <div id="drag-item" draggable="true" class="box">📦 กล่องพัสดุ A</div>
+    </div>
+    <div id="drop-zone" class="zone drop-target">
+      <p class="placeholder-text">ลากกล่องพัสดุมาวางที่นี่</p>
+    </div>
+  </div>
+  <p id="status-msg">สถานะ: รอดำเนินการ</p>
+</div>`,
+      starterCss: `body { font-family: sans-serif; padding: 25px; background: #f8fafc; }
+.dnd-container { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.06); max-width: 500px; }
+.zones { display: flex; gap: 16px; margin: 20px 0; }
+.zone { flex: 1; min-height: 120px; border: 2px dashed #cbd5e1; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; }
+.drop-target { border-color: #3b82f6; background: #eff6ff; }
+.box { background: #3b82f6; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; cursor: grab; user-select: none; }
+.placeholder-text { color: #64748b; font-size: 13px; margin: 0; pointer-events: none; }
+#status-msg { font-weight: bold; color: #334155; }`,
+      starterJs: `const dragItem = document.getElementById("drag-item");
+const dropZone = document.getElementById("drop-zone");
+const statusMsg = document.getElementById("status-msg");
+
+// 1. ดักจับ dragstart บน dragItem และ setData("text/plain", ...)
+// 2. ดักจับ dragover บน dropZone และ preventDefault()
+// 3. ดักจับ drop บน dropZone: ย้าย element และเปลี่ยน statusMsg เป็น "สถานะ: วางวัตถุสำเร็จ!"
+`,
+      targetHtml: `<div class="dnd-container">
+  <h3>HTML5 Drag & Drop Playground</h3>
+  <div class="zones">
+    <div id="source-zone" class="zone"></div>
+    <div id="drop-zone" class="zone drop-target">
+      <p class="placeholder-text">ลากกล่องพัสดุมาวางที่นี่</p>
+      <div id="drag-item" draggable="true" class="box">📦 กล่องพัสดุ A</div>
+    </div>
+  </div>
+  <p id="status-msg">สถานะ: วางวัตถุสำเร็จ!</p>
+</div>`,
+      targetCss: `body { font-family: sans-serif; padding: 25px; background: #f8fafc; } .dnd-container { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.06); max-width: 500px; } .zones { display: flex; gap: 16px; margin: 20px 0; } .zone { flex: 1; min-height: 120px; border: 2px dashed #cbd5e1; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; } .drop-target { border-color: #3b82f6; background: #eff6ff; } .box { background: #3b82f6; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; cursor: grab; user-select: none; } .placeholder-text { color: #64748b; font-size: 13px; margin: 0; pointer-events: none; } #status-msg { font-weight: bold; color: #334155; }`,
+      targetJs: `const dragItem = document.getElementById("drag-item");
+const dropZone = document.getElementById("drop-zone");
+const statusMsg = document.getElementById("status-msg");
+
+dragItem.addEventListener("dragstart", (e) => {
+  if (e.dataTransfer) {
+    e.dataTransfer.setData("text/plain", e.target.id);
+  }
+});
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  const id = e.dataTransfer ? e.dataTransfer.getData("text/plain") : "drag-item";
+  const item = document.getElementById(id);
+  if (item) {
+    dropZone.appendChild(item);
+  }
+  statusMsg.textContent = "สถานะ: วางวัตถุสำเร็จ!";
+});`,
+      validation: (doc, css, js) => {
+        const item = doc.getElementById('drag-item');
+        const dropZone = doc.getElementById('drop-zone');
+        const statusMsg = doc.getElementById('status-msg');
+        if (!item || !dropZone || !statusMsg) return "ไม่พบคอมโพเนนต์ HTML ที่จำเป็น";
+        
+        if (!js.includes("dragstart")) {
+          return "ต้องมีการดักจับอีเวนต์ 'dragstart' บน element ที่ลาก";
+        }
+        if (!js.includes("dragover")) {
+          return "ต้องมีการดักจับอีเวนต์ 'dragover' บน dropZone และเรียก preventDefault()";
+        }
+        if (!js.includes("drop")) {
+          return "ต้องมีการดักจับอีเวนต์ 'drop' บน dropZone";
+        }
+        if (!js.includes("setData") || !js.includes("getData")) {
+          return "ต้องใช้ dataTransfer.setData ใน dragstart และ dataTransfer.getData ใน drop";
+        }
+        return true;
+      },
+      hints: [
+        "dragItem.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', e.target.id); });",
+        "dropZone.addEventListener('dragover', (e) => { e.preventDefault(); });",
+        "dropZone.addEventListener('drop', (e) => { e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); dropZone.appendChild(document.getElementById(id)); statusMsg.textContent = 'สถานะ: วางวัตถุสำเร็จ!'; });"
+      ]
+    },
+
+    {
       id: "js-web-storage",
-      title: "14. บันทึกข้อมูลฝั่งไคลเอนต์ (Web Storage: localStorage)",
+      title: "17. บันทึกข้อมูลฝั่งไคลเอนต์ (Web Storage: localStorage)",
       category: "3. เทคนิคขั้นสูงและ Web APIs",
       slideRef: "ch4 JavaScript_3.pptx.pdf (หน้า 20-24)",
       description: `Web Storage API ช่วยให้เว็บสามารถจัดเก็บข้อมูลไว้บนเบราว์เซอร์ของผู้ใช้ได้:
@@ -944,7 +1251,7 @@ const timer = setInterval(() => {
 - หากต้องการเก็บ Object ต้องแปลงด้วย \`JSON.stringify(obj)\` และแปลงกลับด้วย \`JSON.parse(str)\`
 
 **เป้าหมายการฝึกฝน:**
-1. สร้าง Object ข้อมูลนักศึกษา \`const user = { name: "Duangpen", role: "Instructor" };\`
+1. สร้าง Object ข้อมูลนักศึกษา \`const user = { name: "Somchai", role: "Student" };\`
 2. แปลงเป็น JSON string แล้วบันทึกลงใน \`localStorage\` โดยใช้คีย์ \`"savedUser"\`
 3. ดึงค่านั้นกลับมา แปลงกลับเป็น Object ด้วย \`JSON.parse\`
 4. แสดงชื่อ \`user.name\` ใน element id \`"user-display"\``,
@@ -955,7 +1262,7 @@ const timer = setInterval(() => {
       starterCss: `body { font-family: sans-serif; padding: 20px; }
 .storage-card { background: #fefce8; border: 1px solid #fef08a; padding: 20px; border-radius: 8px; }
 #user-display { font-size: 20px; font-weight: bold; color: #854d0e; }`,
-      starterJs: `const user = { name: "Duangpen", role: "Instructor" };
+      starterJs: `const user = { name: "Somchai", role: "Student" };
 
 // 1. เก็บ user ลงใน localStorage คีย์ "savedUser" ด้วย JSON.stringify
 // 2. ดึงค่ากลับมาด้วย JSON.parse
@@ -963,17 +1270,17 @@ const timer = setInterval(() => {
 `,
       targetHtml: `<div class="storage-card">
   <h3>ข้อมูลจาก LocalStorage</h3>
-  <p id="user-display">ผู้ใช้งาน: Duangpen</p>
+  <p id="user-display">ผู้ใช้งาน: Somchai</p>
 </div>`,
       targetCss: `body { font-family: sans-serif; padding: 20px; } .storage-card { background: #fefce8; border: 1px solid #fef08a; padding: 20px; border-radius: 8px; } #user-display { font-size: 20px; font-weight: bold; color: #854d0e; }`,
-      targetJs: `const user = { name: "Duangpen", role: "Instructor" };
+      targetJs: `const user = { name: "Somchai", role: "Student" };
 localStorage.setItem("savedUser", JSON.stringify(user));
 const retrieved = JSON.parse(localStorage.getItem("savedUser"));
 document.getElementById("user-display").innerHTML = \`ผู้ใช้งาน: \${retrieved.name}\`;`,
       validation: (doc, css, js) => {
         const el = doc.getElementById('user-display');
-        if (!el || !el.textContent.includes("Duangpen")) {
-          return "ข้อความใน #user-display ต้องแสดงชื่อ 'Duangpen'";
+        if (!el || !el.textContent.includes("Somchai")) {
+          return "ข้อความใน #user-display ต้องแสดงชื่อ 'Somchai'";
         }
         if (!js.includes("localStorage.setItem") || !js.includes("localStorage.getItem")) {
           return "ต้องใช้ localStorage.setItem และ localStorage.getItem ตามโจทย์";
@@ -987,6 +1294,136 @@ document.getElementById("user-display").innerHTML = \`ผู้ใช้งา�
         "localStorage.setItem('savedUser', JSON.stringify(user));",
         "const retrieved = JSON.parse(localStorage.getItem('savedUser'));",
         "document.getElementById('user-display').innerHTML = `ผู้ใช้งาน: ${retrieved.name}`;"
+      ]
+    },
+
+    {
+      id: "js-syntactic-sugar",
+      title: "18. ไวยากรณ์ทางลัดสมัยใหม่ (Modern Syntactic Sugar: ES6+)",
+      category: "3. เทคนิคขั้นสูงและ Web APIs",
+      slideRef: "ES6+ Modern JavaScript Standards (ไวยากรณ์ทางลัดที่ใช้จริงในการพัฒนา)",
+      description: `ไวยากรณ์ทางลัด (Syntactic Sugar) ใน JavaScript มาตรฐาน ES6+ ช่วยให้เขียนโค้ดได้กระชับ อ่านง่าย ปลอดภัย และลดความผิดพลาดในการเข้าถึงข้อมูล:
+
+**1. Destructuring Assignment (การแยกส่วนค่า):**
+- Object: \`const { username, score = 0 } = rawData;\` (ดึงค่า property ออกมาเป็นตัวแปร พร้อมใส่ default value ได้)
+- Array: \`const [first, second] = colors;\`
+
+**2. Spread Operator (\`...\`):**
+- โคลนและผสาน Object หรือ Array โดยไม่กระทบกับข้อมูลต้นฉบับ:
+\`const updated = { ...rawProfile, isVIP: true };\`
+
+**3. Optional Chaining (\`?.\`):**
+- เข้าถึงคุณสมบัติซ้อนลึกอย่างปลอดภัย หากค่าข้างหน้าเป็น \`null\` หรือ \`undefined\` จะได้ผลลัพธ์เป็น \`undefined\` ทันที โดยไม่เกิด TypeError หยุดการทำงานของโปรแกรม:
+\`const badgeTitle = userProfile.badge?.title;\`
+
+**4. Nullish Coalescing (\`??\`):**
+- กำหนดค่าเริ่มต้นสำรองเฉพาะเมื่อตัวแปรเป็น \`null\` หรือ \`undefined\` เท่านั้น (ไม่เหมือน \`||\` ที่เผลอตัดค่า \`0\` หรือ \`false\` ทิ้ง):
+\`const displayBadge = userProfile.badge?.title ?? "Standard";\`
+
+---
+**เป้าหมายการฝึกฝน:**
+กำหนด Object \`rawUserData\` มาให้ใน starter code:
+1. ใช้ **Object Destructuring** ดึงค่า \`username\` และ \`score\` จาก \`rawUserData\`
+2. ใช้ **Spread Operator (\`...\`)** โคลน \`rawUserData\` พร้อมเพิ่ม property \`status: "Active"\` เก็บไว้ในตัวแปร \`userProfile\`
+3. ใช้ **Optional Chaining (\`?.\`)** ร่วมกับ **Nullish Coalescing (\`??\`)** ดึงค่า \`userProfile.details?.badge ?? "General"\` เก็บไว้ในตัวแปร \`badge\`
+4. ใช้ **Nullish Coalescing (\`??\`)** ดึงค่า \`userProfile.avatar ?? "default-avatar.png"\` เก็บไว้ในตัวแปร \`avatar\`
+5. กำหนดเนื้อหาใน element \`#profile-card\` ให้แสดง:
+   - \`<div class="info-row"><strong>ชื่อผู้ใช้:</strong> \${username}</div>\`
+   - \`<div class="info-row"><strong>สถานะ:</strong> \${userProfile.status}</div>\`
+   - \`<div class="info-row"><strong>คะแนน:</strong> \${score}</div>\`
+   - \`<div class="badge">\${badge}</div>\`
+   - \`<div class="info-row"><small>รูปโปรไฟล์: \${avatar}</small></div>\``,
+      starterHtml: `<div class="profile-card" id="profile-container">
+  <h3>บัตรข้อมูลสมาชิก (Modern ES6+)</h3>
+  <div id="profile-card">รอการประมวลผลข้อมูล...</div>
+</div>`,
+      starterCss: `body { font-family: 'Sarabun', sans-serif; padding: 20px; background: #f8fafc; }
+.profile-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; max-width: 360px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); }
+.profile-card h3 { margin-top: 0; color: #1e293b; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+.info-row { margin: 8px 0; color: #334155; font-size: 15px; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; background: #dbeafe; color: #1d4ed8; margin: 6px 0; }`,
+      starterJs: `const rawUserData = {
+  username: "alex99",
+  score: 0,
+  details: {
+    badge: "Gold Member"
+  }
+};
+
+// 1. Destructuring: ดึง username และ score จาก rawUserData
+// 2. Spread: สร้าง userProfile จาก rawUserData พร้อม status: "Active"
+// 3. Optional Chaining & Nullish Coalescing: ดึง badge และ avatar
+// 4. แสดงผลข้อมูลลงใน #profile-card
+`,
+      targetHtml: `<div class="profile-card" id="profile-container">
+  <h3>บัตรข้อมูลสมาชิก (Modern ES6+)</h3>
+  <div id="profile-card">
+    <div class="info-row"><strong>ชื่อผู้ใช้:</strong> alex99</div>
+    <div class="info-row"><strong>สถานะ:</strong> Active</div>
+    <div class="info-row"><strong>คะแนน:</strong> 0</div>
+    <div class="badge">Gold Member</div>
+    <div class="info-row"><small>รูปโปรไฟล์: default-avatar.png</small></div>
+  </div>
+</div>`,
+      targetCss: `body { font-family: 'Sarabun', sans-serif; padding: 20px; background: #f8fafc; }
+.profile-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; max-width: 360px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); }
+.profile-card h3 { margin-top: 0; color: #1e293b; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+.info-row { margin: 8px 0; color: #334155; font-size: 15px; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; background: #dbeafe; color: #1d4ed8; margin: 6px 0; }`,
+      targetJs: `const rawUserData = {
+  username: "alex99",
+  score: 0,
+  details: {
+    badge: "Gold Member"
+  }
+};
+
+const { username, score } = rawUserData;
+const userProfile = { ...rawUserData, status: "Active" };
+const badge = userProfile.details?.badge ?? "General";
+const avatar = userProfile.avatar ?? "default-avatar.png";
+
+const card = document.getElementById("profile-card");
+card.innerHTML = \`
+  <div class="info-row"><strong>ชื่อผู้ใช้:</strong> \${username}</div>
+  <div class="info-row"><strong>สถานะ:</strong> \${userProfile.status}</div>
+  <div class="info-row"><strong>คะแนน:</strong> \${score}</div>
+  <div class="badge">\${badge}</div>
+  <div class="info-row"><small>รูปโปรไฟล์: \${avatar}</small></div>
+\`;`,
+      validation: (doc, css, js) => {
+        const card = doc.getElementById('profile-card');
+        if (!card) return "ไม่พบ element #profile-card";
+        const text = card.textContent;
+        if (!text.includes("alex99")) {
+          return "ข้อความใน #profile-card ต้องแสดงชื่อผู้ใช้ 'alex99'";
+        }
+        if (!text.includes("Active")) {
+          return "ข้อความใน #profile-card ต้องแสดงสถานะ 'Active' จากการ Spread";
+        }
+        if (!text.includes("Gold Member")) {
+          return "ข้อความใน #profile-card ต้องแสดงเหรียญรางวัล 'Gold Member' ด้วย Optional Chaining (?.)";
+        }
+        if (!text.includes("default-avatar.png")) {
+          return "ข้อความใน #profile-card ต้องแสดงรูปเริ่มต้น 'default-avatar.png' ด้วย Nullish Coalescing (??)";
+        }
+        if (!js.includes("...")) {
+          return "ต้องใช้ Spread Operator (...) ในการสร้าง userProfile";
+        }
+        if (!js.includes("?.") && !js.includes("??")) {
+          return "ต้องใช้ไวยากรณ์ Optional Chaining (?.) หรือ Nullish Coalescing (??)";
+        }
+        if (!js.includes("{") || !js.includes("}")) {
+          return "ต้องใช้ Object Destructuring { ... } ในการดึงค่าตัวแปร";
+        }
+        return true;
+      },
+      hints: [
+        "const { username, score } = rawUserData;",
+        "const userProfile = { ...rawUserData, status: 'Active' };",
+        "const badge = userProfile.details?.badge ?? 'General';",
+        "const avatar = userProfile.avatar ?? 'default-avatar.png';",
+        "card.innerHTML = `<div class=\"info-row\"><strong>ชื่อผู้ใช้:</strong> ${username}</div>...`;"
       ]
     }
   ],
@@ -1036,14 +1473,7 @@ label { display: block; margin-bottom: 6px; font-weight: 600; color: #334155; }
 input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
 button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
 .result-box { margin-top: 20px; padding: 16px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; background: #f1f5f9; color: #475569; }`,
-      starterJs: `const computeBtn = document.getElementById("btn-compute");
-const weightInput = document.getElementById("weight");
-const heightInput = document.getElementById("height");
-const resultBox = document.getElementById("bmi-result");
-
-computeBtn.addEventListener("click", () => {
-  // เขียนโค้ดคำนวณ BMI และเงื่อนไขที่นี่
-});
+      starterJs: `// เขียนโค้ดคำนวณค่า BMI และการแสดงผลลัพธ์ตามเกณฑ์ด้วยตนเองทั้งหมด
 `,
       targetHtml: `<div class="calculator-card">
   <h2>โปรแกรมคำนวณค่า BMI</h2>
@@ -1132,17 +1562,7 @@ button { padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 
 #btn-decrease:hover { background: #fee2e2; border-color: #ef4444; color: #ef4444; }
 #btn-increase:hover { background: #dcfce7; border-color: #10b981; color: #10b981; }
 #btn-reset:hover { background: #f1f5f9; }`,
-      starterJs: `let count = 0;
-const valueEl = document.getElementById("counter-value");
-const btnInc = document.getElementById("btn-increase");
-const btnDec = document.getElementById("btn-decrease");
-const btnReset = document.getElementById("btn-reset");
-
-// ฟังก์ชันอัปเดตตัวเลขและสี
-function updateDisplay() {
-  valueEl.textContent = count;
-  // ใส่เงื่อนไขเปลี่ยนสีที่นี่
-}
+      starterJs: `// เขียนระบบนับตัวเลข และเงื่อนไขเปลี่ยนสีเมื่อเป็นค่าบวก/ลบ/ศูนย์ด้วยตนเองทั้งหมด
 `,
       targetHtml: `<div class="counter-container">
   <h2>Dynamic Counter</h2>
@@ -1223,11 +1643,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 li { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f1f5f9; border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
 li.completed { text-decoration: line-through; opacity: 0.6; background: #e2e8f0; }
 .del-btn { background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; }`,
-      starterJs: `const taskInput = document.getElementById("task-input");
-const addBtn = document.getElementById("add-task-btn");
-const taskList = document.getElementById("task-list");
-
-// เขียนฟังก์ชันเพิ่ม task ขีดฆ่า และปุ่มลบ
+      starterJs: `// เขียนระบบจัดการ Todo List (เพิ่มงานใหม่, ขีดฆ่าเมื่อเสร็จ, ลบงาน) ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="todo-app">
   <h2>My Task Manager</h2>
@@ -1329,16 +1745,7 @@ addBtn.addEventListener("click", addTask);`,
 .score { font-size: 32px; font-weight: 800; color: #38bdf8; margin: 12px 0; }
 .vote-btn { background: #0284c7; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
 #btn-clear-votes { background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; }`,
-      starterJs: `// ดึงค่าคะแนนเดิมจาก localStorage หรือตั้งต้นที่ 0
-let votes = JSON.parse(localStorage.getItem("app_votes")) || { js: 0, py: 0, go: 0 };
-
-function renderVotes() {
-  document.getElementById("score-js").textContent = votes.js;
-  document.getElementById("score-py").textContent = votes.py;
-  document.getElementById("score-go").textContent = votes.go;
-}
-
-// ผูกปุ่มโหวตและการบันทึก localStorage
+      starterJs: `// เขียนระบบโหวตภาษาโปรแกรมมิ่งและการบันทึกคะแนนลงใน localStorage ด้วยตนเอง
 `,
       targetHtml: `<div class="vote-arena">
   <h2>Vote Your Favorite Language</h2>
@@ -1438,7 +1845,7 @@ document.getElementById("btn-clear-votes").addEventListener("click", () => {
 
 /* เขียนสไตล์ CSS ตะกร้าสินค้าของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: เขียนฟังก์ชันคำนวณราคาสินค้า, โค้ดส่วนลด และอัปเดตยอดเงินใน DOM ตามโจทย์
+      starterJs: `// เขียนโค้ดระบบตะกร้าสินค้าและการคำนวณราคาทั้งหมดด้วยตนเองตามข้อกำหนดในโจทย์
 `,
       targetHtml: `<div class="cart-container">
   <h2>🛒 ตะกร้าสินค้าของฉัน</h2>
@@ -1589,10 +1996,9 @@ updateTotals();`,
         return true;
       },
       hints: [
-        "ใช้ querySelectorAll('.cart-item') เพื่อเข้าถึงทุกชิ้น",
-        "getAttribute('data-price') เพื่ออ่านราคาสินค้า",
-        "เมื่อกด #btn-apply-coupon ตรวจสอบ if (code === 'SAVE50') discount = 50;",
-        "grandTotal = subtotal - discountAmount"
+        "วนลูปคำนวณราคาสินค้าแต่ละชิ้นจากราคาและจำนวน แล้วนำมารวมกันเป็นยอดรวมย่อย (Subtotal)",
+        "เมื่อมีการกดปุ่มบวกหรือลบ ให้เปลี่ยนค่าตัวเลขจำนวนสินค้าและเรียกฟังก์ชันคำนวณราคาใหม่",
+        "เมื่อกดใช้โค้ดส่วนลด ให้ตรวจสอบข้อความที่ผู้ใช้กรอก หากตรงตามเงื่อนไขให้หักลบออกจากยอดรวมสุทธิ"
       ]
     },
     {
@@ -1653,10 +2059,7 @@ updateTotals();`,
 
 /* เขียนสไตล์ CSS จัดเลย์เอาต์ฟอร์มและการ์ดของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: ดักจับ event 'input' บน #input-name เพื่ออัปเดต #preview-name
-// TODO: ดักจับ event 'input' บน #input-role เพื่ออัปเดต #preview-role
-// TODO: ดักจับ event 'change' บน #select-theme เพื่อเปลี่ยน class บน #pass-card
-// TODO: ดักจับ event 'click' บน #btn-reset-pass เพื่อคืนค่าเริ่มต้น
+      starterJs: `// เขียนโค้ดระบบสร้างบัตรสัมมนาและการอัปเดตแบบเรียลไทม์ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="badge-app">
   <div class="form-pane">
@@ -1771,15 +2174,16 @@ if (btnReset) {
         return true;
       },
       hints: [
-        "inputName.addEventListener('input', (e) => previewName.textContent = e.target.value || 'YOUR NAME')",
-        "selectTheme.addEventListener('change', () => passCard.className = selectTheme.value)"
+        "ดักจับ event 'input' บนช่องกรอกข้อความ เพื่อนำค่าไปอัปเดตบนบัตรตัวอย่างแบบเรียลไทม์",
+        "ดักจับ event 'change' บนตัวเลือกธีม แล้วนำค่าที่เลือกไปกำหนดเป็น class ให้กับกล่องบัตร",
+        "เมื่อกดปุ่มรีเซ็ต ให้คืนค่าข้อความบนบัตรและตัวเลือกทั้งหมดกลับเป็นค่าเริ่มต้น"
       ]
     },
     {
       id: "exam-memory-card-game",
       title: "ข้อสอบปฏิบัติการที่ 3: มินิเกมจับคู่ไพ่ Memory Match (สไลด์ 3 หน้า 28)",
       category: "ข้อสอบปฏิบัติการเชิงประยุกต์",
-      description: `ข้อสอบชุดนี้สร้างขึ้นตามโจทย์การบ้านเสริมทักษะใน **Slide 3 หน้า 28 (Card Matching Game)** โดยให้นักศึกษาพัฒนาเกมจับคู่ไพ่ 4 ใบ (2 คู่) ที่มีการพลิกไพ่ด้วย CSS Flip และควบคุมตรรกะการจับคู่ด้วย JavaScript
+      description: `ข้อสอบชุดนี้สร้างขึ้นเพื่อฝึกทักษะการสร้างเกมจับคู่ไพ่ **Memory Match Game (กระดาน 4x4 รวม 16 ใบ / 8 คู่)** โดยผู้สอบต้องพัฒนาเกมจับคู่ไพ่ที่มีการพลิกไพ่ด้วย CSS Flip และควบคุมตรรกะการจับคู่ด้วย JavaScript
 
 **ข้อกำหนดทางเทคนิค (Specifications):**
 1. **HTML:**
@@ -1787,23 +2191,26 @@ if (btnReset) {
      - ตัวนับรอบที่เปิด \`<strong id="moves-count">0</strong>\`
      - ตัวนับคู่ที่จับถูก \`<strong id="matched-count">0</strong>\`
      - ปุ่มเริ่มเกมใหม่ \`<button id="btn-restart-game">เริ่มเกมใหม่</button>\`
-   - กระดานไพ่: ไพ่ 4 ใบ แต่ละใบมี class \`.memory-card\` และมี attribute \`data-card\` (เช่น \`rocket\` 2 ใบ, \`bolt\` 2 ใบ)
+   - กระดานไพ่: กล่อง \`.card-grid\` บรรจุไพ่ 16 ใบ (4x4) แต่ละใบมี class \`.memory-card\` และมี attribute \`data-card\` สำหรับระบุประเภท 8 คู่ (เช่น \`rocket\`, \`bolt\`, \`planet\`, \`robot\`, \`gem\`, \`alien\`, \`fire\`, \`star\`)
+   - ด้านในไพ่แต่ละใบมี \`<span class="front-emoji">\` (แสดงรูปอิโมจิ) และ \`<span class="back-mark">?</span>\`
 2. **CSS:**
-   - สไตล์การ์ด \`.memory-card\` กว้างยาวพอเหมาะ สวยงาม
+   - จัดวางตารางไพ่แบบ 4x4 (\`grid-template-columns: repeat(4, 1fr)\`)
+   - ปกติซ่อน \`.front-emoji\` และแสดง \`.back-mark\`
    - เมื่อมีคลาส \`.flipped\` ให้แสดงหน้าไพ่ (อิโมจิ)
    - เมื่อมีคลาส \`.matched\` ให้แสดงสถานะจับคู่สำเร็จ (เช่น กรอบสีเขียว)
 3. **JavaScript:**
+   - สุ่มสลับตำแหน่งไพ่ (Shuffle cards) ทั้งตอนเริ่มต้นและเมื่อกดเริ่มเกมใหม่ โดยสุ่มจัดลำดับ (เช่น สุ่มกำหนดค่า \`style.order\` ให้การ์ดแต่ละใบ \`card.style.order = Math.floor(Math.random() * 16)\` หรือสลับลำดับใน DOM)
    - เมื่อคลิก \`.memory-card\` ให้เพิ่มคลาส \`.flipped\`
    - เมื่อเปิดครบ 2 ใบใน 1 รอบ:
      - เพิ่มตัวนับ \`#moves-count\` ขึ้น 1
      - ตรวจสอบว่า \`data-card\` ตรงกันหรือไม่:
        - ถ้าตรงกัน: ใส่คลาส \`.matched\` ให้ทั้งสองใบ และเพิ่ม \`#matched-count\` ขึ้น 1
-       - ถ้าไม่ตรงกัน: ใช้ \`setTimeout\` หน่วงเวลาสักครู่ (เช่น 600ms - 800ms) แล้วเอาคลาส \`.flipped\` ออกจากทั้งสองใบ
-   - เมื่อกดปุ่ม \`#btn-restart-game\`: รีเซ็ตคะแนนเป็น 0 และลบคลาส \`.flipped\`, \`.matched\` ออกจากทุกใบ`,
+       - ถ้าไม่ตรงกัน: ใช้ \`setTimeout\` หน่วงเวลาสักครู่ (เช่น 600ms) แล้วเอาคลาส \`.flipped\` ออกจากทั้งสองใบ
+   - เมื่อกดปุ่ม \`#btn-restart-game\`: รีเซ็ตคะแนนและสถิติเป็น 0, ลบคลาส \`.flipped\`, \`.matched\` ออกจากทุกใบ และสุ่มสลับตำแหน่งไพ่ใหม่ (shuffle)`,
       difficulty: "Advanced",
       points: 250,
       xp: 250,
-      starterHtml: `<!-- 🧠 เขียนโครงสร้าง HTML สำหรับแผงสถิติ (#moves-count, #matched-count, #btn-restart-game) และกระดานไพ่ 4 ใบ (.memory-card) ตามข้อกำหนด -->
+      starterHtml: `<!-- 🧠 เขียนโครงสร้าง HTML สำหรับแผงสถิติ (#moves-count, #matched-count, #btn-restart-game) และกระดานไพ่ 4x4 รวม 16 ใบ (.memory-card) ตามข้อกำหนด -->
 `,
       starterCss: `/* ==========================================
    🎨 Color Presets & Card Palette (พรีเซ็ตสีสำหรับการ์ด)
@@ -1823,38 +2230,38 @@ if (btnReset) {
 
 /* เขียนสไตล์ CSS จัดวาง Grid และสถานะไพ่ (.flipped, .matched) ของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: สร้างตัวแปรเก็บไพ่ที่เปิด เช่น let flippedCards = [];
-// TODO: ดักจับ event click บน .memory-card
-// TODO: เช็คคู่ที่ตรงกัน และใช้ setTimeout หากไม่ตรงกัน
-// TODO: ปุ่ม #btn-restart-game คืนค่าเริ่มต้น
+      starterJs: `// เขียนตรรกะเกมจับคู่ไพ่ การสุ่มสลับตำแหน่งไพ่ (shuffle) การตรวจคู่ และการนับสถิติทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="game-wrapper">
-  <h2>🧠 Memory Card Matcher</h2>
+  <h2>🧠 Memory Card Matcher (4x4)</h2>
   <div class="game-stats">
     <div>ครั้งที่เปิด: <strong id="moves-count">0</strong></div>
-    <div>คู่ที่ตรงกัน: <strong id="matched-count">0</strong> / 2</div>
+    <div>คู่ที่ตรงกัน: <strong id="matched-count">0</strong> / 8</div>
     <button id="btn-restart-game">เริ่มเกมใหม่</button>
   </div>
   <div class="card-grid">
-    <div class="memory-card" data-card="rocket">
-      <span class="front-emoji">🚀</span>
-      <span class="back-mark">?</span>
-    </div>
-    <div class="memory-card" data-card="bolt">
-      <span class="front-emoji">⚡</span>
-      <span class="back-mark">?</span>
-    </div>
-    <div class="memory-card" data-card="rocket">
-      <span class="front-emoji">🚀</span>
-      <span class="back-mark">?</span>
-    </div>
-    <div class="memory-card" data-card="bolt">
-      <span class="front-emoji">⚡</span>
-      <span class="back-mark">?</span>
-    </div>
+    <div class="memory-card" data-card="rocket"><span class="front-emoji">🚀</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="bolt"><span class="front-emoji">⚡</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="planet"><span class="front-emoji">🪐</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="robot"><span class="front-emoji">🤖</span><span class="back-mark">?</span></div>
+
+    <div class="memory-card" data-card="gem"><span class="front-emoji">💎</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="rocket"><span class="front-emoji">🚀</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="alien"><span class="front-emoji">👾</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="fire"><span class="front-emoji">🔥</span><span class="back-mark">?</span></div>
+
+    <div class="memory-card" data-card="star"><span class="front-emoji">🌟</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="bolt"><span class="front-emoji">⚡</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="gem"><span class="front-emoji">💎</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="robot"><span class="front-emoji">🤖</span><span class="back-mark">?</span></div>
+
+    <div class="memory-card" data-card="planet"><span class="front-emoji">🪐</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="alien"><span class="front-emoji">👾</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="star"><span class="front-emoji">🌟</span><span class="back-mark">?</span></div>
+    <div class="memory-card" data-card="fire"><span class="front-emoji">🔥</span><span class="back-mark">?</span></div>
   </div>
 </div>`,
-      targetCss: `body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; padding: 24px; display: flex; justify-content: center; } .game-wrapper { background: #1e293b; padding: 28px; border-radius: 16px; width: 380px; text-align: center; } .game-stats { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; font-size: 14px; } #btn-restart-game { padding: 6px 12px; background: #3b82f6; border: none; color: white; border-radius: 6px; cursor: pointer; } .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; } .memory-card { height: 90px; background: #334155; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid transparent; user-select: none; } .memory-card .front-emoji { display: none; } .memory-card.flipped { background: #1e40af; border-color: #60a5fa; } .memory-card.flipped .front-emoji { display: inline; } .memory-card.flipped .back-mark { display: none; } .memory-card.matched { background: #065f46; border-color: #34d399; cursor: default; }`,
+      targetCss: `body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; padding: 24px; display: flex; justify-content: center; } .game-wrapper { background: #1e293b; padding: 24px; border-radius: 16px; width: 440px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); } .game-stats { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 18px 0; font-size: 14px; } #btn-restart-game { padding: 6px 14px; background: #3b82f6; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; } #btn-restart-game:hover { background: #2563eb; } .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } .memory-card { height: 75px; background: #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: 2px solid transparent; user-select: none; transition: transform 0.2s, background 0.2s; } .memory-card:hover { transform: scale(1.03); background: #475569; } .memory-card .front-emoji { display: none; } .memory-card.flipped { background: #1e40af; border-color: #60a5fa; } .memory-card.flipped .front-emoji { display: inline; } .memory-card.flipped .back-mark { display: none; } .memory-card.matched { background: #065f46; border-color: #34d399; cursor: default; }`,
       targetJs: `let flippedCards = [];
 let lockBoard = false;
 let moves = 0;
@@ -1864,6 +2271,13 @@ const movesEl = document.getElementById("moves-count");
 const matchesEl = document.getElementById("matched-count");
 const cards = document.querySelectorAll(".memory-card");
 const restartBtn = document.getElementById("btn-restart-game");
+
+function shuffle() {
+  cards.forEach(card => {
+    const randomPos = Math.floor(Math.random() * cards.length);
+    card.style.order = randomPos;
+  });
+}
 
 function flipCard() {
   if (lockBoard) return;
@@ -1910,18 +2324,26 @@ function restart() {
   cards.forEach(card => {
     card.classList.remove("flipped", "matched");
   });
+  shuffle();
 }
 
+shuffle();
 cards.forEach(c => c.addEventListener("click", flipCard));
 if (restartBtn) restartBtn.addEventListener("click", restart);`,
-      validation: (doc) => {
+      validation: (doc, css = "", js = "") => {
         const cards = doc.querySelectorAll('.memory-card');
         const movesEl = doc.getElementById('moves-count');
         const matchesEl = doc.getElementById('matched-count');
         const restartBtn = doc.getElementById('btn-restart-game');
 
-        if (cards.length < 4) return "ต้องมีไพ่อย่างน้อย 4 ใบที่มีคลาส .memory-card";
+        if (cards.length < 16) return "ต้องมีไพ่อย่างน้อย 16 ใบ (กระดาน 4x4) ที่มีคลาส .memory-card";
         if (!movesEl || !matchesEl || !restartBtn) return "ต้องมี #moves-count, #matched-count และ #btn-restart-game";
+
+        const hasOrder = Array.from(cards).some(c => c.style.order !== '');
+        const hasRandom = typeof js === 'string' && js.includes('Math.random');
+        if (!hasOrder && !hasRandom && js !== '') {
+          return "ต้องมีฟังก์ชันสุ่มสลับตำแหน่งไพ่ (Shuffle) เช่น การสุ่มกำหนด style.order ให้กับไพ่แต่ละใบ";
+        }
 
         cards[0].click();
         if (!cards[0].classList.contains('flipped')) {
@@ -1936,9 +2358,10 @@ if (restartBtn) restartBtn.addEventListener("click", restart);`,
         return true;
       },
       hints: [
-        "ใช้ flippedCards.push(this) เพื่อจำไพ่ที่เปิด",
-        "ตรวจคู่: c1.getAttribute('data-card') === c2.getAttribute('data-card')",
-        "หากไม่ตรงกัน ให้ใช้ setTimeout เคลียร์ class 'flipped' ออกหลังจาก 600ms"
+        "สุ่มสลับตำแหน่งไพ่ (Shuffle) โดยวนลูปการ์ดแต่ละใบแล้วสุ่มลำดับ CSS เช่น card.style.order = Math.floor(Math.random() * 16) เมื่อเริ่มเกมและเมื่อกดปุ่มเริ่มใหม่",
+        "จำสถานะไพ่ที่เปิดในรอบปัจจุบันเพื่อนำมาเปรียบเทียบว่ามีค่า data หรือสัญลักษณ์ตรงกันหรือไม่",
+        "หากไพ่ทั้งสองใบตรงกัน ให้กำหนดสถานะจับคู่สำเร็จ (.matched) แต่หากไม่ตรงกัน ให้ใช้ setTimeout พลิกไพ่กลับ",
+        "เมื่อกดปุ่มเริ่มใหม่ ให้รีเซ็ตสถิติ ปิดหน้าไพ่ทุกใบ และเรียกฟังก์ชันสุ่มสลับตำแหน่งไพ่ใหม่"
       ]
     },
     {
@@ -1997,10 +2420,7 @@ if (restartBtn) restartBtn.addEventListener("click", restart);`,
 
 /* เขียนสไตล์ CSS จัดเลย์เอาต์การ์ดและฟอร์มของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: สร้าง Array เก็บรายการ transactions
-// TODO: ฟังก์ชันคำนวณและอัปเดตยอดคงเหลือ (Balance, Income, Expense)
-// TODO: ฟังก์ชัน Render รายการประวัติ
-// TODO: ผูก Event Listener บนปุ่ม #btn-add-tx, ปุ่มลบ, และปุ่ม Filter
+      starterJs: `// เขียนระบบบันทึกรายรับ-รายจ่าย คำนวณยอดคงเหลือ และการกรองหมวดหมู่ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="tracker-app">
   <h2>💰 เครื่องมือบันทึกรายรับ-รายจ่าย</h2>
@@ -2178,9 +2598,9 @@ renderList();`,
         return true;
       },
       hints: [
-        "ใช้ transactions.filter(t => t.type === 'income').reduce(...) เพื่อหายอดรวม",
-        "ยอดคงเหลือ: balance = totalIncome - totalExpense",
-        "ปุ่ม filter ให้เปลี่ยนค่า currentFilter แล้วเรียก renderList()"
+        "จัดเก็บรายการธุรกรรมใน Array เพื่อให้สามารถคำนวณและกรองข้อมูลได้ง่าย",
+        "คำนวณยอดคงเหลือจาก ผลรวมรายรับ ทั้งหมด ลบด้วย ผลรวมรายจ่าย ทั้งหมด",
+        "เมื่อผู้ใช้คลิกปุ่มตัวกรอง ให้อัปเดตสถานะตัวกรองปัจจุบันแล้วเรนเดอร์เฉพาะรายการที่ตรงเงื่อนไข"
       ]
     },
     {
@@ -2238,9 +2658,7 @@ renderList();`,
 
 /* เขียนสไตล์ CSS สำหรับเลย์เอาต์การ์ดและผลลัพธ์สภาพอากาศต่อจากนี้ */
 `,
-      starterJs: `// TODO: สร้างฟังก์ชัน fetchWeatherData(city) แบบ async/await
-// TODO: ผูก event listener บนปุ่ม #btn-search-weather
-// TODO: แสดงข้อมูลใน #weather-card
+      starterJs: `// เขียนโค้ดระบบค้นหาสภาพอากาศ การเชื่อมต่อ Fetch API และการจัดการสถานะทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="weather-app">
   <h2>🌦️ Live Weather & AQI Hub</h2>
@@ -2449,9 +2867,7 @@ handleSearch();`,
 
 /* เขียนสไตล์ CSS จัดวาง Grid และ Modal Backdrop ของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: สร้างข้อมูลหรือฟังก์ชันดึงภาพยนตร์
-// TODO: สร้างฟังก์ชัน Debounce สำหรับช่องค้นหา #movie-search
-// TODO: Render การ์ดภาพยนตร์และเปิดดู Modal เมื่อคลิกการ์ด
+      starterJs: `// เขียนโค้ดระบบค้นหาภาพยนตร์ เทคนิค Debounce และการจัดการ Modal ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="movie-app">
   <div class="app-header">
@@ -2613,9 +3029,7 @@ renderMovies(movies);`,
 
 /* เขียนสไตล์ CSS จัดตำแหน่ง Canvas และปุ่มควบคุมของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: ดึง canvas context 2D
-// TODO: สร้าง game loop ด้วย requestAnimationFrame
-// TODO: วาดผู้เล่น ยานอวกาศ และอุกกาบาต
+      starterJs: `// เขียนโค้ดระบบเกม Canvas 2D การควบคุม และ Game Loop ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="game-box">
   <div class="hud">
@@ -2825,9 +3239,7 @@ if (btnRight) btnRight.addEventListener("click", moveRight);`,
 
 /* เขียนสไตล์ CSS สำหรับตาราง Grid 3x3 และอนิเมชันตุ่นโผล่ (.hole.up .mole) ของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: สุ่มหลุมตุ่นและใส่ class 'up'
-// TODO: ดักจับ click บน .mole เพื่อเพิ่มคะแนน
-// TODO: จับเวลานับถอยหลังด้วย setInterval
+      starterJs: `// เขียนตรรกะเกมตีตัวตุ่น การสุ่มหลุม และระบบนับคะแนนทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="mole-app">
   <h2>🔨 Whack-A-Mole Reflex Challenge</h2>
@@ -3015,9 +3427,7 @@ if (startBtn) startBtn.addEventListener("click", startGame);`,
 
 /* เขียนสไตล์ CSS สำหรับกระดานตาราง 6x5 และแป้นพิมพ์เสมือนจริงของคุณต่อจากนี้ */
 `,
-      starterJs: `// TODO: สร้างกระดาน 6 แถว แถวละ 5 ช่อง
-// TODO: สร้างแป้นพิมพ์เสมือนจริงและดักจับ Event keydown
-// TODO: ตรวจสอบคำตอบและใส่คลาส correct, present, absent
+      starterJs: `// เขียนตรรกะเกมทายคำศัพท์ Wordle และการประมวลผลแป้นพิมพ์ทั้งหมดด้วยตนเอง
 `,
       targetHtml: `<div class="wordle-app">
   <h2>🟩 Wordle Master (5 ตัวอักษร)</h2>
@@ -3206,6 +3616,760 @@ initKeyboard();`,
         "สร้าง 6 แถว แถวละ 5 ช่อง ด้วยลูปซ้อน 2 ชั้น",
         "เปรียบเทียบทีละตัวอักษร: ตัวตรงตำแหน่งใส่ 'correct', มีตัวในคำใส่ 'present', ไม่มีใส่ 'absent'",
         "ดักจับ event 'keydown' เพื่อรองรับการพิมพ์จากคีย์บอร์ดจริง"
+      ]
+    },
+    {
+      id: "exam-drag-drop-board",
+      title: "ข้อสอบปฏิบัติการที่ 10: กระดานเคลื่อนย้ายงาน HTML5 Drag & Drop Kanban (สไลด์ 3 หน้า 18-19)",
+      category: "3. เทคนิคขั้นสูงและ Web APIs",
+      difficulty: "ยาก (Advanced Exam)",
+      xp: 260,
+      description: `ข้อสอบชุดนี้สร้างขึ้นเพื่อทดสอบความรู้และทักษะการใช้งาน **HTML5 Drag and Drop API** ตามที่สอนในสไลด์ชุดที่ 3 หน้า 18–19 โดยตรง!
+
+ผู้สอบต้องพัฒนาระบบกระดานจัดหมวดหมู่งาน (Kanban Board) 2 คอลัมน์ ได้แก่:
+1. **#col-todo** (คอลัมน์ "งานที่ต้องทำ") บรรจุการ์ดงานเบื้องต้นอย่างน้อย 2 ใบ
+2. **#col-done** (คอลัมน์ "งานที่เสร็จแล้ว")
+
+**ข้อกำหนดทางเทคนิค (Specifications):**
+1. **HTML:**
+   - การ์ดงานแต่ละใบต้องมีคลาส \`.kanban-card\` พร้อมแอตทริบิวต์ \`draggable="true"\` และระบุ id ประจำตัว (เช่น \`id="card-1"\`, \`id="card-2"\`)
+   - คอลัมน์ทั้งสองมีคลาส \`.kanban-col\` และมี id เป็น \`col-todo\` และ \`col-done\`
+   - ป้ายระบุจำนวนงาน: \`<span id="count-todo">2</span>\` และ \`<span id="count-done">0</span>\`
+2. **JavaScript Drag & Drop Events:**
+   - **\`dragstart\` บนการ์ด:** ส่ง id ของการ์ดเข้าไปใน dataTransfer ผ่านคำสั่ง \`ev.dataTransfer.setData("text/plain", ev.target.id);\` และใส่คลาส \`dragging\` ให้กับการ์ด
+   - **\`dragend\` บนการ์ด:** ลบคลาส \`dragging\` ออกจากการ์ด
+   - **\`dragover\` บนคอลัมน์:** เรียก \`ev.preventDefault();\` เสมอเพื่ออนุญาตให้วาง (Drop) ได้ และเพิ่มคลาส \`drag-over\` ให้กับคอลัมน์
+   - **\`dragleave\` บนคอลัมน์:** ลบคลาส \`drag-over\` ออกจากคอลัมน์
+   - **\`drop\` บนคอลัมน์:**
+     - เรียก \`ev.preventDefault();\`
+     - ดึง id ของการ์ดที่ถูกลากออกมาด้วยคำสั่ง \`const cardId = ev.dataTransfer.getData("text/plain");\`
+     - ค้นหา element ของการ์ดด้วย \`document.getElementById(cardId)\`
+     - ย้ายการ์ดเข้าไปต่อท้ายในคอลัมน์นั้นด้วย \`col.appendChild(card);\`
+     - ลบคลาส \`drag-over\`
+     - อัปเดตตัวเลขจำนวนงานบน \`#count-todo\` และ \`#count-done\` ให้ตรงกับจำนวนการ์ดจริง`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Kanban Drag and Drop</title>
+</head>
+<body>
+  <div class="kanban-wrapper">
+    <h2>📋 กระดานติดตามงาน (HTML5 Drag & Drop)</h2>
+    <div class="board-container">
+      <div class="kanban-col" id="col-todo">
+        <div class="col-header">
+          <h3>📌 งานที่ต้องทำ (<span id="count-todo">2</span>)</h3>
+        </div>
+        <div class="kanban-card" id="card-1" draggable="true">
+          <h4>ออกแบบโครงสร้างฐานข้อมูล</h4>
+          <span class="badge high">สำคัญมาก</span>
+        </div>
+        <div class="kanban-card" id="card-2" draggable="true">
+          <h4>จัดทำสไลด์นำเสนอโปรเจกต์</h4>
+          <span class="badge normal">ปกติ</span>
+        </div>
+      </div>
+
+      <div class="kanban-col" id="col-done">
+        <div class="col-header">
+          <h3>✅ งานที่เสร็จแล้ว (<span id="count-done">0</span>)</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: 'Sarabun', sans-serif;
+  background: #f8fafc;
+  padding: 24px;
+}
+.kanban-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.board-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 16px;
+}
+.kanban-col {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 16px;
+  min-height: 320px;
+  border: 2px dashed #cbd5e1;
+  transition: all 0.2s ease;
+}
+.kanban-col.drag-over {
+  background: #e0f2fe;
+  border-color: #0284c7;
+}
+.col-header {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+.kanban-card {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  cursor: grab;
+  transition: opacity 0.2s ease;
+}
+.kanban-card:active {
+  cursor: grabbing;
+}
+.kanban-card.dragging {
+  opacity: 0.4;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+.badge.high { background: #fee2e2; color: #dc2626; }
+.badge.normal { background: #e0f2fe; color: #0284c7; }`,
+      starterJs: `// เขียนโค้ดระบบ HTML5 Drag and Drop จัดการ Kanban Board ของคุณที่นี่
+`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Kanban Drag and Drop</title>
+</head>
+<body>
+  <div class="kanban-wrapper">
+    <h2>📋 กระดานติดตามงาน (HTML5 Drag & Drop)</h2>
+    <div class="board-container">
+      <div class="kanban-col" id="col-todo">
+        <div class="col-header">
+          <h3>📌 งานที่ต้องทำ (<span id="count-todo">2</span>)</h3>
+        </div>
+        <div class="kanban-card" id="card-1" draggable="true">
+          <h4>ออกแบบโครงสร้างฐานข้อมูล</h4>
+          <span class="badge high">สำคัญมาก</span>
+        </div>
+        <div class="kanban-card" id="card-2" draggable="true">
+          <h4>จัดทำสไลด์นำเสนอโปรเจกต์</h4>
+          <span class="badge normal">ปกติ</span>
+        </div>
+      </div>
+
+      <div class="kanban-col" id="col-done">
+        <div class="col-header">
+          <h3>✅ งานที่เสร็จแล้ว (<span id="count-done">0</span>)</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`,
+      targetCss: `body { font-family: 'Sarabun', sans-serif; background: #f8fafc; padding: 24px; } .kanban-wrapper { max-width: 800px; margin: 0 auto; } .board-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; } .kanban-col { background: #f1f5f9; border-radius: 12px; padding: 16px; min-height: 320px; border: 2px dashed #cbd5e1; transition: all 0.2s ease; } .kanban-col.drag-over { background: #e0f2fe; border-color: #0284c7; } .col-header { font-size: 15px; margin-bottom: 12px; color: #1e293b; } .kanban-card { background: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); cursor: grab; transition: opacity 0.2s ease; } .kanban-card:active { cursor: grabbing; } .kanban-card.dragging { opacity: 0.4; } .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; margin-top: 6px; } .badge.high { background: #fee2e2; color: #dc2626; } .badge.normal { background: #e0f2fe; color: #0284c7; }`,
+      targetJs: `function updateKanbanCounts() {
+  const colTodo = document.getElementById("col-todo");
+  const colDone = document.getElementById("col-done");
+  const todoCards = colTodo.querySelectorAll(".kanban-card");
+  const doneCards = colDone.querySelectorAll(".kanban-card");
+  document.getElementById("count-todo").textContent = todoCards.length;
+  document.getElementById("count-done").textContent = doneCards.length;
+}
+
+const cards = document.querySelectorAll(".kanban-card");
+const columns = document.querySelectorAll(".kanban-col");
+
+cards.forEach(card => {
+  card.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", e.target.id);
+    card.classList.add("dragging");
+  });
+
+  card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+  });
+});
+
+columns.forEach(col => {
+  col.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    col.classList.add("drag-over");
+  });
+
+  col.addEventListener("dragleave", () => {
+    col.classList.remove("drag-over");
+  });
+
+  col.addEventListener("drop", (e) => {
+    e.preventDefault();
+    col.classList.remove("drag-over");
+    const cardId = e.dataTransfer.getData("text/plain");
+    const card = document.getElementById(cardId);
+    if (card) {
+      col.appendChild(card);
+      updateKanbanCounts();
+    }
+  });
+});
+
+updateKanbanCounts();`,
+      validation: (doc, css, js) => {
+        const colTodo = doc.getElementById("col-todo");
+        const colDone = doc.getElementById("col-done");
+        const countTodo = doc.getElementById("count-todo");
+        const countDone = doc.getElementById("count-done");
+
+        if (!colTodo || !colDone) {
+          return "ต้องมี element คอลัมน์ #col-todo และ #col-done";
+        }
+        if (!countTodo || !countDone) {
+          return "ต้องมีป้ายระบุจำนวนงาน #count-todo และ #count-done";
+        }
+
+        const cards = doc.querySelectorAll(".kanban-card");
+        if (cards.length < 2) {
+          return "ต้องมีการ์ด .kanban-card อย่างน้อย 2 ใบ";
+        }
+        for (const card of cards) {
+          if (card.getAttribute("draggable") !== "true") {
+            return "การ์ดแต่ละใบต้องมีแอตทริบิวต์ draggable='true'";
+          }
+        }
+
+        if (typeof js === 'string') {
+          if (!js.includes("dataTransfer") || !js.includes("setData") || !js.includes("getData")) {
+            return "ต้องใช้ DataTransfer API (setData และ getData) ตามสไลด์ ch4 JavaScript_3 หน้า 18-19";
+          }
+          if (!js.includes("preventDefault")) {
+            return "ในอีเวนต์ dragover และ drop ต้องเรียก preventDefault() เพื่ออนุญาตให้วางได้";
+          }
+        }
+
+        return true;
+      },
+      hints: [
+        "ระบุ draggable='true' ให้กับการ์ดเพื่อเปิดใช้งาน HTML5 Drag & Drop",
+        "ใน dragstart ใช้ ev.dataTransfer.setData('text/plain', ev.target.id)",
+        "ใน dragover บนคอลัมน์ ต้องเรียก ev.preventDefault() เสมอเพื่อให้สามารถวาง (drop) ได้",
+        "ใน drop ใช้ ev.dataTransfer.getData('text/plain') และ col.appendChild(cardElement) เพื่อย้ายการ์ด"
+      ]
+    },
+    {
+      id: "exam-this-constructor-payroll",
+      title: "ข้อสอบปฏิบัติการที่ 11: ระบบคำนวณเงินเดือน & สวัสดิการพนักงาน (Object Constructor & this Binding)",
+      category: "3. เทคนิคขั้นสูงและ Web APIs",
+      difficulty: "ยาก (Advanced Exam)",
+      xp: 270,
+      description: `ข้อสอบชุดนี้สร้างขึ้นเพื่อทดสอบ **Object Constructor Function (สไลด์ 1 หน้า 57)** และ **Explicit this Binding ด้วย .call(), .apply(), และ .bind() (สไลด์ 3 หน้า 1-6)**
+
+**ข้อกำหนดทางเทคนิค (Specifications):**
+1. **Object Constructor Function:**
+   - ประกาศ Constructor Function ชื่อ \`Employee(id, name, baseSalary, department)\`
+   - กำหนดค่า \`this.id = id;\`, \`this.name = name;\`, \`this.baseSalary = baseSalary;\`, \`this.department = department;\`
+   - สร้างพนักงานอย่างน้อย 2 คนด้วยคีย์เวิร์ด \`new\`:
+     - \`emp1 = new Employee(1, "วิชัย สายโค้ด", 35000, "Engineering");\`
+     - \`emp2 = new Employee(2, "กัญญา การตลาด", 42000, "Marketing");\`
+2. **ฟังก์ชันคำนวณค่าตอบแทนพิเศษ (Standalone Function ที่ใช้ \`this\`):**
+   - สร้างฟังก์ชันภายนอก \`calculateNetComp(bonusRate, taxRate)\`
+   - ฟังก์ชันนี้ต้องเข้าถึงฐานเงินเดือนผ่าน \`this.baseSalary\`
+   - สูตรคำนวณ: \`const bonus = this.baseSalary * bonusRate;\`
+   - หักภาษี: \`const tax = (this.baseSalary + bonus) * (taxRate / 100);\`
+   - คืนค่าสุทธิ: \`return Math.round(this.baseSalary + bonus - tax);\`
+3. **Explicit Binding Execution:**
+   - **ใช้ \`.call()\`:** คำนวณเงินเดือนสุทธิของ \`emp1\` โดยส่ง Arguments ทีละตัว: \`calculateNetComp.call(emp1, 1.5, 5)\`
+   - **ใช้ \`.apply()\`:** คำนวณเงินเดือนสุทธิของ \`emp2\` โดยส่ง Arguments เป็น Array: \`calculateNetComp.apply(emp2, [2.0, 7])\`
+   - **ใช้ \`.bind()\`:** สร้างฟังก์ชันผูกค่า \`calcEmp1 = calculateNetComp.bind(emp1);\`
+4. **DOM Display:**
+   - แสดงการ์ดพนักงานทั้ง 2 คนลงใน \`#payroll-list\`
+   - มีปุ่ม \`<button id="btn-calc-payroll">คำนวณเงินเดือนสุทธิ</button>\` เมื่อกดจะแสดงผลลัพธ์สุทธิของการ์ดแต่ละใบ และอัปเดตยอดรวมงบประมาณบน \`<strong id="total-payroll-budget">0</strong>\``,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Payroll & this Binding</title>
+</head>
+<body>
+  <div class="payroll-container">
+    <h2>🏢 ระบบบัญชีเงินเดือนและสวัสดิการ (Object Constructor & this Binding)</h2>
+    <div class="action-bar">
+      <button id="btn-calc-payroll">💰 คำนวณเงินเดือนสุทธิและสวัสดิการ</button>
+      <div class="budget-stat">งบประมาณรวม: <strong id="total-payroll-budget">0</strong> บาท</div>
+    </div>
+    <div id="payroll-list" class="cards-grid">
+      <!-- การ์ดพนักงานจะแสดงที่นี่ -->
+    </div>
+  </div>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: 'Sarabun', sans-serif;
+  background: #f8fafc;
+  padding: 24px;
+}
+.payroll-container {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+#btn-calc-payroll {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#btn-calc-payroll:hover {
+  background: #1d4ed8;
+}
+.budget-stat {
+  font-size: 16px;
+  color: #334155;
+}
+#total-payroll-budget {
+  color: #059669;
+  font-size: 20px;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.emp-card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  border-left: 5px solid #2563eb;
+}
+.emp-card h3 { margin: 0 0 8px 0; color: #1e293b; }
+.emp-card p { margin: 4px 0; color: #64748b; font-size: 14px; }
+.net-pay {
+  margin-top: 12px;
+  padding: 8px;
+  background: #ecfdf5;
+  border-radius: 6px;
+  color: #047857;
+  font-weight: bold;
+}`,
+      starterJs: `// เขียนโค้ด Object Constructor Function และ Explicit this Binding ของคุณที่นี่
+`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Payroll & this Binding</title>
+</head>
+<body>
+  <div class="payroll-container">
+    <h2>🏢 ระบบบัญชีเงินเดือนและสวัสดิการ (Object Constructor & this Binding)</h2>
+    <div class="action-bar">
+      <button id="btn-calc-payroll">💰 คำนวณเงินเดือนสุทธิและสวัสดิการ</button>
+      <div class="budget-stat">งบประมาณรวม: <strong id="total-payroll-budget">0</strong> บาท</div>
+    </div>
+    <div id="payroll-list" class="cards-grid">
+      <!-- การ์ดพนักงานจะแสดงที่นี่ -->
+    </div>
+  </div>
+</body>
+</html>`,
+      targetCss: `body { font-family: 'Sarabun', sans-serif; background: #f8fafc; padding: 24px; } .payroll-container { max-width: 780px; margin: 0 auto; } .action-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; } #btn-calc-payroll { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; } #btn-calc-payroll:hover { background: #1d4ed8; } .budget-stat { font-size: 16px; color: #334155; } #total-payroll-budget { color: #059669; font-size: 20px; } .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .emp-card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); border-left: 5px solid #2563eb; } .emp-card h3 { margin: 0 0 8px 0; color: #1e293b; } .emp-card p { margin: 4px 0; color: #64748b; font-size: 14px; } .net-pay { margin-top: 12px; padding: 8px; background: #ecfdf5; border-radius: 6px; color: #047857; font-weight: bold; }`,
+      targetJs: `function Employee(id, name, baseSalary, department) {
+  this.id = id;
+  this.name = name;
+  this.baseSalary = baseSalary;
+  this.department = department;
+}
+
+function calculateNetComp(bonusRate, taxRate) {
+  const bonus = this.baseSalary * bonusRate;
+  const tax = (this.baseSalary + bonus) * (taxRate / 100);
+  return Math.round(this.baseSalary + bonus - tax);
+}
+
+const emp1 = new Employee(1, "วิชัย สายโค้ด", 35000, "Engineering");
+const emp2 = new Employee(2, "กัญญา การตลาด", 42000, "Marketing");
+const employees = [emp1, emp2];
+
+function renderEmployees() {
+  const list = document.getElementById("payroll-list");
+  list.innerHTML = "";
+  employees.forEach(emp => {
+    const card = document.createElement("div");
+    card.className = "emp-card";
+    card.id = \`emp-\${emp.id}\`;
+    card.innerHTML = \`
+      <h3>\${emp.name}</h3>
+      <p>แผนก: \${emp.department}</p>
+      <p>ฐานเงินเดือน: \${emp.baseSalary.toLocaleString()} บาท</p>
+      <div class="net-pay" id="net-pay-\${emp.id}">รอการคำนวณ...</div>
+    \`;
+    list.appendChild(card);
+  });
+}
+
+document.getElementById("btn-calc-payroll").addEventListener("click", () => {
+  // คำนวณ emp1 ด้วย .call()
+  const net1 = calculateNetComp.call(emp1, 1.5, 5);
+  // คำนวณ emp2 ด้วย .apply()
+  const net2 = calculateNetComp.apply(emp2, [2.0, 7]);
+  // ผูกค่าด้วย .bind()
+  const boundEmp1 = calculateNetComp.bind(emp1);
+
+  document.getElementById("net-pay-1").textContent = \`ยอดสุทธิรวมโบนัส: \${net1.toLocaleString()} บาท\`;
+  document.getElementById("net-pay-2").textContent = \`ยอดสุทธิรวมโบนัส: \${net2.toLocaleString()} บาท\`;
+
+  const total = net1 + net2;
+  document.getElementById("total-payroll-budget").textContent = total.toLocaleString();
+});
+
+renderEmployees();`,
+      validation: (doc, css, js) => {
+        const list = doc.getElementById("payroll-list");
+        const calcBtn = doc.getElementById("btn-calc-payroll");
+        const totalBudget = doc.getElementById("total-payroll-budget");
+
+        if (!list || !calcBtn || !totalBudget) {
+          return "ต้องมี element #payroll-list, #btn-calc-payroll และ #total-payroll-budget";
+        }
+
+        if (typeof js === 'string') {
+          if (!js.includes("function Employee") || !js.includes("this.baseSalary")) {
+            return "ต้องประกาศ Object Constructor Function Employee และกำหนดค่า properties ผ่าน this ตามสไลด์ 1 หน้า 57";
+          }
+          if (!js.includes(".call(") || !js.includes(".apply(")) {
+            return "ต้องมีการเรียกใช้ .call() และ .apply() ในการทำ Explicit Binding ตามสไลด์ 3 หน้า 5-6";
+          }
+        }
+
+        calcBtn.click();
+        const cards = list.querySelectorAll(".emp-card");
+        if (cards.length < 2) {
+          return "ต้องเรนเดอร์การ์ดพนักงาน (.emp-card) อย่างน้อย 2 คน";
+        }
+
+        const netPay1 = doc.getElementById("net-pay-1");
+        const netPay2 = doc.getElementById("net-pay-2");
+        if (!netPay1 || !netPay2 || netPay1.textContent.includes("รอการคำนวณ")) {
+          return "เมื่อคลิกปุ่ม #btn-calc-payroll ต้องคำนวณยอดเงินสุทธิของพนักงานทุกคน";
+        }
+
+        return true;
+      },
+      hints: [
+        "สร้าง constructor: function Employee(id, name, baseSalary, department) { this.name = ... }",
+        "ฟังก์ชันคำนวณดึงค่าผ่าน this.baseSalary",
+        "ใช้ .call(emp1, 1.5, 5) สำหรับการส่ง arguments แยกตัว",
+        "ใช้ .apply(emp2, [2.0, 7]) สำหรับการส่ง arguments รวมเป็น Array"
+      ]
+    },
+    {
+      id: "exam-dom-node-queue",
+      title: "ข้อสอบปฏิบัติการที่ 12: ระบบจัดการคิวด่วนพิเศษ DOM Node Tree (insertBefore & replaceChild)",
+      category: "2. การจัดการ DOM & ฟอร์ม",
+      difficulty: "ยาก (Advanced Exam)",
+      xp: 280,
+      description: `ข้อสอบชุดนี้สร้างขึ้นเพื่อทดสอบทักษะการจัดการ **DOM Node Tree (สไลด์เล่ม 2 หน้า 24–35)** โดยเฉพาะการใช้เมธอด:
+- \`parentElement.insertBefore(newChild, referenceNode)\` (หน้า 35)
+- \`parentElement.replaceChild(newChild, oldChild)\` (หน้า 34)
+- \`parentElement.removeChild(childNode)\` หรือ \`childNode.remove()\` (หน้า 33)
+- \`parentElement.appendChild(newChild)\` (หน้า 31)
+
+**ข้อกำหนดทางเทคนิค (Specifications):**
+1. **HTML:**
+   - รายการคิว: \`<ul id="queue-list">\` มีคิวเริ่มต้น 3 รายการ (\`<li class="queue-item">...</li>\`)
+   - ช่องกรอกชื่อ: \`<input id="input-patient" placeholder="พิมพ์ชื่อผู้รับบริการ...">\`
+   - ปุ่มปฏิบัติการ:
+     - \`<button id="btn-add-normal">ต่อท้ายคิวปกติ (appendChild)</button>\`
+     - \`<button id="btn-insert-vip">แทรกคิวด่วน VIP หน้าสุด (insertBefore)</button>\`
+     - \`<button id="btn-replace-emergency">สลับแทนที่คิวแรกด้วยเคสฉุกเฉิน (replaceChild)</button>\`
+     - \`<button id="btn-call-next">เรียกคิวถัดไป (removeChild)</button>\`
+   - ป้ายสถานะ: ผู้รับบริการปัจจุบัน \`<span id="serving-now">ยังไม่มีผู้รับบริการ</span>\` และจำนวนคิวรอ \`<strong id="queue-count">3</strong>\`
+2. **JavaScript DOM Node Tree Operations:**
+   - **เมื่อกด #btn-add-normal:**
+     - ตรวจสอบช่องกรอก ถ้ามีข้อความให้สร้าง \`li\` ใหม่ด้วย \`document.createElement("li")\` ใส่ class \`queue-item\`
+     - นำไปต่อท้ายด้วยคำสั่ง \`queueList.appendChild(newLi);\`
+   - **เมื่อกด #btn-insert-vip:**
+     - ตรวจสอบช่องกรอก ถ้ามีข้อความให้สร้าง \`li\` ใหม่ ใส่ class \`queue-item vip\`
+     - แทรกไว้หน้าสุดด้วยคำสั่ง \`queueList.insertBefore(newLi, queueList.firstElementChild);\` (หากคิวว่างให้ใช้ appendChild)
+   - **เมื่อกด #btn-replace-emergency:**
+     - ตรวจสอบช่องกรอก ถ้ามีข้อความและมีคิวรออยู่อย่างน้อย 1 รายการ ให้สร้าง \`li\` ใหม่ ใส่ class \`queue-item emergency\`
+     - ทำการแทนที่คิวแรกทันทีด้วยคำสั่ง \`queueList.replaceChild(newLi, queueList.firstElementChild);\`
+   - **เมื่อกด #btn-call-next:**
+     - หากมีคิวอยู่ในรายการ ให้นำชื่อของคิวแรกไปแสดงบน \`#serving-now\`
+     - นำคิวแรกออกจาก DOM ด้วยคำสั่ง \`queueList.removeChild(queueList.firstElementChild);\`
+   - ทุกครั้งที่มีการเปลี่ยนแปลงคิว ให้อัปเดตตัวเลขบน \`#queue-count\` ให้เท่ากับ \`queueList.children.length\` เสมอ และล้างค่าในช่องพิมพ์ให้ว่าง`,
+      starterHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospital Priority Queue</title>
+</head>
+<body>
+  <div class="queue-app">
+    <h2>🏥 ระบบจัดการคิวผู้ป่วย DOM Node Hierarchy</h2>
+    <div class="status-panel">
+      <div>กำลังตรวจ: <span id="serving-now">ยังไม่มีผู้รับบริการ</span></div>
+      <div>รอในคิว: <strong id="queue-count">3</strong> ท่าน</div>
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="input-patient" placeholder="พิมพ์ชื่อผู้ป่วย...">
+    </div>
+
+    <div class="buttons-grid">
+      <button id="btn-add-normal" class="btn normal">➕ ต่อท้ายคิวปกติ (appendChild)</button>
+      <button id="btn-insert-vip" class="btn vip">⭐ แทรกคิว VIP หน้าสุด (insertBefore)</button>
+      <button id="btn-replace-emergency" class="btn emergency">🚨 แทนที่ด้วยเคสฉุกเฉิน (replaceChild)</button>
+      <button id="btn-call-next" class="btn next">🔔 เรียกคิวถัดไป (removeChild)</button>
+    </div>
+
+    <ul id="queue-list" class="queue-list">
+      <li class="queue-item">นายสมชาย รักสงบ</li>
+      <li class="queue-item">นางสาวมณี สดใส</li>
+      <li class="queue-item">นายบุญมี มีสุข</li>
+    </ul>
+  </div>
+</body>
+</html>`,
+      starterCss: `body {
+  font-family: 'Sarabun', sans-serif;
+  background: #f1f5f9;
+  padding: 24px;
+}
+.queue-app {
+  max-width: 650px;
+  margin: 0 auto;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.status-panel {
+  display: flex;
+  justify-content: space-between;
+  background: #e2e8f0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: bold;
+}
+#serving-now { color: #0284c7; }
+#queue-count { color: #dc2626; font-size: 18px; }
+.input-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+.buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.btn {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn.normal { background: #3b82f6; color: white; }
+.btn.vip { background: #f59e0b; color: white; }
+.btn.emergency { background: #ef4444; color: white; }
+.btn.next { background: #10b981; color: white; }
+.queue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.queue-item {
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 15px;
+}
+.queue-item.vip {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+  font-weight: bold;
+}
+.queue-item.emergency {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: bold;
+}`,
+      starterJs: `// เขียนโค้ดระบบจัดการ DOM Node Tree คิวผู้ป่วยของคุณที่นี่
+`,
+      targetHtml: `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospital Priority Queue</title>
+</head>
+<body>
+  <div class="queue-app">
+    <h2>🏥 ระบบจัดการคิวผู้ป่วย DOM Node Hierarchy</h2>
+    <div class="status-panel">
+      <div>กำลังตรวจ: <span id="serving-now">ยังไม่มีผู้รับบริการ</span></div>
+      <div>รอในคิว: <strong id="queue-count">3</strong> ท่าน</div>
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="input-patient" placeholder="พิมพ์ชื่อผู้ป่วย...">
+    </div>
+
+    <div class="buttons-grid">
+      <button id="btn-add-normal" class="btn normal">➕ ต่อท้ายคิวปกติ (appendChild)</button>
+      <button id="btn-insert-vip" class="btn vip">⭐ แทรกคิว VIP หน้าสุด (insertBefore)</button>
+      <button id="btn-replace-emergency" class="btn emergency">🚨 แทนที่ด้วยเคสฉุกเฉิน (replaceChild)</button>
+      <button id="btn-call-next" class="btn next">🔔 เรียกคิวถัดไป (removeChild)</button>
+    </div>
+
+    <ul id="queue-list" class="queue-list">
+      <li class="queue-item">นายสมชาย รักสงบ</li>
+      <li class="queue-item">นางสาวมณี สดใส</li>
+      <li class="queue-item">นายบุญมี มีสุข</li>
+    </ul>
+  </div>
+</body>
+</html>`,
+      targetCss: `body { font-family: 'Sarabun', sans-serif; background: #f1f5f9; padding: 24px; } .queue-app { max-width: 650px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); } .status-panel { display: flex; justify-content: space-between; background: #e2e8f0; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 15px; font-weight: bold; } #serving-now { color: #0284c7; } #queue-count { color: #dc2626; font-size: 18px; } .input-group input { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; } .buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; } .btn { padding: 10px; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: bold; } .btn.normal { background: #3b82f6; color: white; } .btn.vip { background: #f59e0b; color: white; } .btn.emergency { background: #ef4444; color: white; } .btn.next { background: #10b981; color: white; } .queue-list { list-style: none; padding: 0; margin: 0; } .queue-item { padding: 12px 16px; background: #f8fafc; border-left: 4px solid #3b82f6; margin-bottom: 8px; border-radius: 4px; font-size: 15px; } .queue-item.vip { border-left-color: #f59e0b; background: #fffbeb; font-weight: bold; } .queue-item.emergency { border-left-color: #ef4444; background: #fef2f2; color: #b91c1c; font-weight: bold; }`,
+      targetJs: `const queueList = document.getElementById("queue-list");
+const inputPatient = document.getElementById("input-patient");
+const countEl = document.getElementById("queue-count");
+const servingEl = document.getElementById("serving-now");
+
+function updateQueueCount() {
+  countEl.textContent = queueList.children.length;
+}
+
+document.getElementById("btn-add-normal").addEventListener("click", () => {
+  const name = inputPatient.value.trim();
+  if (!name) return;
+  const li = document.createElement("li");
+  li.className = "queue-item";
+  li.textContent = name;
+  queueList.appendChild(li);
+  inputPatient.value = "";
+  updateQueueCount();
+});
+
+document.getElementById("btn-insert-vip").addEventListener("click", () => {
+  const name = inputPatient.value.trim();
+  if (!name) return;
+  const li = document.createElement("li");
+  li.className = "queue-item vip";
+  li.textContent = \`⭐ [VIP] \${name}\`;
+  if (queueList.firstElementChild) {
+    queueList.insertBefore(li, queueList.firstElementChild);
+  } else {
+    queueList.appendChild(li);
+  }
+  inputPatient.value = "";
+  updateQueueCount();
+});
+
+document.getElementById("btn-replace-emergency").addEventListener("click", () => {
+  const name = inputPatient.value.trim();
+  if (!name) return;
+  if (!queueList.firstElementChild) return;
+  const li = document.createElement("li");
+  li.className = "queue-item emergency";
+  li.textContent = \`🚨 [ฉุกเฉิน] \${name}\`;
+  queueList.replaceChild(li, queueList.firstElementChild);
+  inputPatient.value = "";
+  updateQueueCount();
+});
+
+document.getElementById("btn-call-next").addEventListener("click", () => {
+  const first = queueList.firstElementChild;
+  if (first) {
+    servingEl.textContent = first.textContent;
+    queueList.removeChild(first);
+    updateQueueCount();
+  }
+});
+
+updateQueueCount();`,
+      validation: (doc, css, js) => {
+        const queueList = doc.getElementById("queue-list");
+        const inputPatient = doc.getElementById("input-patient");
+        const btnAdd = doc.getElementById("btn-add-normal");
+        const btnVip = doc.getElementById("btn-insert-vip");
+        const btnEmergency = doc.getElementById("btn-replace-emergency");
+        const btnNext = doc.getElementById("btn-call-next");
+        const countEl = doc.getElementById("queue-count");
+        const servingEl = doc.getElementById("serving-now");
+
+        if (!queueList || !inputPatient || !btnAdd || !btnVip || !btnEmergency || !btnNext || !countEl || !servingEl) {
+          return "ต้องมีครบทุกองค์ประกอบ: #queue-list, #input-patient, ปุ่มทั้ง 4, #queue-count และ #serving-now";
+        }
+
+        if (typeof js === 'string') {
+          if (!js.includes("insertBefore")) {
+            return "ต้องใช้เมธอด insertBefore() สำหรับแทรกคิวด่วน VIP ตามสไลด์ 2 หน้า 35";
+          }
+          if (!js.includes("replaceChild")) {
+            return "ต้องใช้เมธอด replaceChild() สำหรับสลับแทนที่คิวฉุกเฉินตามสไลด์ 2 หน้า 34";
+          }
+          if (!js.includes("removeChild")) {
+            return "ต้องใช้เมธอด removeChild() สำหรับนำคิวที่เรียกแล้วออกจาก DOM Tree ตามสไลด์ 2 หน้า 33";
+          }
+        }
+
+        // Test insert VIP
+        inputPatient.value = "คุณหญิงสุดสวย";
+        btnVip.click();
+        if (!queueList.firstElementChild || !queueList.firstElementChild.textContent.includes("คุณหญิงสุดสวย")) {
+          return "เมื่อกด #btn-insert-vip โหนดใหม่ต้องถูกแทรกไว้ที่ตำแหน่งแรกสุดด้วย insertBefore()";
+        }
+
+        // Test replace emergency
+        inputPatient.value = "คนไข้หัวใจวิกฤต";
+        btnEmergency.click();
+        if (!queueList.firstElementChild || !queueList.firstElementChild.textContent.includes("คนไข้หัวใจวิกฤต")) {
+          return "เมื่อกด #btn-replace-emergency โหนดแรกต้องถูกแทนที่ด้วย replaceChild()";
+        }
+
+        // Test call next
+        btnNext.click();
+        if (!servingEl.textContent.includes("คนไข้หัวใจวิกฤต")) {
+          return "เมื่อกด #btn-call-next ต้องนำชื่อผู้ป่วยแรกไปแสดงบน #serving-now และลบออกจากรายการด้วย removeChild()";
+        }
+
+        return true;
+      },
+      hints: [
+        "ใช้ queueList.appendChild(newLi) เพื่อต่อท้ายคิวปกติ",
+        "ใช้ queueList.insertBefore(newLi, queueList.firstElementChild) เพื่อแทรกไว้หน้าสุด",
+        "ใช้ queueList.replaceChild(emergencyLi, queueList.firstElementChild) เพื่อแทนที่คิวแรก",
+        "ใช้ queueList.removeChild(queueList.firstElementChild) เพื่อนำโหนดแรกออก"
       ]
     }
   ],
@@ -3530,6 +4694,99 @@ person.greet();`,
       correctIndex: 0,
       explanation: "การใช้ .classList.add('className') จะเป็นการเพิ่มคลาสใหม่ต่อท้ายคลาสเดิมโดยไม่ไปทับหรือลบคลาสที่มีอยู่แล้ว ในขณะที่ .className = 'highlight' จะเป็นการเขียนทับคลาสเดิมทั้งหมด"
     },
+    {
+      id: "q33",
+      category: "Part 1: พื้นฐาน JavaScript",
+      chapter: 1,
+      question: "ตามสไลด์ ch4 JavaScript หน้า 57 หากต้องการสร้างพิมพ์เขียวสำหรับออบเจกต์ประเภทเดียวกันหลายๆ ชิ้น (Object Type Blueprint) ต้องใช้สิ่งใด?",
+      codeSnippet: `function Person(first, last, age) {
+  this.firstName = first;
+  this.lastName = last;
+  this.age = age;
+}
+const father = new Person("John", "Doe", 50);`,
+      options: [
+        "Object Constructor Function โดยเรียกใช้คู่กับคีย์เวิร์ด new",
+        "Object Literal แบบธรรมดา",
+        "Array.prototype.push()",
+        "JSON.stringify()"
+      ],
+      correctIndex: 0,
+      explanation: "ตามสไลด์ ch4 JavaScript หน้า 57 การสร้างโครงสร้างต้นแบบ (Object Type) เพื่อสร้าง Object ซ้ำๆ ได้อย่างสะดวก จะใช้ 'Object Constructor Function' นิยมตั้งชื่อขึ้นต้นด้วยตัวพิมพ์ใหญ่ และสร้าง Instance ใหม่ด้วยคีย์เวิร์ด 'new'"
+    },
+    {
+      id: "q34",
+      category: "Part 2: การจัดการ DOM & ฟอร์ม",
+      chapter: 2,
+      question: "ตามสไลด์ ch4 JavaScript_2 หน้า 34-35 เมธอดใดของโหนดแม่ที่ใช้สำหรับ 'แทนที่โหนดลูกเดิมด้วยโหนดใหม่'?",
+      codeSnippet: `const parent = document.getElementById("div1");
+const child = document.getElementById("p1");
+const newPara = document.createElement("p");
+newPara.textContent = "เนื้อหาใหม่";
+// คำสั่งแทนที่ child ด้วย newPara คือข้อใด?`,
+      options: [
+        "parent.replaceChild(newPara, child);",
+        "parent.insertBefore(newPara, child);",
+        "parent.appendChild(newPara, child);",
+        "child.replaceWith(parent);"
+      ],
+      correctIndex: 0,
+      explanation: "ตามสไลด์ ch4 JavaScript_2 หน้า 34 เมธอด parentElement.replaceChild(newChild, oldChild) ใช้สำหรับสลับแทนที่โหนดลูกเดิมด้วยโหนดลูกใหม่ ส่วน insertBefore() ใช้แทรกโหนดใหม่ไว้ข้างหน้าโหนดที่มีอยู่เดิม"
+    },
+    {
+      id: "q35",
+      category: "Part 2: การจัดการ DOM & ฟอร์ม",
+      chapter: 2,
+      question: "ตามสไลด์ ch4 JavaScript_2 หน้า 8 และหน้า 23 การเข้าถึงค่าของช่องกรอกชื่อ 'fname' ในฟอร์มชื่อ 'myForm' ผ่าน DOM Collection ทำได้ตามข้อใด?",
+      codeSnippet: `<form name="myForm" action="/submit" onsubmit="return validateForm()">
+  <input type="text" name="fname">
+</form>`,
+      options: [
+        "document.forms[\"myForm\"][\"fname\"].value",
+        "document.getForm(\"myForm\").getValue(\"fname\")",
+        "document.elements[\"myForm\"].fname",
+        "document.forms.getInput(\"fname\").text"
+      ],
+      correctIndex: 0,
+      explanation: "ตามสไลด์ ch4 JavaScript_2 หน้า 8 และ 23 เราสามารถเข้าถึง Elements ในฟอร์มผ่าน Collection document.forms โดยระบุชื่อ form name และ field name เช่น document.forms[\"myForm\"][\"fname\"].value"
+    },
+    {
+      id: "q36",
+      category: "Part 3: เทคนิคขั้นสูงและ Web APIs",
+      chapter: 3,
+      question: "ตามสไลด์ ch4 JavaScript_3 หน้า 17 คำสั่งใดใน Geolocation API ใช้สำหรับขอพิกัดละติจูดและลองจิจูดปัจจุบันของผู้ใช้?",
+      codeSnippet: `if (navigator.geolocation) {
+  // เรียกคำสั่งดึงพิกัดตำแหน่งปัจจุบัน
+}`,
+      options: [
+        "navigator.geolocation.getCurrentPosition(showPosition);",
+        "navigator.geolocation.watchGPS(showPosition);",
+        "window.getLocation.getCoordinates();",
+        "document.geolocation.fetchPosition();"
+      ],
+      correctIndex: 0,
+      explanation: "ตามสไลด์ ch4 JavaScript_3 หน้า 17 การขอตำแหน่งพิกัดทางภูมิศาสตร์ของเบราว์เซอร์ ใช้เมธอด navigator.geolocation.getCurrentPosition(successCallback, errorCallback)"
+    },
+    {
+      id: "q37",
+      category: "Part 3: เทคนิคขั้นสูงและ Web APIs",
+      chapter: 3,
+      question: "ตามสไลด์ ch4 JavaScript_3 หน้า 5-6 ข้อใดอธิบายความแตกต่างระหว่าง .call() และ .apply() ได้ถูกต้องที่สุด?",
+      codeSnippet: `const person = {
+  fullName: function(city, country) {
+    return this.firstName + " " + this.lastName + "," + city + "," + country;
+  }
+};
+const person1 = { firstName: "John", lastName: "Doe" };`,
+      options: [
+        ".call() รับ Arguments แยกเป็นตัวๆ ด้วยเครื่องหมายจุลภาค ส่วน .apply() รับ Arguments ทั้งหมดรวมกันเป็น Array",
+        ".apply() รับ Arguments แยกเป็นตัวๆ ส่วน .call() บังคับส่งเป็น Array",
+        ".apply() ทำงานแบบอะซิงโครนัส ส่วน .call() ทำงานแบบซิงโครนัส",
+        "ทั้งคู่รับ Arguments เป็น Array เหมือนกันทุกประการ"
+      ],
+      correctIndex: 0,
+      explanation: "ตามสไลด์ ch4 JavaScript_3 หน้า 5-6 เมธอด .call() และ .apply() รันฟังก์ชันทันทีเหมือนกัน แต่จุดต่างคือ .call() จะส่ง argument ทีละตัว เช่น .call(person1, 'Oslo', 'Norway') ในขณะที่ .apply() จะส่ง arguments รวมกันเป็น Array เช่น .apply(person1, ['Oslo', 'Norway'])"
+    },
 
     // ==========================================
     // ส่วนเพิ่มเติมพิเศษ: นอกเนื้อหาสไลด์ (Modern JS & Real-World Pro Tips)
@@ -3762,6 +5019,76 @@ console.log(total);`,
       ],
       correctIndex: 0,
       explanation: "เมธอด .reduce(callback, initialValue) จะวนลูปสะสมค่า โดยเริ่มจาก 0 และนำราคาของแต่ละชิ้นมาบวกสะสม: 0 + 200 + 50 + 750 = 1000"
+    },
+    {
+      id: "q33",
+      category: "นอกเนื้อหาสไลด์: Modern JS",
+      chapter: 4,
+      question: "ข้อใดอธิบายความแตกต่างระหว่าง Nullish Coalescing (??) กับ Logical OR (||) ได้ถูกต้องที่สุด?",
+      codeSnippet: `const count = 0;
+const a = count || 10;
+const b = count ?? 10;
+console.log(a, b);`,
+      options: [
+        "a = 10 และ b = 0 เพราะ ?? ตรวจสอบเฉพาะ null หรือ undefined ส่วน || ตรวจสอบทุกค่า Falsy",
+        "a = 0 และ b = 10 เพราะ ?? ทำงานเหมือน || ทุกประการ",
+        "a = 0 และ b = 0 เพราะเลข 0 มีค่าเท่ากันทั้งคู่",
+        "เกิด SyntaxError เพราะ ?? ไม่สามารถใช้ร่วมกับตัวแปรตัวเลขได้"
+      ],
+      correctIndex: 0,
+      explanation: "?? (Nullish Coalescing) จะให้ค่าเริ่มต้นเฉพาะเมื่อฝั่งซ้ายเป็น null หรือ undefined เท่านั้น ในขณะที่ || มองว่าเลข 0, boolean false, หรือสตริงว่างเป็น Falsy จึงทำให้ count || 10 ได้ค่า 10 แต่ count ?? 10 ยังคงได้เลข 0 ตามเดิม"
+    },
+    {
+      id: "q34",
+      category: "นอกเนื้อหาสไลด์: Modern JS",
+      chapter: 4,
+      question: "ผลลัพธ์ของการทำ Object Destructuring พร้อมระบุ Default Value ในโค้ดนี้คืออะไร?",
+      codeSnippet: `const user = { name: "Somchai", age: null };
+const { name, age = 18, role = "Guest" } = user;
+console.log(name, age, role);`,
+      options: [
+        "Somchai null Guest เพราะ Default Value จะทำงานเมื่อค่าเป็น undefined เท่านั้น (null จะไม่ถูกแทนที่)",
+        "Somchai 18 Guest เพราะทั้ง null และ undefined จะถูกแทนที่ด้วย Default Value",
+        "Somchai 18 undefined เพราะไม่ได้ระบุค่า role ไว้ใน Object",
+        "เกิด ReferenceError เพราะหาค่า role ไม่พบบนตัวแปร"
+      ],
+      correctIndex: 0,
+      explanation: "ใน Destructuring Assignment ค่า Default Value จะถูกนำมาใช้ต่อเมื่อค่านั้นเป็น undefined (หรือไม่ได้กำหนด key ไว้) เท่านั้น แต่ในที่นี้ user.age มีค่าเป็น null ชัดเจน จึงไม่ถูกแทนที่ด้วย 18 ส่วน role ไม่มีอยู่ใน user จึงได้รับค่าเริ่มต้น 'Guest'"
+    },
+    {
+      id: "q35",
+      category: "นอกเนื้อหาสไลด์: Modern JS",
+      chapter: 4,
+      question: "ประโยชน์สำคัญที่สุดของการใช้งาน Optional Chaining (?.) คือข้อใด?",
+      codeSnippet: `const order = { id: 101, customer: null };
+const zip = order.customer?.address?.zipcode;
+console.log(zip);`,
+      options: [
+        "ป้องกัน TypeError: Cannot read properties of null/undefined โดยจะคืนค่า undefined ทันทีหากคุณสมบัติใดชั้นหนึ่งเป็น null หรือ undefined",
+        "บังคับให้โปรแกรมเกิด Exception และหยุดการทำงานทันทีเพื่อความปลอดภัย",
+        "แปลงค่า null และ undefined ให้กลายเป็น Object เปล่าเสมอ",
+        "เพิ่มความเร็วในการประมวลผลให้เร็วกว่าการใช้จุด (.) ปกติ 10 เท่า"
+      ],
+      correctIndex: 0,
+      explanation: "Optional Chaining (?.) ช่วยป้องกันข้อผิดพลาดรุนแรงระดับ TypeError หากมีค่าข้างหน้าเป็น null หรือ undefined จะเกิดการ Short-circuit และคืนค่า undefined กลับมาอย่างปลอดภัยโดยหน้าเว็บไม่พัง"
+    },
+    {
+      id: "q36",
+      category: "นอกเนื้อหาสไลด์: Modern JS",
+      chapter: 4,
+      question: "ผลลัพธ์ของการใช้ Spread Operator (...) รวมและทับค่าใน Object ต่อไปนี้คืออะไร?",
+      codeSnippet: `const base = { theme: "light", fontSize: 14 };
+const custom = { fontSize: 18, showAvatar: true };
+const finalConfig = { ...base, ...custom, theme: "dark" };
+console.log(finalConfig);`,
+      options: [
+        "{ theme: 'dark', fontSize: 18, showAvatar: true } เพราะคุณสมบัติที่ระบุทีหลังจะ Override ทับค่าเดิม",
+        "{ theme: 'light', fontSize: 14, showAvatar: true } เพราะค่าเดิมจาก base จะถูกคงไว้เสมอ",
+        "เกิดข้อผิดพลาด SyntaxError เพราะห้ามระบุ property ซ้ำซ้อนกันใน Object",
+        "{ theme: ['light', 'dark'], fontSize: [14, 18], showAvatar: true }"
+      ],
+      correctIndex: 0,
+      explanation: "การ Spread Object จากซ้ายไปขวา หากมีคีย์ซ้ำกัน ค่าที่ระบุทีหลังจะเขียนทับ (Override) ค่าเดิมเสมอ ในที่นี้ fontSize 14 ถูกแทนที่ด้วย 18 และ theme 'light' ถูกแทนที่ด้วย 'dark'"
     }
   ]
 };

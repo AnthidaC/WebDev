@@ -42,13 +42,6 @@ export default function EditorContainer({
     }
   };
 
-  const handleLoadSolution = () => {
-    if (!activeItem) return;
-    if (activeItem.targetHtml) setHtml(activeItem.targetHtml);
-    if (activeItem.targetCss) setCss(activeItem.targetCss);
-    if (activeItem.targetJs !== undefined) setJs(activeItem.targetJs);
-  };
-
   return (
     <div className="editor-panel">
       <div className="editor-tabs-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -132,23 +125,6 @@ export default function EditorContainer({
             >
               <Sparkles size={11} />
               <span>กู้คืน JS เริ่มต้น</span>
-            </button>
-          )}
-
-          {activeItem && activeItem.targetHtml && (
-            <button
-              onClick={handleLoadSolution}
-              className="editor-action-btn"
-              style={{
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.2))',
-                color: '#059669',
-                borderColor: 'rgba(16, 185, 129, 0.4)',
-                fontWeight: '600'
-              }}
-              title="โหลดโค้ดตัวอย่างที่ทำงานสมบูรณ์ 100% เข้ามาใน Editor ทั้ง 3 แท็บ เพื่อทดลองใช้งานและดูการทำงานจริง"
-            >
-              <Sparkles size={11} className="text-emerald-500" />
-              <span>โหลดตัวอย่างที่ทำงานจริง</span>
             </button>
           )}
         </div>

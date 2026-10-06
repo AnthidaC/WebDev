@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Lightbulb, CheckCircle2, XCircle, ChevronDown, ChevronUp, Play, Trophy, Sparkles } from 'lucide-react';
+import { Lightbulb, CheckCircle2, XCircle, ChevronDown, ChevronUp, Play, Trophy, Sparkles, Eye } from 'lucide-react';
 
-export default function InstructionPanel({ activeItem, onVerify, validationError, isSuccess, isChallenge, onLoadSolution }) {
+export default function InstructionPanel({ activeItem, onVerify, validationError, isSuccess, isChallenge, onViewDemo }) {
   const [showHints, setShowHints] = useState(false);
 
   // Close hints when item changes
@@ -122,27 +122,19 @@ export default function InstructionPanel({ activeItem, onVerify, validationError
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-            <button onClick={onVerify} className="verify-btn" style={{ flex: 1 }}>
+          <div className="validation-actions-group">
+            <button onClick={onVerify} className="verify-btn primary-action">
               <Play size={14} fill="white" />
               <span>ตรวจคำตอบ</span>
             </button>
-            {onLoadSolution && activeItem.targetHtml && (
+            {onViewDemo && activeItem.targetHtml && (
               <button
-                onClick={onLoadSolution}
-                className="verify-btn"
-                style={{
-                  background: 'linear-gradient(135deg, #059669, #10b981)',
-                  flex: '0 0 auto',
-                  padding: '0 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="โหลดโค้ดตัวอย่างที่ทำงานจริง 100% สำหรับทดลองเล่นและตรวจสอบระบบ"
+                onClick={onViewDemo}
+                className="verify-btn demo-action"
+                title="สลับไปยังแท็บตัวอย่างจริงในหน้าต่างพรีวิวด้านขวา เพื่อทดลองเล่นและดูการทำงานจริงของระบบ (ไม่ลงโค้ดเฉลยใน Editor)"
               >
-                <Sparkles size={14} />
-                <span>รันตัวอย่างจริง</span>
+                <Eye size={14} />
+                <span>ดูตัวอย่างการทำงานจริง</span>
               </button>
             )}
           </div>
@@ -153,7 +145,7 @@ export default function InstructionPanel({ activeItem, onVerify, validationError
           <div className="hint-toggle-bar">
             <button onClick={() => setShowHints(!showHints)} className="hint-trigger">
               <Lightbulb size={16} className="text-yellow-500" />
-              <span>{showHints ? 'ซ่อนคำแนะนำ' : 'แสดงคำแนะนำ'}</span>
+              <span>{showHints ? 'ซ่อนแนวคิดคำแนะนำ' : isChallenge ? 'แสดงแนวคิดคำแนะนำ (ไม่มีโค้ดเฉลย)' : 'แสดงคำแนะนำ'}</span>
               {showHints ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
             {showHints && (
