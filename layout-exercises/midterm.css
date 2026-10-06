@@ -1,0 +1,357 @@
+/* ==========================================================
+   CSS LAYOUT MIDTERM EXAM: FLORA & FAUNA BOTANICAL CAFE
+   สไตล์ชีตโจทย์เริ่มต้น (Starter Template - Minimal Edition)
+   คำสั่ง: ให้ผู้เรียนเขียนสไตล์จัดหน้าเว็บจากโครงสร้าง HTML เองทั้งหมด
+   ========================================================== */
+
+/* 🌌 โหลดฟอนต์พรีเมียม (ระบุไว้ให้ล่วงหน้า) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Sarabun:ital,wght@0,100..800;1,100..800&family=Sora:wght@100..800&display=swap');
+
+/* 🎨 1. ตัวแปรและสีธีมพรีเมียม (Design Tokens เจาะจงไว้ให้ตามแบรนด์) */
+:root {
+  --primary-color: #1b3b2b;      /* เขียวป่าลึก (Deep Forest) */
+  --primary-hover: #11251b;      /* เขียวป่าลึกพิเศษ */
+  --accent-color: #c49a6c;       /* ทองโบราณ (Antique Gold) */
+  --accent-light: #f5efe6;       /* ครีมผืนทราย (Sand Cream) */
+  --bg-light: #faf8f5;           /* พื้นหลังสีงาช้าง (Luxury Ivory) */
+  --text-dark: #1b2520;          /* ดำถ่านเจือเขียวป่าไม้ (Charcoal Forest) */
+  --text-muted: #6c7870;         /* เขียวอมเทาสบายตา (Sage Muted) */
+  --white: #ffffff;
+  --bestseller-color: #9e2a2b;   /* แดงทับทิม (Ruby Red) */
+  --border-color: #e5e0d8;       /* เส้นขอบอุ่นเบาบาง (Warm Soft Border) */
+  --border-radius: 16px;         
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Sarabun', 'Sora', sans-serif;
+}
+
+/* 🧹 2. ค่าเริ่มต้นและการรีเซ็ต (CSS Reset - ระบุไว้ให้ล่วงหน้า) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.7;
+}
+
+h1, h2, h3, .logo {
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 🖼️ ภาพพื้นหลังแบนเนอร์ยักษ์ (เจาะจงลิงก์รูปไว้ให้) */
+.hero {
+  background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+}
+
+
+/* ==========================================================
+   ✍️ เริ่มเขียนคำสั่ง CSS จัด Layout ของคุณตั้งแต่จุดนี้เป็นต้นไป
+   ========================================================== */
+
+/* === ตอนที่ 1: ระบบนำทางส่วนกลาง (Shared Navigation Bar) === */
+.navbar {
+  /* ทำสไตล์ตรึงขอบบน (Sticky Nav) และ กระจกฝ้า (Glassmorphic) */
+}
+
+.nav-container {
+  /* จัดวางโลโก้ฝั่งซ้าย ลิงก์เมนูฝั่งขวา */
+}
+
+.nav-links {
+  /* จัดเรียงลิงก์แนวนอน */
+}
+
+.nav-item {
+  /* ตกแต่งลิงก์เมนูนำทางปกติ */
+}
+
+.nav-item.active {
+  /* แต่งลิงก์เมนูของหน้าปัจจุบัน */
+}
+
+
+/* === ตอนที่ 2: หน้าข้อมูลร้าน (midterm-shop.html) === */
+
+/* 2.1 แบนเนอร์ยักษ์และป้ายข้อความ (Hero Section) */
+.hero {
+  /* กำหนดความสูง 600px และจัดข้อมูลให้อยู่กึ่งกลางหน้าจอแนวตั้ง/นอน */
+}
+
+.hero-overlay {
+  /* เคลือบแผ่นโปร่งแสงสีดำทับหน้าภาพเพื่อให้อ่านตัวหนังสือสีขาวง่าย */
+}
+
+.hero-content {
+  /* ป้องกันการทับซ้อนกับแถบเมนูนำทาง และจัดกึ่งกลางตัวบล็อก */
+}
+
+.hero-content h1 {
+  /* สไตล์หัวเรื่อง และใส่ text-shadow ช่วยให้อ่านง่าย */
+}
+
+.hero-content p {
+  /* สไตล์คำโปรย */
+}
+
+.hero-content .badge {
+  /* ป้ายกำกับบน Hero */
+}
+
+/* 2.2 โครงสร้างประวัติร้านและตัวเลขสถิติ (About & Stats) */
+.about-section {
+  /* แบ่งสองฝั่งซ้าย (ข้อความเกี่ยวกับเรา) ขวา (กลุ่มการ์ดสถิติ) */
+}
+
+.stats-grid {
+  /* จัดกลุ่มกล่องสถิติย่อย 3 ชิ้น */
+}
+
+.stat-item {
+  /* ตกแต่งรายละเอียดกล่องสถิติ */
+}
+
+/* 2.3 คลังภาพแกลเลอรีเรือนกระจกอสมมาตร (Bento Grid) */
+.gallery-grid {
+  /* กำหนด Grid 3 คอลัมน์ */
+}
+
+.gallery-item {
+  /* ตกแต่งกล่องรูปภาพแกลเลอรี */
+}
+
+/* คำท้าทาย: Bento Spanning (ระบุขอบเขตการจัดภาพแกลเลอรีอสมมาตร) */
+.item-1 {
+  /* ภาพที่ 1: กิน 2 คอลัมน์ และ 2 แถว */
+}
+
+.item-2 {
+  /* ภาพที่ 2: กิน 2 แถวแนวตั้ง */
+}
+
+.item-5 {
+  /* ภาพที่ 5: กิน 2 คอลัมน์แนวนอน */
+}
+
+.gallery-caption {
+  /* คำอธิบายรูปลอยทับด้านล่าง และซ่อนไว้เพื่อทำ Hover Slide Up */
+}
+
+/* เอฟเฟกต์การซูมและแสดงคำบรรยายเมื่อชี้เมาส์ที่ภาพแกลเลอรี */
+.gallery-item:hover img {
+  /* ซูมภาพ */
+}
+
+.gallery-item:hover .gallery-caption {
+  /* แสดงผลคำอธิบายเลื่อนขึ้น */
+}
+
+
+/* === ตอนที่ 3: หน้ารายละเอียดเมนูและบริการ (midterm-menu.html) === */
+
+.category-nav {
+  /* จัดเมนูปุ่มตัวกรองอาหารให้อยู่กึ่งกลางหน้าจอเรียงแนวนอน */
+}
+
+.category-btn {
+  /* แต่งปุ่มตัวเลือก */
+}
+
+.menu-grid {
+  /* กำหนดโหมด Grid 4 คอลัมน์ */
+}
+
+.menu-card {
+  /* ตกแต่งกล่องการ์ดเมนูอาหาร และใช้ Flexbox แนวตั้งจัดการความสูง */
+}
+
+.card-badge {
+  /* แปะป้ายมุมขวาบนของภาพการ์ด (Absolute) */
+}
+
+.card-content {
+  /* จัดการ Flexbox ภายในเพื่อดันส่วนราคาและปุ่มสั่งซื้อให้ชิดล่างเสมอ */
+}
+
+.card-desc {
+  /* คีย์สำคัญช่วยดันเนื้อหาลงล่าง */
+}
+
+.card-footer {
+  /* จัดวางราคา (ซ้าย) ปุ่มสั่งซื้อ (ขวา) ให้อยู่ระนาบเดียวกัน */
+}
+
+/* เอฟเฟกต์การยกลอยขึ้นและเปลี่ยนเงาของการ์ดเมนูเมื่อชี้เมาส์ */
+.menu-card:hover {
+  /* Hover Lift & Shadow transition */
+}
+
+
+/* === ตอนที่ 4: หน้าแบบฟอร์มการจองโต๊ะ (midterm-booking.html) === */
+
+.split-layout {
+  /* แบ่งหน้าจอเป็น 2 ฝั่ง ซ้าย (ข้อมูลระเบียบ 35%) ขวา (ฟอร์มลงทะเบียน 65%) */
+}
+
+/* แผนผังโซนที่นั่งจำลอง SVG ในฝั่งซ้าย */
+.floor-svg {
+  /* คุมความกว้างแผนผัง */
+}
+
+.floor-zone rect {
+  /* ตั้งค่า Transition ล่วงหน้า */
+}
+
+/* คำท้าทาย: ไฮไลท์เปลี่ยนสไตล์โซนที่นั่งจริงใน SVG เมื่อวางเมาส์ชี้ */
+.floor-zone:hover rect {
+  /* เปลี่ยนสีกรอบเป็นสีทองและพื้นคีย์สีทองจาง */
+}
+
+/* ฟอร์มและอินพุตฝั่งขวา */
+.form-grid {
+  /* จัดช่องป้อนข้อมูลแบ่งแถวละ 2 ช่อง */
+}
+
+.form-grid.col-3 {
+  /* จัดช่องวันเวลาแบ่งแถวละ 3 ช่อง */
+}
+
+.form-group label {
+  /* ตกแต่งป้ายกำกับฟิลด์ */
+}
+
+input[type="text"], input[type="email"], input[type="tel"], 
+input[type="date"], input[type="time"], select, textarea {
+  /* แต่งสไตล์ช่องกรอกข้อมูลพื้นฐาน */
+}
+
+/* เอฟเฟกต์จับโฟกัสช่องกรอกข้อมูล */
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, 
+input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
+  /* เรืองแสงขอบกล่องเมื่อกดพิมพ์ */
+}
+
+/* ปุ่มเลือกแพ็กเกจแบบ Custom Radio Cards (ซ่อนปุ่มกลมแบบเดิม) */
+.radio-cards-grid {
+  /* จัดวางวิทยุการ์ด 3 ใบเรียงแนวนอน */
+}
+
+.custom-radio-card {
+  /* ตกแต่งกล่องฉลากตัวเลือกการ์ด */
+}
+
+/* คำท้าทาย: สไตล์เปลี่ยนสีกรอบและพื้นหลังเมื่อ Radio การ์ดโดนคลิกเลือก */
+.radio-card-wrapper input[type="radio"]:checked + .custom-radio-card {
+  /* สไตล์เมื่อโดนเลือก (:checked) */
+}
+
+/* สวิตช์ปิดเปิดแบบสไลด์เมล็ดผักโขม (Custom Toggle Switch) */
+.switch-container {
+  /* จัดขนาดกล่องสวิตช์ */
+}
+
+.switch-slider {
+  /* แต่งรางสไลด์ */
+}
+
+.switch-slider::before {
+  /* แต่งตัวลูกกลมกลิ้งด้านใน */
+}
+
+/* คำท้าทาย: สไตล์เคลื่อนที่และเปลี่ยนสีเมื่อปุ่ม Toggle โดนเช็คเลือก */
+.switch-container input:checked + .switch-slider {
+  /* รางสลับเป็นสีเขียว */
+}
+
+.switch-container input:checked + .switch-slider::before {
+  /* เลื่อนลูกกลมสไลด์ข้ามฝั่งไปทางขวา */
+}
+
+
+/* === ตอนที่ 5: ปุ่มทั่วไปและฟุตเตอร์ (Common Buttons & Footer) === */
+.btn {
+  /* ตกแต่งรูปร่างปุ่มนำทางทั่วไป */
+}
+
+.btn-primary {
+  /* ปุ่มเขียวป่าไม้หลัก */
+}
+
+.btn-outline {
+  /* ปุ่มโครงเส้นขอบใส */
+}
+
+.footer {
+  /* จัดวางเนื้อหาและสีส่วนท้ายเว็บ */
+}
+
+
+/* ==========================================================
+   📱 การตอบสนองตามขนาดหน้าจอมือถือ (Responsive Media Queries)
+   ========================================================== */
+
+/* 5.1 ขนาดหน้าจอแท็บเล็ต (หน้าจอน้อยกว่า 992px) */
+@media (max-width: 992px) {
+  .split-layout {
+    /* ยุบคอลัมน์เป็น 1 คอลัมน์แนวตั้ง */
+  }
+
+  .menu-grid {
+    /* ยุบ Grid การ์ดเมนูเหลือ 2 คอลัมน์ */
+  }
+}
+
+/* 5.2 ขนาดหน้าจอมือถือทั่วไป (หน้าจอน้อยกว่า 768px) */
+@media (max-width: 768px) {
+  .nav-container {
+    /* ยุบแถบเมนูนำทางให้ซ้อนแนวตั้ง */
+  }
+  
+  .navbar {
+    /* ปลดล็อกความสูงแถบเมนู */
+  }
+
+  .hero h1 {
+    /* ลดขนาดหัวเรื่องลงเล็กน้อย */
+  }
+
+  .about-section {
+    /* ยุบข้อมูลสถิติประวัติเป็นคอลัมน์เดียว */
+  }
+
+  .gallery-grid {
+    /* ยุบ Bento แกลเลอรีเรียงภาพเป็นดิ่งแถวเดียว */
+  }
+
+  .item-1, .item-2, .item-3, .item-4, .item-5 {
+    /* คืนค่า Span Grid ให้กว้าง 1 แถวและสูงเท่ากันปกติ */
+  }
+
+  .menu-grid {
+    /* ยุบการ์ดเมนูเหลือ 1 คอลัมน์ */
+  }
+
+  .form-grid, .form-grid.col-3, .radio-cards-grid {
+    /* ยุบช่องอินพุตคำถามและ Radio Card ทั้งหมดเรียงดิ่ง 1 แถว */
+  }
+}

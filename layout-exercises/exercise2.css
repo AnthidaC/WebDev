@@ -1,0 +1,138 @@
+/* ล้างค่าเริ่มต้น (Reset Styles) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #fafafa;
+  color: #111827;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 🎨 Header */
+.blog-header {
+  border-bottom: 4px double #111827;
+  padding: 30px 20px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.blog-header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+}
+
+/* 🎨 Hero Section (ข่าวเด่น) */
+.hero-section {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+  padding: 60px 40px;
+  border-radius: 12px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.hero-content {
+  max-width: 700px;
+}
+
+.badge {
+  background-color: #ef4444;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.hero-content h2 {
+  font-size: 2.2rem;
+  margin: 15px 0;
+  line-height: 1.2;
+}
+
+.hero-content p {
+  color: #cbd5e1;
+  margin-bottom: 25px;
+}
+
+.btn {
+  background-color: white;
+  color: #0f172a;
+  border: none;
+  padding: 12px 24px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #f1f5f9;
+}
+
+/* 💡 ส่วนสำหรับฝึก: จัดการคอลัมน์ข่าวสาร (articles-grid)
+   เขียน CSS เพื่อให้แสดงผลเป็น 3 คอลัมน์บน Desktop, 2 บน Tablet และ 1 บน Mobile */
+.articles-grid {
+  /* เขียน CSS ของคุณตรงนี้:
+     1. กำหนดให้เป็น CSS Grid
+     2. กำหนด template columns ให้ทำระบบ responsive อัตโนมัติ (คำใบ้: repeat, auto-fit, minmax)
+     3. กำหนดระยะห่างระหว่างชิ้นงาน (gap)
+  */
+  
+  margin-bottom: 40px;
+}
+
+/* 🎨 สไตล์ของการ์ดข่าว */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card-img {
+  height: 180px;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.card-content h3 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.card-content p {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 🎨 Footer */
+.blog-footer {
+  background-color: #111827;
+  color: #9ca3af;
+  text-align: center;
+  padding: 30px;
+  font-size: 14px;
+}
