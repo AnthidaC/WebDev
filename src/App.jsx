@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { curriculum } from './data/curriculum';
 import { jsCurriculum } from './data/jsCurriculum';
 import Sidebar from './components/Sidebar';
 import ThemeToggle from './components/ThemeToggle';
 import InstructionPanel from './components/InstructionPanel';
-import EditorContainer from './components/EditorContainer';
+import useIdleReady from './hooks/useIdleReady';
 import PreviewContainer from './components/PreviewContainer';
 import QuizArena from './components/QuizArena';
 import CheatSheet from './components/CheatSheet';
@@ -25,7 +25,31 @@ import {
   Play
 } from 'lucide-react';
 
+const FullStackAcademy = lazy(() => import('./fullstack/FullStackAcademy'));
+const EditorContainer = lazy(() => import('./components/EditorContainer'));
+function readLocalRecord(key) {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(key) || '{}');
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  } catch {
+    return {};
+  }
+}
+
 export default function App() {
+  const [area, setArea] = useState(() => new URLSearchParams(window.location.search).get('course') === 'fullstack' ? 'fullstack' : localStorage.getItem('webdev-area') || 'legacy');
+  function openFullstack() { localStorage.setItem('webdev-area', 'fullstack'); setArea('fullstack'); }
+  function exitFullstack(course) {
+    localStorage.setItem('webdev-course', course); localStorage.setItem('webdev-area', 'legacy');
+    const url = new URL(window.location.href); url.searchParams.delete('course');
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    setArea('legacy');
+  }
+  if (area === 'fullstack') return <Suspense fallback={<div className="editor-loading">กำลังเปิด Full Stack Academy...</div>}><FullStackAcademy onExit={exitFullstack}/></Suspense>;
+  return <LegacyApp onOpenFullstack={openFullstack}/>;
+}
+
+function LegacyApp({ onOpenFullstack }) {
   // Theme state
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('webdev-theme') || 'dark';
@@ -55,8 +79,7 @@ export default function App() {
   // Sandbox code cache: { [itemId]: { html, css, js } }
   const [codeCache, setCodeCache] = useState(() => {
     const key = course === 'js' ? 'webdev-code-cache-js' : 'webdev-code-cache';
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : {};
+    return readLocalRecord(key);
   });
 
   // Current HTML, CSS, and JS code
@@ -72,14 +95,14 @@ export default function App() {
   // User Progress: { [itemId]: true }
   const [progress, setProgress] = useState(() => {
     const key = course === 'js' ? 'webdev-progress-js' : 'webdev-progress';
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : {};
+    return readLocalRecord(key);
   });
 
   // Layout states
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
   const [mobileTab, setMobileTab] = useState('instruction'); // 'instruction' | 'editor' | 'preview'
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+  const editorReady = useIdleReady(!isMobile || mobileTab === 'editor');
 
   useEffect(() => {
     const handleResize = () => {
@@ -127,12 +150,10 @@ export default function App() {
     localStorage.setItem('webdev-course', newCourse);
 
     const newKey = newCourse === 'js' ? 'webdev-code-cache-js' : 'webdev-code-cache';
-    const savedCache = localStorage.getItem(newKey);
-    setCodeCache(savedCache ? JSON.parse(savedCache) : {});
+    setCodeCache(readLocalRecord(newKey));
 
     const progKey = newCourse === 'js' ? 'webdev-progress-js' : 'webdev-progress';
-    const savedProg = localStorage.getItem(progKey);
-    setProgress(savedProg ? JSON.parse(savedProg) : {});
+    setProgress(readLocalRecord(progKey));
 
     const newId = newCourse === 'js' ? 'js-intro-display' : 'html-structure';
     setActiveId(newId);
@@ -478,6 +499,10 @@ export default function App() {
         {/* Course Switcher & Mode Switcher in Center */}
         <div className="header-center">
           <div className="course-switcher-pill">
+            <button onClick={onOpenFullstack} className="course-btn" title="ฝึก Node + React แบบโปรเจกต์หลายไฟล์">
+              <span>Node + React</span>
+              <span className="course-badge">ใหม่</span>
+            </button>
             <button
               onClick={() => handleSwitchCourse('js')}
               className={`course-btn ${course === 'js' ? 'active js' : ''}`}
@@ -666,7 +691,7 @@ export default function App() {
                 className="mobile-pane-full mobile-editor-wrapper"
                 style={{ display: mobileTab === 'editor' ? 'flex' : 'none' }}
               >
-                <EditorContainer
+                {editorReady ? <Suspense fallback={<div className="editor-panel editor-deferred" role="status">กำลังเปิดตัวแก้ไขโค้ด…</div>}><EditorContainer
                   html={html}
                   setHtml={setHtml}
                   css={css}
@@ -679,7 +704,7 @@ export default function App() {
                   activeItem={activeItem}
                   fontSize={editorFontSize}
                   setFontSize={setEditorFontSize}
-                />
+                /></Suspense> : <div className="editor-panel editor-deferred" role="status">แตะแท็บโค้ดเพื่อเปิดตัวแก้ไข</div>}
                 <div className="mobile-editor-actions-bar">
                   <button onClick={handleVerify} className="mobile-action-btn primary">
                     <Play size={14} fill="white" />
@@ -736,7 +761,7 @@ export default function App() {
                 onMouseDown={startVerticalDrag}
               />
 
-              <EditorContainer
+              {editorReady ? <Suspense fallback={<div className="editor-panel editor-deferred" role="status">กำลังเปิดตัวแก้ไขโค้ด…</div>}><EditorContainer
                 html={html}
                 setHtml={setHtml}
                 css={css}
@@ -749,7 +774,7 @@ export default function App() {
                 activeItem={activeItem}
                 fontSize={editorFontSize}
                 setFontSize={setEditorFontSize}
-              />
+              /></Suspense> : <div className="editor-panel editor-deferred" role="status">กำลังเตรียมตัวแก้ไขโค้ด…</div>}
             </div>
 
             {/* Horizontal Split Drag Bar */}

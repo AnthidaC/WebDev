@@ -46,6 +46,15 @@ export default function QuizArena({ quizBank, onBackToLessons }) {
   const totalQuestions = filteredQuestions.length;
   const answeredCount = Object.keys(userAnswers).length;
 
+  const switchMode = (nextMode) => {
+    if (nextMode === examMode) return;
+    setExamMode(nextMode);
+    setUserAnswers({});
+    setCurrentIndex(0);
+    setShowExplanation(false);
+    setIsExamSubmitted(false);
+  };
+
   const handleSelectOption = (index) => {
     if (examMode && isExamSubmitted) return; // Locked in exam mode after submit
     if (!examMode && userAnswers[currentQ.id] !== undefined) return; // Already answered in practice mode
@@ -150,13 +159,13 @@ export default function QuizArena({ quizBank, onBackToLessons }) {
           <div className="mode-toggle-pill">
             <button
               className={`mode-btn ${!examMode ? 'active' : ''}`}
-              onClick={() => { setExamMode(false); setIsExamSubmitted(false); }}
+              onClick={() => switchMode(false)}
             >
               🎯 โหมดฝึกฝน (ตรวจทันที)
             </button>
             <button
               className={`mode-btn ${examMode ? 'active' : ''}`}
-              onClick={() => { setExamMode(true); setIsExamSubmitted(false); }}
+              onClick={() => switchMode(true)}
             >
               📝 โหมดจำลองสอบ (Exam)
             </button>
@@ -209,6 +218,7 @@ export default function QuizArena({ quizBank, onBackToLessons }) {
                 <span className="q-badge-number">
                   คำถามที่ {currentIndex + 1} จาก {totalQuestions}
                 </span>
+                <span className="q-category-tag">ตอบแล้ว {answeredCount}/{totalQuestions}</span>
                 <span className="q-category-tag">{currentQ?.category}</span>
               </div>
 

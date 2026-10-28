@@ -8,7 +8,9 @@ import {
   Sparkles,
   HelpCircle,
   FileCode2,
-  Code
+  Code,
+  Search,
+  X
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -25,6 +27,8 @@ export default function Sidebar({
   onOpenCheatSheet = () => {}
 }) {
   const [examFilter, setExamFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const matchesSearch = (item) => !search.trim() || `${item.title || ''} ${item.category || ''} ${item.description || ''}`.toLowerCase().includes(search.trim().toLowerCase());
 
   const getExamCategory = (exam) => {
     const id = exam.id;
@@ -41,6 +45,10 @@ export default function Sidebar({
     }
     categories[lesson.category].push(lesson);
   });
+  const visibleCategories = Object.entries(categories).map(([name, items]) => [name, items.filter(matchesSearch)]).filter(([, items]) => items.length);
+  const visibleChallenges = challenges.filter(matchesSearch);
+  const visibleExams = appliedExams.filter((exam) => (examFilter === 'all' || getExamCategory(exam) === examFilter) && matchesSearch(exam));
+  const showMidtermLinks = course === 'css' && (!search.trim() || /midterm|กลางภาค|ร้าน|เมนู|จอง|ตัวอย่าง/i.test(search));
 
   return (
     <aside className={`app-sidebar ${isOpen ? '' : 'collapsed'}`}>
@@ -76,8 +84,10 @@ export default function Sidebar({
         </div>
       )}
 
+      <label className="sidebar-search"><Search size={15}/><input value={search} onChange={event => setSearch(event.target.value)} placeholder="ค้นหาบทเรียนหรือโจทย์..." aria-label="ค้นหาบทเรียนหรือโจทย์"/>{search && <button type="button" aria-label="ล้างคำค้น" onClick={() => setSearch('')}><X size={14}/></button>}</label>
+
       {/* Lessons Section */}
-      {Object.keys(categories).map((catName) => (
+      {visibleCategories.map(([catName, categoryLessons]) => (
         <div key={catName} className="sidebar-section">
           <h3 className="sidebar-title">
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -85,7 +95,7 @@ export default function Sidebar({
               {catName}
             </span>
           </h3>
-          {categories[catName].map((lesson) => {
+          {categoryLessons.map((lesson) => {
             const isCompleted = progress[lesson.id];
             const isActive = activeId === lesson.id && activeMode === 'learn';
 
@@ -115,14 +125,14 @@ export default function Sidebar({
       ))}
 
       {/* Challenges / Projects Section */}
-      {challenges.length > 0 && (
+      {visibleChallenges.length > 0 && (
         <div className="sidebar-section">
           <h3 className="sidebar-title">
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Sparkles size={12} className="text-yellow-500" /> ภารกิจโปรเจกต์ (Slide Challenges)
             </span>
           </h3>
-          {challenges.map((challenge) => {
+          {visibleChallenges.map((challenge) => {
             const isCompleted = progress[challenge.id];
             const isActive = activeId === challenge.id && activeMode === 'learn';
 
@@ -208,8 +218,7 @@ export default function Sidebar({
             ))}
           </div>
 
-          {appliedExams
-            .filter((exam) => examFilter === 'all' || getExamCategory(exam) === examFilter)
+          {visibleExams
             .map((exam) => {
               const isCompleted = progress[exam.id];
               const isActive = activeId === exam.id && activeMode === 'learn';
@@ -270,8 +279,10 @@ export default function Sidebar({
         </div>
       )}
 
+      {search && visibleCategories.length === 0 && visibleChallenges.length === 0 && visibleExams.length === 0 && !showMidtermLinks && <p className="sidebar-no-results">ไม่พบ “{search}”</p>}
+
       {/* Midterm Exam Section for HTML/CSS Course */}
-      {course === 'css' && (
+      {showMidtermLinks && (
         <div className="sidebar-section">
           <h3 className="sidebar-title">
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

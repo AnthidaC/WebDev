@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local teaching sources and verification output
+.codex-remote-attachments/
+tmp/
+test-results/
+playwright-report/
