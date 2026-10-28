@@ -435,9 +435,252 @@ exports.remove = async (req, res, next) => {
     ],
   },
   {
+    id: 'react-hooks',
+    badge: '🪝 React Hooks ครบทุกตัว',
+    title: 'สรุป React Hooks & Router Hooks ทั้งหมด (useState, useEffect, useRef, useContext, useMemo, useReducer, useParams, useNavigate)',
+    summary: 'คู่มือรวมทุก Hook ที่ต้องใช้ใน React และ React Router พร้อมแพตเทิร์นการอัปเดต Array/Object State แบบไม่พัง',
+    sections: [
+      {
+        title: 'H.1 useState — การเก็บและอัปเดตค่าตัวเลข ข้อความ Object และ Array (เพิ่ม/แก้/ลบ)',
+        whenToUse: 'เมื่อต้องการให้หน้าจอ React วาดใหม่ (re-render) ทันทีที่ข้อมูลเปลี่ยน',
+        keyPoints: [
+          'ห้ามแก้ตัวแปร state โดยตรง (เช่น ห้าม items.push()) ต้องสร้างค่าใหม่ส่งเข้าฟังก์ชัน set... เสมอ',
+          'ถ้าค่าใหม่คำนวณจากค่าก่อนหน้า ให้ใช้ Functional Update: setCount(prev => prev + 1)',
+          'สำหรับ Array: เพิ่มใช้ [...prev, newItem], แก้ไขใช้ prev.map(...), ลบใช้ prev.filter(...)',
+        ],
+        code: `import { useState } from 'react';
+
+// 1. State พื้นฐาน (ตัวเลข / ข้อความ / Boolean)
+const [count, setCount] = useState(0);
+const [keyword, setKeyword] = useState('');
+const [loading, setLoading] = useState(false);
+
+// เพิ่ม/ลดตัวเลขโดยไม่ติดลบ
+const increment = () => setCount(prev => prev + 1);
+const decrement = () => setCount(prev => Math.max(0, prev - 1));
+
+// 2. State แบบ Object (เช่น ข้อมูลฟอร์ม) -> ใช้ Spread (...prev)
+const [form, setForm] = useState({ name: '', price: '' });
+const updateField = (field, value) => {
+  setForm(prev => ({ ...prev, [field]: value }));
+};
+
+// 3. State แบบ Array (เพิ่ม / แก้ไข / ลบ แบบ Immutable)
+const [items, setItems] = useState([{ id: 1, name: 'ชาไทย', done: false }]);
+
+// เพิ่มรายการต่อท้าย
+const addItem = (newItem) => setItems(prev => [...prev, newItem]);
+
+// แก้ไขรายการตาม id
+const toggleItem = (id) =>
+  setItems(prev => prev.map(item => (item.id === id ? { ...item, done: !item.done } : item)));
+
+// ลบรายการตาม id
+const removeItem = (id) =>
+  setItems(prev => prev.filter(item => item.id !== id));`,
+      },
+      {
+        title: 'H.2 useEffect — การรันโค้ดเมื่อเปิดหน้าเว็บ เมื่อตัวแปรเปลี่ยน และการทำ Cleanup',
+        whenToUse: 'ใช้ดึงข้อมูลจาก API (fetch / axios) ตอนเปิดหน้าเว็บ หรือสั่งโหลดใหม่เมื่อคำค้นหา/พารามิเตอร์เปลี่ยน',
+        keyPoints: [
+          'ไม่ใส่ Dependency Array เลย -> รันทุกครั้งที่ render (ระวังเกิด Infinite Loop ถ้านำไปเรียก setState ข้างใน)',
+          'ใส่ [] (Array ว่าง) -> รันแค่ครั้งเดียวตอน Component ถูกสร้างขึ้นครั้งแรก (Mount)',
+          'ใส่ [keyword, categoryId] -> รันตอนเริ่ม และรันใหม่ทุกครั้งที่ keyword หรือ categoryId เปลี่ยนค่า',
+          'return () => { ... } คือฟังก์ชัน Cleanup รันก่อนออกจากหน้าหรือก่อนรันรอบใหม่ (เช่น ยกเลิก fetch หรือ clearInterval)',
+        ],
+        code: `import { useState, useEffect } from 'react';
+import { api } from '../services/api';
+
+export default function CourseListDemo() {
+  const [courses, setCourses] = useState([]);
+  const [keyword, setKeyword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let ignore = false; // ป้องกันการ setState หลังปิดหน้า
+
+    async function fetchCourses() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await api.courses(keyword ? { keyword } : {});
+        if (!ignore) setCourses(data);
+      } catch (err) {
+        if (!ignore) setError(err.response?.data?.message || 'โหลดข้อมูลไม่สำเร็จ');
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    fetchCourses();
+
+    // Cleanup function
+    return () => {
+      ignore = true;
+    };
+  }, [keyword]); // รันใหม่เมื่อ keyword เปลี่ยน
+
+  return null;
+}`,
+      },
+      {
+        title: 'H.3 useRef — การอ้างอิง DOM Element (เช่น สั่ง Focus ช่อง Input) และเก็บค่าที่ไม่ทำให้ Re-render',
+        whenToUse: 'เมื่อต้องการสั่ง inputRef.current.focus() หรือเลื่อนหน้าจอ โดยไม่ต้องวาดหน้าใหม่',
+        keyPoints: [
+          'สร้างด้วย const inputRef = useRef(null) แล้วผูกเข้ากับแท็ก JSX ด้วย ref={inputRef}',
+          'เข้าถึง DOM จริงผ่าน inputRef.current (เช่น inputRef.current?.focus())',
+        ],
+        code: `import { useRef } from 'react';
+
+export default function SearchBox() {
+  const inputRef = useRef(null);
+
+  function handleFocusClick() {
+    inputRef.current?.focus();
+  }
+
+  return (
+    <div>
+      <label>
+        ชื่อ
+        <input ref={inputRef} type="text" placeholder="กดปุ่มเพื่อโฟกัสช่องนี้" />
+      </label>
+      <button type="button" onClick={handleFocusClick}>
+        โฟกัสชื่อ
+      </button>
+    </div>
+  );
+}`,
+      },
+      {
+        title: 'H.4 createContext & useContext — การแชร์ข้อมูลข้ามหน้า (เช่น Theme หรือ AuthContext)',
+        whenToUse: 'เมื่อหลายหน้าหรือหลาย Component ต้องใช้ข้อมูลชุดเดียวกัน เช่น ข้อมูลผู้ใช้ที่ล็อกอินอยู่ (user, token, logout) หรือธีมมืด/สว่าง',
+        keyPoints: [
+          'ขั้นตอนที่ 1: สร้าง Context ด้วย const MyContext = createContext(null)',
+          'ขั้นตอนที่ 2: สร้าง Provider Component ที่ส่ง value={{ ... }} ครอบลูกๆ (<MyContext.Provider value={...}>)',
+          'ขั้นตอนที่ 3: ใน Component ลูก เรียก const data = useContext(MyContext)',
+        ],
+        code: `import { createContext, useContext, useState } from 'react';
+
+// 1. สร้าง Context
+const ThemeContext = createContext(null);
+
+// 2. สร้าง Provider ครอบแอป
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. สร้าง Custom Hook เพื่อเรียกใช้ง่ายๆ ในหน้าลูก
+export function useTheme() {
+  return useContext(ThemeContext);
+}
+
+// 4. ตัวอย่างการนำไปใช้ใน Component ลูก
+export function ThemeToolbar() {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <div>
+      <p>ธีม: {theme}</p>
+      <button type="button" onClick={toggleTheme}>เปลี่ยนธีม</button>
+    </div>
+  );
+}`,
+      },
+      {
+        title: 'H.5 useMemo & useReducer — การจำค่าคำนวณและการจัดการ State ซับซ้อน',
+        whenToUse: 'ใช้ useMemo เมื่อต้องกรอง/คำนวณยอดรวมจากรายการจำนวนมาก และใช้ useReducer เมื่อมีหลาย Action ในการเปลี่ยน State',
+        keyPoints: [
+          'useMemo(() => คำนวณ, [dependencies]) จะคำนวณใหม่เฉพาะเมื่อตัวแปรใน dependencies เปลี่ยนเท่านั้น',
+          'useReducer(reducerFn, initialState) คืนค่า [state, dispatch] เหมาะกับตะกร้าสินค้าหรือฟอร์มซับซ้อน',
+        ],
+        code: `import { useMemo, useReducer } from 'react';
+
+// 1. useMemo: คำนวณยอดรวมเฉพาะรายการที่ status === 'active'
+function EnrollmentSummary({ enrollments }) {
+  const totalFee = useMemo(() => {
+    return enrollments
+      .filter(item => item.status === 'active')
+      .reduce((sum, item) => sum + item.price, 0);
+  }, [enrollments]);
+
+  return <p>ยอดรวมค่าเรียน: {totalFee} บาท</p>;
+}
+
+// 2. useReducer: จัดการตะกร้าสินค้า
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD':
+      return [...state, action.item];
+    case 'REMOVE':
+      return state.filter(i => i.id !== action.id);
+    case 'CLEAR':
+      return [];
+    default:
+      return state;
+  }
+}
+
+export function CartExample() {
+  const [cart, dispatch] = useReducer(cartReducer, []);
+  return (
+    <button onClick={() => dispatch({ type: 'ADD', item: { id: 1, name: 'Book' } })}>
+      เพิ่มลงตะกร้า ({cart.length})
+    </button>
+  );
+}`,
+      },
+      {
+        title: 'H.6 React Router Hooks — useParams, useNavigate, useLocation, useSearchParams',
+        whenToUse: 'ใช้ในเว็บหลายหน้า (react-router-dom) เพื่ออ่านพารามิเตอร์บน URL หรือสั่งเปลี่ยนหน้าด้วยโค้ด',
+        keyPoints: [
+          'useParams() อ่านค่าจากพารามิเตอร์ของ Route เช่น <Route path="/menu/:id" /> -> const { id } = useParams()',
+          'useNavigate() ได้ฟังก์ชัน navigate("/path") ใช้สั่งย้ายหน้าหลังจาก Login หรือบันทึกฟอร์มสำเร็จ',
+          'useSearchParams() ใช้รับ/เปลี่ยนค่า Query String เช่น ?keyword=react',
+        ],
+        code: `import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+
+export default function CourseDetailPage() {
+  // 1. อ่าน :id จาก URL เช่น /courses/3 -> id === "3" (อย่าลืมแปลง Number(id) ถ้าต้องเทียบตัวเลข)
+  const { id } = useParams();
+
+  // 2. สั่งเปลี่ยนหน้าด้วยโค้ด (เช่น หลัง Login หรือกดปุ่มย้อนกลับ)
+  const navigate = useNavigate();
+
+  // 3. ดูข้อมูล path ปัจจุบัน
+  const location = useLocation(); // เช่น location.pathname === "/courses/3"
+
+  // 4. อ่าน/เขียน Query String (?tab=reviews)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') || 'info';
+
+  return (
+    <section>
+      <h1>รายละเอียดคอร์ส #{id}</h1>
+      <p>หน้าปัจจุบัน: {location.pathname} (แท็บ: {tab})</p>
+      <button type="button" onClick={() => setSearchParams({ tab: 'reviews' })}>
+        ดูรีวิว
+      </button>
+      <button type="button" onClick={() => navigate('/my-courses')}>
+        ไปหน้าคอร์สของฉัน
+      </button>
+    </section>
+  );
+}`,
+      },
+    ],
+  },
+  {
     id: 'react-core',
-    badge: 'บทที่ 4 · React Core & Hooks',
-    title: 'React Components, State, Form, useEffect & Context',
+    badge: 'บทที่ 4 · React UI & Form',
+    title: 'React Components, Props & Controlled Form',
     summary: 'การสร้าง Component, การผูก Controlled Form, การดึง API ด้วย useEffect และการแชร์ข้อมูลด้วย Context/useRef',
     sections: [
       {
