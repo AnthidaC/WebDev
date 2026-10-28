@@ -1016,5 +1016,66 @@ function getScreensForActivity(id) {
     ];
   }
 
+  // exam-final-practice
+  if (id === 'exam-final-practice') {
+    return [
+      {
+        title: 'SkillHub Academy — Multi-Page (4 หน้า) + Role Auth (Student / Admin) + DB (.sql)',
+        tabLabel: '1. หน้าคอร์ส & ลงทะเบียน (/)',
+        url: 'http://localhost:5173/',
+        statusBadge: 'FINAL EXAM · 4 PAGES',
+        specNotes: [
+          'Navbar มีลิงก์ครบ 4 หน้า: "/" (คอร์สเรียนทั้งหมด), "/my-courses" (คอร์สของฉัน), "/admin" (จัดการคอร์ส), "/login"',
+          'หน้า "/" มีช่อง "ค้นหาคอร์ส", ตัวกรอง "หมวดหมู่", แสดงที่นั่ง "ว่าง X / Y ที่นั่ง" และปุ่ม "ลงทะเบียนเรียน"',
+          'กดปุ่ม ZIP ด้านบนเพื่อดาวน์โหลดไฟล์ database/skillhub_exam.sql สำหรับ Import ลง MySQL/XAMPP ได้ทันที',
+        ],
+        render: () => (
+          <div style={{ padding: '14px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', marginBottom: '10px', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', gap: '10px', fontWeight: 'bold', color: '#087f6c' }}>
+                <span>🎓 SkillHub</span>
+                <span>คอร์สเรียนทั้งหมด</span>
+                <span>คอร์สของฉัน</span>
+                <span>จัดการคอร์ส (Admin)</span>
+              </div>
+              <span>mali (student)</span>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <span style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '4px' }}>🔍 ค้นหาคอร์ส: React</span>
+              <span style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '4px' }}>หมวดหมู่: ทุกหมวดหมู่ ▾</span>
+            </div>
+            <div style={{ padding: '10px', background: '#f8fafc', border: '1px solid #dce6df', borderRadius: '6px' }}>
+              <small style={{ color: '#64748b' }}>CS301 · Web Development</small>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#0f172a' }}>Full Stack Node &amp; React</div>
+              <div>ราคา 1500 บาท · <strong>ว่าง 2 / 3 ที่นั่ง</strong></div>
+              <span style={{ display: 'inline-block', marginTop: '6px', padding: '4px 10px', background: '#087f6c', color: '#fff', borderRadius: '4px', fontWeight: 'bold' }}>ลงทะเบียนเรียน</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        title: 'การแยกสิทธิ์ Role Guard (/admin) และหน้าคอร์สของฉัน (/my-courses)',
+        tabLabel: '2. Role Guard & Admin CRUD',
+        url: 'http://localhost:5173/admin',
+        statusBadge: '401 / 403 ROLE GUARD',
+        specNotes: [
+          'ถ้าเข้าหน้า /admin ด้วยสิทธิ์ student ต้องแสดง <p role="alert">ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</p>',
+          'ถ้าเข้าด้วยสิทธิ์ admin จะเห็นฟอร์มเพิ่ม/แก้ไขคอร์ส (รหัสวิชา, ชื่อวิชา, หมวดหมู่วิชา, ราคาคอร์ส, จำนวนที่นั่ง) และปุ่ม "บันทึกคอร์ส"',
+          'ฝั่ง API ป้องกันด้วย verifyToken (401) และ requireAdmin (403) พร้อมกติกาห้ามลบคอร์สที่มีคนเรียนอยู่ (409)',
+        ],
+        render: () => (
+          <div style={{ padding: '14px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '12px' }}>
+            <div style={{ padding: '8px 12px', background: '#fee2e2', color: '#dc2626', borderRadius: '4px', fontWeight: 'bold', marginBottom: '8px' }}>
+              ⚠️ กรณี Student เข้า /admin → role=&quot;alert&quot;: ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)
+            </div>
+            <div style={{ padding: '8px 12px', background: '#f0fdf4', color: '#15803d', borderRadius: '4px', fontWeight: 'bold' }}>
+              ✓ กรณี Admin เข้า /admin → แสดงฟอร์ม &quot;บันทึกคอร์ส&quot; + ปุ่ม &quot;แก้ไข&quot; / &quot;ลบคอร์ส&quot;
+            </div>
+          </div>
+        ),
+      },
+    ];
+  }
+
   return [];
 }

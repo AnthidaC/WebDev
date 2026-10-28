@@ -44,6 +44,9 @@ function renderInteractiveDemo(id, item) {
   if (id === 'exam-store-hub') {
     return <StoreHubTargetDemo />;
   }
+  if (id === 'exam-final-practice') {
+    return <FinalPracticeTargetDemo />;
+  }
 
   if (id === 'exam-campus-gear') {
     return (
@@ -1013,6 +1016,163 @@ function StoreHubTargetDemo() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+
+function FinalPracticeTargetDemo() {
+  const [page, setPage] = useState('/');
+  const [role, setRole] = useState('student');
+  const [keyword, setKeyword] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [courses, setCourses] = useState([
+    { id: 1, code: 'CS301', title: 'Full Stack Node & React', categoryId: 1, categoryName: 'Web Development', price: 1500, seats: 3, enrolled: 1 },
+    { id: 2, code: 'AI202', title: 'Applied Machine Learning', categoryId: 2, categoryName: 'Data & AI', price: 2200, seats: 2, enrolled: 0 },
+    { id: 3, code: 'SEC101', title: 'Web Security & JWT Auth', categoryId: 3, categoryName: 'Cybersecurity', price: 1800, seats: 1, enrolled: 1 },
+  ]);
+  const [enrollments, setEnrollments] = useState([
+    { id: 1, courseId: 1, courseCode: 'CS301', courseTitle: 'Full Stack Node & React', price: 1500, status: 'active' },
+    { id: 2, courseId: 3, courseCode: 'SEC101', courseTitle: 'Web Security & JWT Auth', price: 1800, status: 'active' },
+  ]);
+  const [code, setCode] = useState('');
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('1500');
+  const [seats, setSeats] = useState('5');
+  const [alertMsg, setAlertMsg] = useState('');
+
+  const filtered = courses.filter(c => {
+    const matchK = !keyword || c.title.toLowerCase().includes(keyword.toLowerCase()) || c.code.toLowerCase().includes(keyword.toLowerCase());
+    const matchC = !categoryId || c.categoryId === Number(categoryId);
+    return matchK && matchC;
+  });
+
+  function enroll(course) {
+    setAlertMsg('');
+    if (role === 'guest') { setAlertMsg('401 Unauthorized: กรุณาเข้าสู่ระบบก่อนลงทะเบียนเรียน'); return; }
+    if (enrollments.some(e => e.courseId === course.id && e.status === 'active')) {
+      setAlertMsg('409 Conflict: ลงทะเบียนคอร์สนี้ไปแล้ว'); return;
+    }
+    if (course.enrolled >= course.seats) {
+      setAlertMsg('409 Conflict: ที่นั่งเต็มแล้ว'); return;
+    }
+    setCourses(list => list.map(c => c.id === course.id ? { ...c, enrolled: c.enrolled + 1 } : c));
+    setEnrollments(list => [...list, { id: Date.now(), courseId: course.id, courseCode: course.code, courseTitle: course.title, price: course.price, status: 'active' }]);
+  }
+
+  function cancelEnroll(item) {
+    setAlertMsg('');
+    setEnrollments(list => list.map(e => e.id === item.id ? { ...e, status: 'cancelled' } : e));
+    setCourses(list => list.map(c => c.id === item.courseId ? { ...c, enrolled: Math.max(0, c.enrolled - 1) } : c));
+  }
+
+  function addCourse(e) {
+    e.preventDefault();
+    setAlertMsg('');
+    if (!code.trim() || !title.trim()) { setAlertMsg('400 Bad Request: กรอกรหัสและชื่อวิชาให้ครบ'); return; }
+    if (courses.some(c => c.code.toUpperCase() === code.trim().toUpperCase())) { setAlertMsg('409 Conflict: รหัสวิชาซ้ำ'); return; }
+    setCourses(list => [...list, { id: Date.now(), code: code.trim().toUpperCase(), title: title.trim(), categoryId: 1, categoryName: 'Web Development', price: Number(price) || 0, seats: Number(seats) || 1, enrolled: 0 }]);
+    setCode(''); setTitle('');
+  }
+
+  return (
+    <div style={{ background: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', padding: '16px', fontSize: '13px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '6px', marginBottom: '12px', border: '1px solid #e2e8f0' }}>
+        <div><strong>จำลองสลับ Role ทดสอบสิทธิ์:</strong></div>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[['guest', 'Guest (ยังไม่ Login)'], ['student', 'Student (mali)'], ['admin', 'Admin (admin)']].map(([r, label]) => (
+            <button key={r} type="button" onClick={() => { setRole(r); setAlertMsg(''); }} style={{ padding: '4px 10px', borderRadius: '4px', border: '1px solid #cbd5e1', background: role === r ? '#087f6c' : '#fff', color: role === r ? '#fff' : '#0f172a', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer' }}>{label}</button>
+          ))}
+        </div>
+      </div>
+
+      <nav style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #dce6df', paddingBottom: '10px', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {[['/', 'คอร์สเรียนทั้งหมด (/)'], ['/my-courses', 'คอร์สของฉัน (/my-courses)'], ['/admin', 'จัดการคอร์ส (/admin)'], ['/login', 'เข้าสู่ระบบ (/login)']].map(([p, label]) => (
+            <button key={p} type="button" onClick={() => { setPage(p); setAlertMsg(''); }} style={{ background: 'none', border: 'none', color: page === p ? '#087f6c' : '#475569', fontWeight: page === p ? 'bold' : 'normal', textDecoration: page === p ? 'underline' : 'none', cursor: 'pointer', padding: 0 }}>{label}</button>
+          ))}
+        </div>
+        <span style={{ fontSize: '11px', color: '#64748b' }}>สถานะ: <strong>{role}</strong></span>
+      </nav>
+
+      {alertMsg && <div role="alert" style={{ padding: '8px 12px', background: '#fee2e2', color: '#dc2626', borderRadius: '6px', marginBottom: '12px', fontWeight: 'bold' }}>{alertMsg}</div>}
+
+      {page === '/' && (
+        <div>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+            <input value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="ค้นหาคอร์ส (รหัส/ชื่อวิชา)..." style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #cbd5e1', flex: 1 }} />
+            <select value={categoryId} onChange={e => setCategoryId(e.target.value)} style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
+              <option value="">ทุกหมวดหมู่</option>
+              <option value="1">Web Development</option>
+              <option value="2">Data &amp; AI</option>
+              <option value="3">Cybersecurity</option>
+            </select>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+            {filtered.map(c => {
+              const avail = Math.max(0, c.seats - c.enrolled);
+              return (
+                <div key={c.id} style={{ padding: '12px', border: '1px solid #dce6df', borderRadius: '8px', background: '#f8fafc' }}>
+                  <small style={{ color: '#64748b' }}>{c.code} · {c.categoryName}</small>
+                  <h4 style={{ margin: '4px 0' }}>{c.title}</h4>
+                  <div>ราคา {c.price} บาท · <strong>ว่าง {avail} / {c.seats} ที่นั่ง</strong></div>
+                  <button type="button" disabled={avail <= 0} onClick={() => enroll(c)} style={{ marginTop: '8px', padding: '5px 10px', background: avail > 0 ? '#087f6c' : '#94a3b8', color: '#fff', border: 'none', borderRadius: '4px', cursor: avail > 0 ? 'pointer' : 'not-allowed', fontSize: '12px' }}>
+                    {avail > 0 ? 'ลงทะเบียนเรียน' : 'ที่นั่งเต็ม'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {page === '/my-courses' && (
+        role === 'guest' ? (
+          <div role="alert" style={{ padding: '12px', background: '#fee2e2', color: '#dc2626', borderRadius: '6px' }}>กรุณาเข้าสู่ระบบก่อนดูรายการลงทะเบียน</div>
+        ) : (
+          <div>
+            <p>ยอดรวมค่าเรียนที่ลงทะเบียนอยู่ (active): <strong>{enrollments.filter(e => e.status === 'active').reduce((s, e) => s + e.price, 0)} บาท</strong></p>
+            {enrollments.map(e => (
+              <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', border: '1px solid #dce6df', borderRadius: '6px', marginBottom: '6px' }}>
+                <span><strong>{e.courseCode} · {e.courseTitle}</strong> ({e.price} บาท) — สถานะ: {e.status}</span>
+                {e.status === 'active' && <button type="button" onClick={() => cancelEnroll(e)} style={{ padding: '4px 8px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>ยกเลิกลงทะเบียน</button>}
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      {page === '/admin' && (
+        role !== 'admin' ? (
+          <div role="alert" style={{ padding: '12px', background: '#fee2e2', color: '#dc2626', borderRadius: '6px', fontWeight: 'bold' }}>403 Forbidden: ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</div>
+        ) : (
+          <div>
+            <form onSubmit={addCourse} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px', padding: '10px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+              <input value={code} onChange={e => setCode(e.target.value)} placeholder="รหัสวิชา เช่น WEB404" style={{ padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', width: '130px' }} />
+              <input value={title} onChange={e => setTitle(e.target.value)} placeholder="ชื่อวิชา" style={{ padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', flex: 1 }} />
+              <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="ราคา" style={{ padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', width: '80px' }} />
+              <input type="number" value={seats} onChange={e => setSeats(e.target.value)} placeholder="ที่นั่ง" style={{ padding: '5px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', width: '70px' }} />
+              <button type="submit" style={{ padding: '5px 12px', background: '#087f6c', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>บันทึกคอร์ส</button>
+            </form>
+            {courses.map(c => (
+              <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', border: '1px solid #dce6df', borderRadius: '6px', marginBottom: '6px' }}>
+                <span><strong>{c.code} · {c.title}</strong> ({c.price} บาท · ลงทะเบียน {c.enrolled}/{c.seats})</span>
+                <button type="button" onClick={() => {
+                  if (c.enrolled > 0) { setAlertMsg('409 Conflict: ห้ามลบคอร์สที่มีผู้ลงทะเบียนอยู่'); return; }
+                  setCourses(list => list.filter(x => x.id !== c.id));
+                }} style={{ padding: '4px 8px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>ลบคอร์ส</button>
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      {page === '/login' && (
+        <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+          <p style={{ margin: '0 0 8px 0' }}>ในโปรเจกต์จริง หน้า <code>/login</code> จะมีฟอร์มเข้าสู่ระบบ (<code>POST /api/auth/login</code>) และสมัครสมาชิก (<code>POST /api/auth/register</code>) พร้อมเก็บ JWT ลง <code>sessionStorage</code></p>
+          <small style={{ color: '#64748b' }}>บัญชีเริ่มต้น: admin / admin12345 (role: admin) และ mali / mali12345 (role: student)</small>
+        </div>
+      )}
     </div>
   );
 }

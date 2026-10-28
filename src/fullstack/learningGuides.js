@@ -62,6 +62,16 @@ export const apiExamples = {
   'fs-14': [['ค้นหา Mali', 'GET', '/api/search?keyword=Mali'], ['ข้อความทดสอบ SQL injection', 'GET', '/api/search?keyword=%27%20OR%201%3D1%20--']],
   'fs-16': [['สมัครสมาชิก', 'POST', '/api/auth/register', { userName: 'mali', email: 'mali@example.com', password: 'Practice123!' }], ['เข้าสู่ระบบ', 'POST', '/api/auth/login', { userName: 'mali', password: 'Practice123!' }]],
   'fs-17': [['สมัครก่อน (ข้อมูลแยกจากบทก่อน)', 'POST', '/api/auth/register', { userName: 'mali', email: 'mali@example.com', password: 'Practice123!' }], ['เข้าสู่ระบบ', 'POST', '/api/auth/login', { userName: 'mali', password: 'Practice123!' }], ['โปรไฟล์ที่ต้องมี token', 'GET', '/api/auth/me']],
+  'exam-final-practice': [
+    ['ดูคอร์สทั้งหมด', 'GET', '/api/courses'],
+    ['ค้นหาคอร์ส React', 'GET', '/api/courses?keyword=React'],
+    ['Login นักศึกษา (mali)', 'POST', '/api/auth/login', { userName: 'mali', password: 'mali12345' }],
+    ['Login ผู้ดูแล (admin)', 'POST', '/api/auth/login', { userName: 'admin', password: 'admin12345' }],
+    ['ตรวจโปรไฟล์ (/me)', 'GET', '/api/auth/me'],
+    ['ลงทะเบียนคอร์ส #2', 'POST', '/api/enrollments', { courseId: 2 }],
+    ['ดูคอร์สของฉัน', 'GET', '/api/enrollments/my'],
+    ['เพิ่มคอร์สใหม่ (Admin)', 'POST', '/api/courses', { code: 'DEV999', title: 'Cloud Deployment', categoryId: 1, price: 1900, seats: 5 }],
+  ],
 };
 
 export function filePurpose(path) {
@@ -81,6 +91,7 @@ export function filePurpose(path) {
   if (path.includes('/components/')) return 'component ย่อยสำหรับใช้ซ้ำ';
   if (path.includes('/pages/')) return 'component ของแต่ละหน้า';
   if (path.endsWith('.json')) return 'ข้อมูลตัวอย่างในรูปแบบ JSON';
+  if (path.endsWith('.sql')) return 'สคริปต์ฐานข้อมูล SQL (CREATE TABLE และ INSERT ข้อมูลเริ่มต้น) สำหรับ Import ลง MySQL/XAMPP';
   if (path.endsWith('.md')) return 'คำอธิบายโปรเจกต์และวิธีรัน';
   return 'ไฟล์เฉพาะของบทนี้ ดูขั้นตอนลงมือทำประกอบ';
 }

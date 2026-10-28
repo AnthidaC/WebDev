@@ -983,4 +983,31 @@ export default function App() {
 **คำแนะนำก่อนเริ่มทำข้อสอบ**
 1. เปิดอ่านไฟล์ \`EXAM_REQUIREMENTS.md\` เพื่อศึกษารายละเอียด API Endpoints (\`GET /api/products\`, \`POST /api/products\`, \`POST /api/orders\`, \`GET /api/orders\`) และชื่อ Label
 2. ทดลองเล่นระบบจำลองในแท็บ **👁️ ตัวอย่างผลลัพธ์ (Demo)** เพื่อดูพฤติกรรมเมื่อเพิ่มสินค้า สั่งซื้อสำเร็จ และเมื่อสั่งซื้อเกินจำนวนสต็อกคงเหลือ`,
+
+  'exam-final-practice': `**สอบปฏิบัติ F: ฝึกสอบปลายภาค Full Stack (SkillHub Academy — Multi-Page + Role Auth + DB .sql)**
+โจทย์จำลองสอบปลายภาคแบบครบวงจรที่รวมทุกเนื้อหาไว้ในข้อเดียว โดยระบบเตรียม **เฉพาะโครงไฟล์โปรเจกต์ (Project Skeleton)** และ **ฐานข้อมูลพร้อมข้อมูลเริ่มต้น (ทั้งไฟล์ \`database/skillhub_exam.sql\` เมื่อกดดาวน์โหลด ZIP และ \`backend/db/store.js\`)** มาให้
+
+**สิ่งที่เตรียมไว้ให้แล้วในโปรเจกต์**
+1. **ฐานข้อมูล SQL (\`database/skillhub_exam.sql\`, \`database/schema.sql\`, \`database/seed.sql\`)**: มี 4 ตารางหลัก ได้แก่ \`users\`, \`categories\`, \`courses\`, และ \`enrollments\` พร้อมข้อมูลเริ่มต้น (กดปุ่ม **ZIP** ด้านบนเพื่อโหลดไฟล์ \`.sql\` ไป Import ลง phpMyAdmin / MySQL ได้เลย)
+2. **บัญชีทดสอบ 2 สิทธิ์ (Role)**:
+   - ผู้ดูแลระบบ (**Admin**): \`userName: "admin"\`, รหัสผ่าน \`"admin12345"\`, \`role: "admin"\`
+   - นักศึกษา (**Student**): \`userName: "mali"\`, รหัสผ่าน \`"mali12345"\`, \`role: "student"\`
+3. **โครงไฟล์ Backend & Frontend 4 หน้า**: มีคอมเมนต์ \`// TODO\` ระบุจุดที่ต้องเขียนในแต่ละไฟล์อย่างชัดเจน
+
+**สเปกของระบบที่ต้องพัฒนาให้ครบ (100 คะแนน)**
+1. **ส่วนที่ 1 — Auth & Role Middleware (25 คะแนน)**:
+   - เติม \`verifyToken\` (ตรวจ \`Bearer <token>\` ไม่ผ่านตอบ \`401\`) และ \`requireAdmin\` (ตรวจ \`req.user.role === 'admin'\` ไม่ผ่านตอบ \`403\`) ใน \`backend/middleware/auth.js\`
+   - เติม \`POST /api/auth/register\` (แฮชรหัสผ่านด้วย \`bcryptjs\`, บังคับ \`role: 'student'\`, ข้อมูลผิดตอบ \`400\`, ชื่อ/อีเมลซ้ำตอบ \`409\`, สำเร็จตอบ \`201\`), \`POST /api/auth/login\` (ตรวจรหัสผ่านและส่ง JWT \`{ token, user }\` ตอบ \`200\` หรือ \`401\`), และ \`GET /api/auth/me\` ใน \`backend/routes/auth.js\`
+2. **ส่วนที่ 2 — Courses API & Admin CRUD (30 คะแนน)**:
+   - ใน \`backend/routes/courses.js\`: \`GET /api/courses\` ต้องรองรับ \`?keyword=\` (ค้นใน \`title\` หรือ \`code\`) และ \`?categoryId=\` พร้อมคำนวณ \`availableSeats = course.seats - course.enrolled\`
+   - \`POST /api/courses\`, \`PUT /api/courses/:id\`, \`DELETE /api/courses/:id\` ต้องใช้ \`verifyToken, requireAdmin\` (ห้ามรหัสวิชาซ้ำ \`409\`, ห้ามลด \`seats\` ต่ำกว่า \`enrolled\` \`409\`, และห้ามลบคอร์สที่มีคนลงทะเบียนอยู่ \`409\`)
+3. **ส่วนที่ 3 — Enrollments API & Seat Quota (20 คะแนน)**:
+   - ใน \`backend/routes/enrollments.js\`: \`GET /api/enrollments/my\` ดึงรายการลงทะเบียนของตนเอง
+   - \`POST /api/enrollments\` รับ \`{ courseId }\` ตรวจห้ามลงทะเบียนซ้ำ (\`409\`) และห้ามลงเมื่อที่นั่งเต็ม (\`409\`) พร้อมบวก \`course.enrolled += 1\` (\`201\`)
+   - \`PATCH /api/enrollments/:id/cancel\` อนุญาตเฉพาะเจ้าของหรือ Admin เปลี่ยนสถานะเป็น \`'cancelled'\` และคืนที่นั่ง \`course.enrolled -= 1\` (\`200\`)
+4. **ส่วนที่ 4 — Multi-Page React Router 4 หน้า & Role Guard (25 คะแนน)**:
+   - หน้า \`/\` (\`CatalogPage.jsx\`): ค้นหา/กรองหมวดหมู่ แสดงที่นั่งว่าง และปุ่ม \`ลงทะเบียนเรียน\`
+   - หน้า \`/login\` (\`LoginPage.jsx\`): ฟอร์ม \`เข้าสู่ระบบ\` และ \`สมัครสมาชิก\` เชื่อมกับ \`AuthContext\`
+   - หน้า \`/my-courses\` (\`MyCoursesPage.jsx\`): แสดงคอร์สที่ลงทะเบียน ยอดรวมค่าเรียนเฉพาะรายการที่ \`active\` และปุ่ม \`ยกเลิกลงทะเบียน\`
+   - หน้า \`/admin\` (\`AdminPage.jsx\`): ถ้าไม่ใช่ \`admin\` ต้องแสดง \`<p role="alert">ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</p>\` ถ้าเป็น \`admin\` แสดงฟอร์มเพิ่ม/แก้ไข/ลบคอร์สเรียน`,
 };

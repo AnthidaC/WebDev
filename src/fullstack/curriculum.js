@@ -1,4 +1,5 @@
 import { storeHubStarter, storeHubSolution, storeHubTests, storeHubRequirements } from './exams/exam-store-hub.js';
+import { finalPracticeStarter, finalPracticeSolution, finalPracticeTests } from './exams/exam-final-practice.js';
 import { makeProject, baseFiles, apiTest, uiTest, customerFiles, customersController, crudTests, customerUiTests, authFiles, authTests, packageFile } from './templates.js';
 import { strictLoadingCheck } from './projectChecks.js';
 import { guidedProjects } from './guidedProjects.js';
@@ -786,6 +787,53 @@ const storeHubExam = {
 };
 exams.push(storeHubExam);
 
+const finalPracticeExam = {
+  id: 'exam-final-practice',
+  title: 'สอบ F · ฝึกสอบปลายภาค Full Stack (Multi-Page + Role + DB .sql)',
+  chapter: '08 · จำลองสอบ',
+  minutes: 240,
+  source: 'รวมทุกบท ch5 Node · ch6 React · ch7 FullStack 1–2 · ch8 Auth & Role',
+  difficulty: 'ข้อสอบปลายภาค · 100 คะแนน',
+  entry: 'EXAM_REQUIREMENTS.md',
+  previewPort: '5173',
+  runtime: 'webcontainer',
+  paragraphs: [
+    'โจทย์จำลองสอบปลายภาคแบบครบวงจร (SkillHub Academy): เตรียมเฉพาะโครงไฟล์โปรเจกต์ (Skeleton) และฐานข้อมูลพร้อม Seed (ทั้งไฟล์ database/skillhub_exam.sql สำหรับ Import ลง MySQL/XAMPP เมื่อกดโหลด ZIP และ backend/db/store.js สำหรับรันตรวจในเว็บ)',
+    'ครอบคลุมทุกหัวข้อที่ออกสอบปลายภาค: ระบบสมัคร/เข้าสู่ระบบด้วย bcrypt + JWT, การแยกสิทธิ์ Role (guest / student / admin) ทั้งฝั่ง API Middleware (401/403) และฝั่งหน้าเว็บ, ระบบค้นหา/กรองคอร์สเรียน, การลงทะเบียนตัดโควตาที่นั่งว่าง และการจัดการหลายหน้าด้วย React Router (4 หน้า)',
+    'เปิดไฟล์ EXAM_REQUIREMENTS.md หรืออ่านแผงโจทย์ด้านซ้ายเพื่อดูสเปก API, ตารางฐานข้อมูล, ชื่อฟิลด์ และลำดับการทำทีละส่วน',
+  ],
+  steps: [
+    'ส่วนที่ 1 (25 คะแนน): เขียน Middleware verifyToken (401) และ requireAdmin (403) ใน backend/middleware/auth.js และทำ POST /register, POST /login, GET /me ใน backend/routes/auth.js',
+    'ส่วนที่ 2 (30 คะแนน): ทำ API คอร์สเรียนใน backend/routes/courses.js — GET /api/courses รองรับ ?keyword= และ ?categoryId= พร้อมคำนวณ availableSeats และทำ POST/PUT/DELETE ที่อนุญาตเฉพาะ Admin',
+    'ส่วนที่ 3 (20 คะแนน): ทำ API ลงทะเบียนเรียนใน backend/routes/enrollments.js — ตรวจห้ามลงซ้ำ (409), ห้ามเกินที่นั่งว่าง (409), ตัดยอด enrolled และทำ PATCH /:id/cancel คืนที่นั่ง',
+    'ส่วนที่ 4 (25 คะแนน): เติมหน้าเว็บ React Multi-Page ทั้ง 4 หน้า (CatalogPage, LoginPage, MyCoursesPage, AdminPage) เชื่อมกับ AuthContext และบังคับสิทธิ์ตาม Role',
+  ],
+  manual: [
+    'กดปุ่ม ZIP มุมขวาบนเพื่อตรวจสอบว่าได้รับไฟล์ database/skillhub_exam.sql, database/schema.sql และ database/seed.sql ครบถ้วน',
+    'ทดสอบเข้าสู่ระบบด้วยบัญชีนักศึกษา (mali / mali12345) แล้วลองเปิดหน้า /admin ต้องเห็นข้อความเตือน ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)',
+    'ทดสอบลงทะเบียนเรียนคอร์สที่ยังมีที่นั่งว่าง แล้วไปที่หน้า /my-courses เพื่อตรวจยอดรวมค่าเรียนและทดลองกดยกเลิกลงทะเบียนเพื่อคืนที่นั่ง',
+    'ทดสอบเข้าสู่ระบบด้วยบัญชีผู้ดูแล (admin / admin12345) แล้วเพิ่ม แก้ไข และลองลบคอร์สที่มีคนเรียนอยู่ (ระบบต้องปฏิเสธ 409)',
+  ],
+  rubric: [
+    { label: 'ส่วนที่ 1 · Auth (Register/Login/JWT) & Role Middleware (401/403)', points: 25 },
+    { label: 'ส่วนที่ 2 · Courses API (Search/Filter + Admin CRUD + Constraints)', points: 30 },
+    { label: 'ส่วนที่ 3 · Enrollments API (Seat Quota + Duplicate Check + Cancel Refund)', points: 20 },
+    { label: 'ส่วนที่ 4 · Multi-Page React Router (4 หน้า) + AuthContext + Role Guard', points: 25 },
+  ],
+  requirements: [
+    ['R01 · JWT & Role Middleware (401/403)', 10, 'verifyToken ตรวจ Bearer token (401) และ requireAdmin ตรวจ role === "admin" (403)'],
+    ['R02 · Register / Login / Me API', 15, 'POST /api/auth/register (bcrypt hash, บังคับ role student, 400/409/201), POST /api/auth/login (JWT, 401/200), GET /api/auth/me'],
+    ['R03 · Search & Filter Courses API', 12, 'GET /api/courses รองรับ ?keyword= (ค้นใน title/code) และ ?categoryId= พร้อมคำนวณ availableSeats'],
+    ['R04 · Admin Course CRUD & Seat Rules', 18, 'POST/PUT/DELETE /api/courses เฉพาะ Admin, ห้ามรหัสซ้ำ (409), ห้ามลด seats ต่ำกว่า enrolled (409), ห้ามลบคอร์สที่มีคนเรียน (409)'],
+    ['R05 · Student Enrollment & Refund Seat', 20, 'POST /api/enrollments ตรวจซ้ำ/ตรวจที่นั่งเต็ม (409) และตัดที่นั่ง, PATCH /api/enrollments/:id/cancel คืนที่นั่ง (เฉพาะเจ้าของหรือ Admin)'],
+    ['R06 · Multi-Page React Router & Role UI', 25, 'ครบ 4 หน้า (/, /login, /my-courses, /admin) เชื่อม AuthContext, แสดงยอดรวมค่าเรียน และกั้นหน้า /admin สำหรับ Admin เท่านั้น'],
+  ],
+  starter: { ...finalPracticeStarter, 'tests/goal.test.jsx': finalPracticeTests },
+  solution: { ...finalPracticeSolution, 'tests/goal.test.jsx': finalPracticeTests },
+  kind: 'exam',
+};
+exams.push(finalPracticeExam);
+
 const effectLesson = lessons.find(item => item.id === 'fs-09');
 effectLesson.starter['tests/strict-loading.test.jsx'] = strictLoadingCheck;
 effectLesson.solution['tests/strict-loading.test.jsx'] = strictLoadingCheck;
@@ -794,7 +842,7 @@ workshops.unshift(...guidedProjects);
 export const coursePhases = [
   { id: 'node', title: '1 · Node', description: 'รัน JavaScript → module → async → ไฟล์ → Express/API → Router', ids: ['guided-0','fs-01','fs-02','fs-03','fs-04','guided-1','fs-05','lab-restaurant'] },
   { id: 'react', title: '2 · React', description: 'โครงหน้า → props → state → form → routing → context/ref โดยยังไม่ต่อ API', ids: ['fs-00','fs-06','guided-2','fs-07','fs-08','fs-10','fs-11'] },
-  { id: 'full', title: '3 · Full Stack', description: 'เตรียมสองฝั่ง → HTTP/Axios → CRUD → MySQL/Prisma → auth/JWT → Docker → เวิร์กช็อปและสอบ', ids: ['fs-09','guided-3','fs-12','fs-13','guided-4','fs-14','fs-15','fs-16','fs-17','lab-customers','lab-member','lab-food','lab-booking','lab-inventory','lab-community','exam-api','exam-react','exam-auth','exam-campus-gear','exam-store-hub'] },
+  { id: 'full', title: '3 · Full Stack', description: 'เตรียมสองฝั่ง → HTTP/Axios → CRUD → MySQL/Prisma → auth/JWT → Docker → เวิร์กช็อปและสอบ', ids: ['fs-09','guided-3','fs-12','fs-13','guided-4','fs-14','fs-15','fs-16','fs-17','lab-customers','lab-member','lab-food','lab-booking','lab-inventory','lab-community','exam-api','exam-react','exam-auth','exam-campus-gear','exam-store-hub','exam-final-practice'] },
 ];
 const activities = [...lessons, ...workshops, ...exams];
 for (const phase of coursePhases) {

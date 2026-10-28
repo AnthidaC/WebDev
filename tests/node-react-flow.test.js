@@ -16,7 +16,7 @@ test('Node + React course moves from foundations to integration, projects and ex
     assert.equal(fullstackCurriculum.indexOf(project), fullstackCurriculum.findIndex(item => item.id === project.connectsTo.lessonId) + 1, `${project.id} follows the lesson that prepares it`);
     assert.ok(project.connectsTo.title, `${project.id} names its related lesson`);
   }
-  assert.deepEqual(fullstackCurriculum.filter(item => item.kind === 'exam').map(item => item.chapter), Array(5).fill('3 · Full Stack'));
+  assert.deepEqual(fullstackCurriculum.filter(item => item.kind === 'exam').map(item => item.chapter), Array(6).fill('3 · Full Stack'));
 });
 
 test('every lesson has a concrete reasoning path, exercise bridge and self explanation', () => {

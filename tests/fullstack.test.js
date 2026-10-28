@@ -4,7 +4,7 @@ import { fullstackCurriculum, lessons, workshops, exams } from '../src/fullstack
 import { toTree, validPath, renamePath, projectZip, readProjectZip, revision } from '../src/fullstack/workspace.js';
 
 test('every activity has a runnable package, instructions, tests and reference', () => {
-  assert.equal(lessons.length, 18); assert.equal(workshops.length, 12); assert.equal(exams.length, 5);
+  assert.equal(lessons.length, 18); assert.equal(workshops.length, 12); assert.equal(exams.length, 6);
   assert.equal(new Set(fullstackCurriculum.map(p => p.id)).size, fullstackCurriculum.length);
   for (const item of fullstackCurriculum) {
     assert.ok(item.source && item.steps.length && item.paragraphs.length && item.manual.length, item.id);
