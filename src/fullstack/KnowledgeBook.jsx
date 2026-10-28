@@ -1,184 +1,777 @@
-import React, { useState } from 'react';
-import { BookOpen, Search, ArrowRight, X, CheckCircle2, Sparkles } from 'lucide-react';
-import { knowledgeCategories } from './knowledgeBookData';
-import CopyCode from './CopyCode';
+import React, { useState, useMemo, useRef } from 'react';
+import { KNOWLEDGE_BOOK_CATEGORIES } from './knowledgeBookData';
 
-export default function KnowledgeBook({ onOpenActivity, onClose }) {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [search, setSearch] = useState('');
+const styles = {
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 9999,
+    backgroundColor: 'rgba(2, 6, 23, 0.85)',
+    backdropFilter: 'blur(8px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '14px',
+  },
+  modal: {
+    width: 'min(1440px, 98vw)',
+    height: 'min(920px, 95vh)',
+    backgroundColor: '#0b1120',
+    border: '1px solid #334155',
+    borderRadius: '16px',
+    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.75)',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    color: '#f8fafc',
+    fontFamily: "'Inter', 'Noto Sans Thai', system-ui, -apple-system, sans-serif",
+  },
+  topBar: {
+    padding: '14px 22px',
+    backgroundColor: '#0f172a',
+    borderBottom: '1px solid #1e293b',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '16px',
+    flexWrap: 'wrap',
+  },
+  titleGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  bookBadge: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '20px',
+    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+    flexShrink: 0,
+  },
+  title: {
+    margin: 0,
+    fontSize: '17px',
+    fontWeight: 800,
+    color: '#f8fafc',
+    letterSpacing: '-0.01em',
+  },
+  subtitle: {
+    margin: '2px 0 0 0',
+    fontSize: '12.5px',
+    color: '#94a3b8',
+  },
+  controlsGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    flex: '1 1 380px',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+  },
+  searchBox: {
+    position: 'relative',
+    flex: '1 1 260px',
+    maxWidth: '380px',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '9px 32px 9px 34px',
+    backgroundColor: '#1e293b',
+    border: '1px solid #334155',
+    borderRadius: '9px',
+    color: '#f8fafc',
+    fontSize: '13.5px',
+    outline: 'none',
+    boxSizing: 'border-box',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: '11px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#94a3b8',
+    fontSize: '13px',
+    pointerEvents: 'none',
+  },
+  fontBtnGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#1e293b',
+    border: '1px solid #334155',
+    borderRadius: '8px',
+    overflow: 'hidden',
+  },
+  fontBtn: (active) => ({
+    padding: '6px 10px',
+    border: 'none',
+    backgroundColor: active ? '#3b82f6' : 'transparent',
+    color: active ? '#ffffff' : '#cbd5e1',
+    fontSize: '12px',
+    fontWeight: 700,
+    cursor: 'pointer',
+  }),
+  closeBtn: {
+    padding: '8px 14px',
+    backgroundColor: '#dc2626',
+    border: '1px solid #ef4444',
+    borderRadius: '9px',
+    color: '#ffffff',
+    fontSize: '13px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  workspace: {
+    flex: 1,
+    display: 'grid',
+    gridTemplateColumns: '300px 1fr',
+    overflow: 'hidden',
+  },
+  sidebar: {
+    backgroundColor: '#0f172a',
+    borderRight: '1px solid #1e293b',
+    overflowY: 'auto',
+    padding: '14px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  sidebarLabel: {
+    fontSize: '11px',
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.07em',
+    color: '#64748b',
+    padding: '4px 10px 6px',
+  },
+  chapterBtn: (active, color) => ({
+    width: '100%',
+    textAlign: 'left',
+    padding: '11px 12px',
+    borderRadius: '10px',
+    border: active ? `1.5px solid ${color}` : '1px solid transparent',
+    backgroundColor: active ? '#1e293b' : 'transparent',
+    color: active ? '#ffffff' : '#cbd5e1',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    transition: 'all 0.15s ease',
+  }),
+  chapterBtnTop: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    fontSize: '13.5px',
+    fontWeight: 700,
+    lineHeight: 1.35,
+  },
+  chapterCount: (active, color) => ({
+    padding: '2px 7px',
+    borderRadius: '999px',
+    fontSize: '11px',
+    fontWeight: 700,
+    backgroundColor: active ? color : '#1e293b',
+    color: active ? '#090d16' : '#94a3b8',
+    flexShrink: 0,
+  }),
+  topicSubList: {
+    marginLeft: '12px',
+    marginTop: '4px',
+    marginBottom: '6px',
+    paddingLeft: '10px',
+    borderLeft: '2px solid #334155',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '3px',
+  },
+  topicJumpBtn: (active) => ({
+    textAlign: 'left',
+    padding: '6px 9px',
+    borderRadius: '7px',
+    border: 'none',
+    backgroundColor: active ? 'rgba(59, 130, 246, 0.18)' : 'transparent',
+    color: active ? '#93c5fd' : '#94a3b8',
+    fontSize: '12px',
+    fontWeight: active ? 700 : 500,
+    cursor: 'pointer',
+    lineHeight: 1.35,
+  }),
+  mainPane: {
+    overflowY: 'auto',
+    padding: '22px 28px 40px',
+    backgroundColor: '#0b1120',
+  },
+  chapterHero: (color) => ({
+    padding: '18px 22px',
+    borderRadius: '14px',
+    background: 'linear-gradient(135deg, #162033 0%, #0f172a 100%)',
+    border: '1px solid #26354d',
+    borderLeft: `5px solid ${color}`,
+    marginBottom: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  }),
+  chapterHeroTitle: {
+    margin: 0,
+    fontSize: '20px',
+    fontWeight: 800,
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  chapterHeroDesc: {
+    margin: 0,
+    fontSize: '14px',
+    color: '#cbd5e1',
+    lineHeight: 1.6,
+  },
+  stepPillsRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+    marginTop: '6px',
+  },
+  stepPill: (active, color) => ({
+    padding: '6px 12px',
+    borderRadius: '8px',
+    border: active ? `1.5px solid ${color}` : '1px solid #334155',
+    backgroundColor: active ? 'rgba(59, 130, 246, 0.18)' : '#0f172a',
+    color: active ? '#ffffff' : '#cbd5e1',
+    fontSize: '12.5px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  }),
+  sectionsStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '22px',
+  },
+  card: {
+    backgroundColor: '#111c30',
+    border: '1px solid #28364f',
+    borderRadius: '14px',
+    overflow: 'hidden',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
+  },
+  cardHeader: {
+    padding: '16px 20px 14px',
+    backgroundColor: '#162238',
+    borderBottom: '1px solid #26354d',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  badgeRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '10px',
+    flexWrap: 'wrap',
+  },
+  badgesLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+  },
+  stepBadge: (color) => ({
+    padding: '4px 10px',
+    borderRadius: '6px',
+    backgroundColor: color || '#38bdf8',
+    color: '#090d16',
+    fontSize: '12px',
+    fontWeight: 800,
+    letterSpacing: '0.02em',
+  }),
+  fileBadge: {
+    padding: '4px 10px',
+    borderRadius: '6px',
+    backgroundColor: '#0b1324',
+    border: '1px solid #334155',
+    color: '#7dd3fc',
+    fontSize: '12.5px',
+    fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+    fontWeight: 600,
+  },
+  cardTitle: (scale) => ({
+    margin: 0,
+    fontSize: `${Math.round(17 * scale)}px`,
+    fontWeight: 800,
+    color: '#ffffff',
+    lineHeight: 1.4,
+  }),
+  whenBox: (scale) => ({
+    margin: 0,
+    padding: '10px 14px',
+    backgroundColor: '#0f172a',
+    borderLeft: '3px solid #38bdf8',
+    borderRadius: '6px',
+    fontSize: `${Math.round(13.5 * scale)}px`,
+    color: '#e2e8f0',
+    lineHeight: 1.55,
+  }),
+  keyPointsBox: {
+    padding: '14px 20px',
+    backgroundColor: '#131f35',
+    borderBottom: '1px solid #24324a',
+  },
+  keyPointsTitle: {
+    fontSize: '12px',
+    fontWeight: 800,
+    color: '#fbbf24',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: '8px',
+  },
+  keyPointsList: (scale) => ({
+    margin: 0,
+    paddingLeft: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    fontSize: `${Math.round(14 * scale)}px`,
+    color: '#f1f5f9',
+    lineHeight: 1.6,
+  }),
+  codeHeader: {
+    padding: '8px 18px',
+    backgroundColor: '#090f1d',
+    borderBottom: '1px solid #1e293b',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    fontSize: '12px',
+    color: '#94a3b8',
+  },
+  copyBtn: (copied) => ({
+    padding: '6px 13px',
+    borderRadius: '7px',
+    border: copied ? '1px solid #22c55e' : '1px solid #475569',
+    backgroundColor: copied ? 'rgba(34, 197, 94, 0.2)' : '#1e293b',
+    color: copied ? '#86efac' : '#f8fafc',
+    fontSize: '12.5px',
+    fontWeight: 700,
+    cursor: 'pointer',
+  }),
+  codePre: (scale) => ({
+    margin: 0,
+    padding: '18px 20px',
+    backgroundColor: '#070b14',
+    color: '#e2e8f0',
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace",
+    fontSize: `${Math.round(13.5 * scale)}px`,
+    lineHeight: 1.68,
+    overflowX: 'auto',
+    tabSize: 2,
+  }),
+  footerNav: {
+    marginTop: '26px',
+    paddingTop: '18px',
+    borderTop: '1px solid #1e293b',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  navBtn: {
+    padding: '10px 16px',
+    borderRadius: '10px',
+    border: '1px solid #334155',
+    backgroundColor: '#1e293b',
+    color: '#f8fafc',
+    fontSize: '13.5px',
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+};
 
-  const query = search.trim().toLowerCase();
+export default function KnowledgeBook({ isOpen, onClose }) {
+  const [activeCategoryId, setActiveCategoryId] = useState(
+    KNOWLEDGE_BOOK_CATEGORIES[0]?.id || 'db-to-api-e2e'
+  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
+  const [fontScale, setFontScale] = useState(1); // 0.92 | 1 | 1.12
+  const mainPaneRef = useRef(null);
 
-  const filteredCategories = knowledgeCategories
-    .filter(cat => selectedCategory === 'all' || cat.id === selectedCategory)
-    .map(cat => {
-      if (!query) return cat;
-      const matchingSections = cat.sections.filter(sec => {
-        const text = [
-          cat.title,
-          cat.badge,
-          sec.title,
-          sec.whenToUse,
-          ...(sec.keyPoints || []),
-          sec.code,
-        ]
-          .join(' ')
-          .toLowerCase();
-        return text.includes(query);
-      });
-      return { ...cat, sections: matchingSections };
-    })
-    .filter(cat => cat.sections.length > 0);
+  const isSearching = searchQuery.trim().length > 0;
 
-  return (
-    <main className="fs-overview fs-knowledge-book" style={{ maxWidth: '1080px', margin: '0 auto', padding: '28px 24px 64px' }}>
-      {/* Header Banner */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, rgba(8, 127, 108, 0.14) 0%, rgba(2, 132, 199, 0.1) 100%)',
-          border: '1px solid var(--fs-border, #cbd5e1)',
-          borderRadius: '16px',
-          padding: '24px',
-          marginBottom: '24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: '16px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <div style={{ maxWidth: '720px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '700', color: '#087f6c', marginBottom: '8px' }}>
-            <BookOpen size={15} /> FULL-STACK CODE HANDBOOK &amp; CHEAT SHEET
+  const filteredCategories = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return KNOWLEDGE_BOOK_CATEGORIES;
+
+    return KNOWLEDGE_BOOK_CATEGORIES.map((cat) => {
+      const matchedSections = cat.sections.filter(
+        (sec) =>
+          sec.title.toLowerCase().includes(q) ||
+          (sec.file && sec.file.toLowerCase().includes(q)) ||
+          (sec.step && sec.step.toLowerCase().includes(q)) ||
+          sec.whenToUse.toLowerCase().includes(q) ||
+          sec.keyPoints.some((kp) => kp.toLowerCase().includes(q)) ||
+          sec.code.toLowerCase().includes(q)
+      );
+      return {
+        ...cat,
+        sections: matchedSections,
+      };
+    }).filter((cat) => cat.sections.length > 0);
+  }, [searchQuery]);
+
+  if (!isOpen) return null;
+
+  const currentCategory =
+    KNOWLEDGE_BOOK_CATEGORIES.find((c) => c.id === activeCategoryId) ||
+    KNOWLEDGE_BOOK_CATEGORIES[0];
+
+  const currentCatIndex = KNOWLEDGE_BOOK_CATEGORIES.findIndex(
+    (c) => c.id === currentCategory?.id
+  );
+  const prevCategory =
+    currentCatIndex > 0 ? KNOWLEDGE_BOOK_CATEGORIES[currentCatIndex - 1] : null;
+  const nextCategory =
+    currentCatIndex >= 0 && currentCatIndex < KNOWLEDGE_BOOK_CATEGORIES.length - 1
+      ? KNOWLEDGE_BOOK_CATEGORIES[currentCatIndex + 1]
+      : null;
+
+  const handleCopy = async (id, code) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(id);
+      setTimeout(() => {
+        setCopiedId((prev) => (prev === id ? null : prev));
+      }, 1800);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1800);
+    }
+  };
+
+  const selectChapter = (catId) => {
+    setSearchQuery('');
+    setActiveCategoryId(catId);
+    if (mainPaneRef.current) {
+      mainPaneRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToSection = (sectionId) => {
+    const el = document.getElementById(`kb-sec-${sectionId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const renderSectionCard = (sec, catColor) => {
+    const isCopied = copiedId === sec.id;
+    return (
+      <article id={`kb-sec-${sec.id}`} key={sec.id} style={styles.card}>
+        <div style={styles.cardHeader}>
+          <div style={styles.badgeRow}>
+            <div style={styles.badgesLeft}>
+              {sec.step && (
+                <span style={styles.stepBadge(catColor)}>{sec.step}</span>
+              )}
+              {sec.file && (
+                <span style={styles.fileBadge}>📄 {sec.file}</span>
+              )}
+            </div>
+            <button
+              type="button"
+              style={styles.copyBtn(isCopied)}
+              onClick={() => handleCopy(sec.id, sec.code)}
+            >
+              {isCopied ? '✓ คัดลอกโค้ดแล้ว' : '📋 คัดลอกโค้ด'}
+            </button>
           </div>
-          <h1 style={{ margin: '0 0 8px 0', fontSize: '26px', letterSpacing: '-0.5px' }}>
-            📚 คลังสมุดโค้ด: Node.js + Express + Database + React + Auth/Role
-          </h1>
-          <p style={{ margin: 0, opacity: 0.85, lineHeight: 1.6 }}>
-            รวบรวมโครงสร้างโค้ด คำสั่งสำคัญ HTTP Status Codes และแพตเทิร์นที่ออกสอบปลายภาคครบทุกบท
-            สามารถค้นหาคำสำคัญและกด <strong>คัดลอก</strong> โค้ดไปปรับใช้ในโปรเจกต์ได้ทันที
+
+          <h3 style={styles.cardTitle(fontScale)}>{sec.title}</h3>
+          <p style={styles.whenBox(fontScale)}>
+            <strong style={{ color: '#38bdf8' }}>💡 ใช้เมื่อไหร่: </strong>
+            {sec.whenToUse}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          {onOpenActivity && (
-            <button
-              type="button"
-              className="fs-primary"
-              onClick={() => onOpenActivity('exam-final-practice')}
-            >
-              <Sparkles size={15} /> ฝึกทำข้อสอบปลายภาค (สอบ F) <ArrowRight size={15} />
-            </button>
-          )}
-          {onClose && (
-            <button
-              type="button"
-              className="fs-secondary"
-              onClick={onClose}
-              aria-label="ปิดสมุดโค้ด"
-            >
-              <X size={15} /> ปิดหน้าต่าง
-            </button>
-          )}
+        {sec.keyPoints && sec.keyPoints.length > 0 && (
+          <div style={styles.keyPointsBox}>
+            <div style={styles.keyPointsTitle}>📌 จุดสำคัญที่ต้องจำเวลาสอบ</div>
+            <ul style={styles.keyPointsList(fontScale)}>
+              {sec.keyPoints.map((pt, idx) => (
+                <li key={idx}>{pt}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div style={styles.codeHeader}>
+          <span>💻 ตัวอย่างโค้ดพร้อมใช้งาน (วางต่อยอดได้ทันที)</span>
+          <span style={{ fontFamily: 'monospace', color: '#7dd3fc' }}>
+            {sec.file || 'JavaScript / JSX'}
+          </span>
         </div>
-      </section>
+        <pre style={styles.codePre(fontScale)}>
+          <code>{sec.code}</code>
+        </pre>
+      </article>
+    );
+  };
 
-      {/* Search & Category Tabs */}
-      <section style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '14px' }}>
-          <label className="fs-search" style={{ flex: '1 1 320px' }}>
-            <Search size={16} />
-            <input
-              aria-label="ค้นหาในคลังสมุดโค้ด"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="ค้นหา เช่น verifyToken, bcrypt, 409, reduce, Router, Prisma, role..."
-            />
-          </label>
-          {search && (
-            <button type="button" className="fs-secondary fs-compact" onClick={() => setSearch('')}>
-              ล้างคำค้นหา
+  return (
+    <div style={styles.overlay} onClick={onClose}>
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* Top Header */}
+        <div style={styles.topBar}>
+          <div style={styles.titleGroup}>
+            <div style={styles.bookBadge}>📘</div>
+            <div>
+              <h2 style={styles.title}>
+                คลังสมุดโค้ด Full Stack (ตั้งแต่ต่อ DB จริง → API → Auth → React Hooks)
+              </h2>
+              <p style={styles.subtitle}>
+                เลือกบททางซ้ายเพื่ออ่านทีละบทแบบสบายตา • มีลำดับไฟล์ Step 1 → 4 พร้อมปุ่มคัดลอกโค้ด
+              </p>
+            </div>
+          </div>
+
+          <div style={styles.controlsGroup}>
+            <div style={styles.searchBox}>
+              <span style={styles.searchIcon}>🔍</span>
+              <input
+                type="text"
+                placeholder="ค้นหา เช่น mysql2, JOIN, transaction, JWT, useEffect..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={styles.searchInput}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '8px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                  }}
+                  title="ล้างคำค้นหา"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Font size selector for comfortable reading */}
+            <div style={styles.fontBtnGroup} title="ปรับขนาดตัวอักษร">
+              <button
+                type="button"
+                style={styles.fontBtn(fontScale === 0.92)}
+                onClick={() => setFontScale(0.92)}
+              >
+                A-
+              </button>
+              <button
+                type="button"
+                style={styles.fontBtn(fontScale === 1)}
+                onClick={() => setFontScale(1)}
+              >
+                A
+              </button>
+              <button
+                type="button"
+                style={styles.fontBtn(fontScale === 1.12)}
+                onClick={() => setFontScale(1.12)}
+              >
+                A+
+              </button>
+            </div>
+
+            <button type="button" style={styles.closeBtn} onClick={onClose}>
+              ✕ ปิดสมุด
             </button>
-          )}
+          </div>
         </div>
 
-        <div className="fs-filters" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            className={selectedCategory === 'all' ? 'active' : ''}
-            onClick={() => setSelectedCategory('all')}
-          >
-            ทั้งหมด ({knowledgeCategories.length} หมวด)
-          </button>
-          {knowledgeCategories.map(cat => (
-            <button
-              key={cat.id}
-              type="button"
-              className={selectedCategory === cat.id ? 'active' : ''}
-              onClick={() => setSelectedCategory(cat.id)}
-            >
-              {cat.badge}
-            </button>
-          ))}
-        </div>
-      </section>
+        {/* Two-Column Notebook Layout */}
+        <div style={styles.workspace}>
+          {/* Left Table of Contents Sidebar */}
+          <aside style={styles.sidebar}>
+            <div style={styles.sidebarLabel}>สารบัญบทเรียน ({KNOWLEDGE_BOOK_CATEGORIES.length} บท)</div>
 
-      {/* Category & Code Sections */}
-      {filteredCategories.length === 0 ? (
-        <p className="fs-empty">ไม่พบหัวข้อที่ตรงกับ &ldquo;{search}&rdquo; ลองค้นด้วยคำอื่น เช่น jwt, 403, map, axios หรือ prisma</p>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-          {filteredCategories.map(cat => (
-            <section
-              key={cat.id}
-              style={{
-                border: '1px solid var(--fs-border, #cbd5e1)',
-                borderRadius: '14px',
-                padding: '22px',
-                background: 'var(--fs-surface, rgba(255,255,255,0.03))',
-              }}
-            >
-              <div style={{ marginBottom: '16px', borderBottom: '1px solid var(--fs-border, #cbd5e1)', paddingBottom: '12px' }}>
-                <span className="fs-kind lesson" style={{ marginBottom: '6px', display: 'inline-block' }}>
-                  {cat.badge}
-                </span>
-                <h2 style={{ margin: '4px 0 6px 0', fontSize: '20px' }}>{cat.title}</h2>
-                <p style={{ margin: 0, opacity: 0.8, fontSize: '14px' }}>{cat.summary}</p>
-              </div>
+            {KNOWLEDGE_BOOK_CATEGORIES.map((cat) => {
+              const isSelected = !isSearching && activeCategoryId === cat.id;
+              return (
+                <div key={cat.id}>
+                  <button
+                    type="button"
+                    style={styles.chapterBtn(isSelected, cat.color)}
+                    onClick={() => selectChapter(cat.id)}
+                  >
+                    <div style={styles.chapterBtnTop}>
+                      <span>
+                        {cat.icon} {cat.title}
+                      </span>
+                      <span style={styles.chapterCount(isSelected, cat.color)}>
+                        {cat.sections.length}
+                      </span>
+                    </div>
+                  </button>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {cat.sections.map(sec => (
-                  <article
-                    key={sec.title}
+                  {/* Sub-topics inside the active chapter */}
+                  {isSelected && (
+                    <div style={styles.topicSubList}>
+                      {cat.sections.map((sec) => (
+                        <button
+                          key={sec.id}
+                          type="button"
+                          style={styles.topicJumpBtn(false)}
+                          onClick={() => scrollToSection(sec.id)}
+                        >
+                          {sec.step ? `[${sec.step}] ` : '• '}
+                          {sec.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </aside>
+
+          {/* Right Main Reading Pane */}
+          <main ref={mainPaneRef} style={styles.mainPane}>
+            {isSearching ? (
+              filteredCategories.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '60px 20px',
+                    color: '#94a3b8',
+                  }}
+                >
+                  <div style={{ fontSize: '42px', marginBottom: '12px' }}>🔎</div>
+                  <div style={{ fontSize: '17px', fontWeight: 700, color: '#f8fafc' }}>
+                    ไม่พบหัวข้อที่ตรงกับ &ldquo;{searchQuery}&rdquo;
+                  </div>
+                  <div style={{ fontSize: '13.5px', marginTop: '6px' }}>
+                    ลองค้นหาด้วยคำว่า pool, query, prisma, transaction, jwt, useEffect, axios
+                  </div>
+                </div>
+              ) : (
+                <div style={styles.sectionsStack}>
+                  <div
                     style={{
-                      border: '1px solid var(--fs-border, #cbd5e1)',
+                      padding: '12px 18px',
                       borderRadius: '10px',
-                      padding: '16px',
-                      background: 'var(--fs-bg, rgba(0,0,0,0.02))',
+                      backgroundColor: '#162238',
+                      border: '1px solid #334155',
+                      fontSize: '14px',
+                      color: '#cbd5e1',
                     }}
                   >
-                    <h3 style={{ margin: '0 0 6px 0', fontSize: '16px' }}>{sec.title}</h3>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '13px', opacity: 0.85 }}>
-                      <strong>ใช้เมื่อไหร่:</strong> {sec.whenToUse}
-                    </p>
-                    {sec.keyPoints?.length > 0 && (
-                      <ul style={{ margin: '0 0 12px 0', paddingLeft: '18px', fontSize: '13px', lineHeight: 1.6 }}>
-                        {sec.keyPoints.map((pt, idx) => (
-                          <li key={idx} style={{ marginBottom: '4px' }}>
-                            <CheckCircle2 size={13} style={{ verticalAlign: 'middle', marginRight: '6px', color: '#087f6c' }} />
-                            <span>{pt}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <CopyCode label={sec.title} text={sec.code} />
-                  </article>
-                ))}
-              </div>
-            </section>
-          ))}
+                    🔍 ผลการค้นหาสำหรับ <strong style={{ color: '#38bdf8' }}>&ldquo;{searchQuery}&rdquo;</strong>
+                  </div>
+                  {filteredCategories.map((cat) => (
+                    <div key={cat.id} style={styles.sectionsStack}>
+                      <h3
+                        style={{
+                          margin: '8px 0 0',
+                          fontSize: '16px',
+                          color: cat.color,
+                        }}
+                      >
+                        {cat.icon} {cat.title}
+                      </h3>
+                      {cat.sections.map((sec) => renderSectionCard(sec, cat.color))}
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              <>
+                {/* Chapter Hero Banner */}
+                <div style={styles.chapterHero(currentCategory.color)}>
+                  <h3 style={styles.chapterHeroTitle}>
+                    <span>{currentCategory.icon}</span>
+                    <span>{currentCategory.title}</span>
+                  </h3>
+                  <p style={styles.chapterHeroDesc}>{currentCategory.description}</p>
+
+                  {/* Quick Jump Pills */}
+                  <div style={styles.stepPillsRow}>
+                    {currentCategory.sections.map((sec) => (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        style={styles.stepPill(false, currentCategory.color)}
+                        onClick={() => scrollToSection(sec.id)}
+                      >
+                        {sec.step ? `${sec.step}: ` : ''}
+                        {sec.file ? sec.file.split(' ')[0] : sec.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Chapter Sections */}
+                <div style={styles.sectionsStack}>
+                  {currentCategory.sections.map((sec) =>
+                    renderSectionCard(sec, currentCategory.color)
+                  )}
+                </div>
+
+                {/* Prev / Next Chapter Footer Navigation */}
+                <div style={styles.footerNav}>
+                  {prevCategory ? (
+                    <button
+                      type="button"
+                      style={styles.navBtn}
+                      onClick={() => selectChapter(prevCategory.id)}
+                    >
+                      ← บทก่อนหน้า: {prevCategory.icon} {prevCategory.title}
+                    </button>
+                  ) : (
+                    <div />
+                  )}
+
+                  {nextCategory && (
+                    <button
+                      type="button"
+                      style={{
+                        ...styles.navBtn,
+                        backgroundColor: '#2563eb',
+                        borderColor: '#3b82f6',
+                      }}
+                      onClick={() => selectChapter(nextCategory.id)}
+                    >
+                      บทถัดไป: {nextCategory.icon} {nextCategory.title} →
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </main>
         </div>
-      )}
-    </main>
+      </div>
+    </div>
   );
 }

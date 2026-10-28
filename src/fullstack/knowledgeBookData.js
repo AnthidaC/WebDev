@@ -1,436 +1,583 @@
 /**
- * คลังสมุดโค้ดและสรุปความรู้ Full Stack (Node.js + Express + Database/Prisma + React + Router + Auth/Role)
- * จัดหมวดหมู่ตามเนื้อหาเรียนและรูปแบบข้อสอบปลายภาค พร้อมโค้ดตัวอย่างที่คัดลอกไปปรับใช้ได้ทันที
+ * คลังสมุดโค้ดและสรุปความรู้ Full Stack (Node.js + Express + Real DB MySQL/Prisma + React + Hooks + Router + Auth/Role)
+ * เรียงลำดับตั้งแต่การดึงฐานข้อมูลจริง (MySQL2 & Prisma) ไปจนถึงเขียน Controller, Route, Middleware และเชื่อมต่อ React จนเสร็จสมบูรณ์
  */
 
 export const knowledgeCategories = [
   {
-    id: 'node-es6',
-    badge: 'บทที่ 1 · Node & ES6+',
-    title: 'Node.js, โมดูล, Array Methods & ไฟล์ JSON',
-    summary: 'พื้นฐานการแยกไฟล์ CommonJS vs ES Module, การคำนวณด้วย map/filter/reduce และการอ่านเขียนไฟล์ด้วย fs/promises',
+    id: 'db-to-api-e2e',
+    badge: '🔥 ลำดับทำข้อสอบ: ดึง DB จริง → API เสร็จ',
+    title: 'Step-by-Step: ตั้งแต่เชื่อมต่อ DB จริง (MySQL2 / Prisma) จนได้ API ครบทั้งระบบ',
+    summary: 'ไล่เรียงทีละไฟล์ตั้งแต่ตั้งค่า .env → สร้างตัวเชื่อม DB → เขียน Controller ดึง/เพิ่ม/แก้/ลบข้อมูลจริง → ผูก Route → เปิด Server',
     sections: [
       {
-        title: '1.1 การแยกไฟล์โมดูล: CommonJS (Backend .js) vs ES Modules (Frontend .jsx)',
-        whenToUse: 'ใช้เมื่อต้องการแยกฟังก์ชันคำนวณ ฐานข้อมูล หรือ Route ออกจากไฟล์หลัก',
+        step: 'Step 1',
+        file: '.env และ backend/db/db.js',
+        title: '1. สร้างไฟล์เชื่อมต่อฐานข้อมูลจริง (เลือกใช้ MySQL2 Pool หรือ Prisma Client)',
+        whenToUse: 'ก้าวแรกสุดของฝั่ง Backend เพื่อให้ทุก Controller เรียกใช้ฐานข้อมูลตัวเดียวกัน',
         keyPoints: [
-          'ฝั่ง Backend (Node/Express) ในคอร์สนี้ใช้ CommonJS: ส่งออกด้วย module.exports หรือ exports.fn และนำเข้าด้วย require("./path.js")',
-          'ฝั่ง Frontend (React/Vite) ใช้ ES Modules: ส่งออกด้วย export default หรือ export const และนำเข้าด้วย import ... from "./path"',
+          'หากโจทย์ให้ไฟล์ .sql มารันกับ MySQL/XAMPP ให้ใช้ mysql2/promise (ได้ผลลัพธ์เป็น Array คู่ [rows] เสมอ)',
+          'หากโจทย์ให้ไฟล์ prisma/schema.prisma มา ให้ใช้ PrismaClient()',
+          'ต้องเรียก require("dotenv").config() ก่อนอ่านค่า process.env เสมอ',
         ],
-        code: `// ==========================================
-// 1. ฝั่ง Backend (CommonJS - ไฟล์ .js)
-// ==========================================
-// ไฟล์ backend/lib/prices.js
-exports.total = (items = []) => {
-  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-};
+        code: `// =========================================================
+// ไฟล์ .env (วางไว้ที่ Root ของโปรเจกต์)
+// =========================================================
+PORT=3000
+JWT_KEY=my-super-secret-exam-key
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=skillhub_exam
+DATABASE_URL="mysql://root:@localhost:3306/skillhub_exam"
 
-// หรือส่งออกหลายฟังก์ชันพร้อมกัน
-module.exports = {
-  total: (items = []) => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
-};
-
-// ไฟล์ backend/app.js (การนำเข้ามาใช้)
-const { total } = require('./lib/prices.js');
-
-// ==========================================
-// 2. ฝั่ง Frontend (ES Modules - ไฟล์ .js / .jsx)
-// ==========================================
-// ไฟล์ frontend/services/api.js
-export const API_URL = '/api';
-export default function formatPrice(n) {
-  return Number(n).toLocaleString() + ' บาท';
-}
-
-// ไฟล์ frontend/App.jsx (การนำเข้ามาใช้)
-import formatPrice, { API_URL } from './services/api';`,
-      },
-      {
-        title: '1.2 ES6 Array Methods ที่ใช้บ่อยที่สุดในการสอบ (map, filter, reduce, find, some)',
-        whenToUse: 'ใช้ค้นหา คัดกรอง แปลงข้อมูล หรือคำนวณผลรวมทั้งใน API และหน้า React',
-        keyPoints: [
-          'map() คืน Array ใหม่ที่มีจำนวนเท่าเดิม (นิยมใช้แปลงข้อมูลหรือวาด JSX)',
-          'filter() คืน Array ใหม่เฉพาะตัวที่เงื่อนไขเป็น true (ใช้ค้นหาหรือลบรายการ)',
-          'reduce((sum, item) => ..., 0) รวมค่าทั้ง Array เป็นค่าเดียว (อย่าลืมใส่ค่าเริ่มต้น 0 เสมอ)',
-          'find() คืน Object ตัวแรกที่เจอ (ถ้าไม่เจอได้ undefined) ส่วน some() คืน true/false (ใช้เช็กข้อมูลซ้ำ)',
-        ],
-        code: `const courses = [
-  { id: 1, code: 'CS301', title: 'Full Stack React', price: 1500, seats: 3, enrolled: 1 },
-  { id: 2, code: 'AI202', title: 'Machine Learning', price: 2200, seats: 2, enrolled: 2 },
-];
-
-// 1. map: เติมฟิลด์คำนวณที่นั่งว่าง (availableSeats) โดยไม่แก้ของเดิม
-const enriched = courses.map(c => ({
-  ...c,
-  availableSeats: Math.max(0, c.seats - c.enrolled),
-}));
-
-// 2. filter: ค้นหาตาม keyword (ไม่สนตัวพิมพ์เล็ก-ใหญ่)
-const keyword = 'react'.toLowerCase();
-const matched = courses.filter(c =>
-  c.title.toLowerCase().includes(keyword) || c.code.toLowerCase().includes(keyword)
-);
-
-// 3. find: ค้นหารายการตาม ID (อย่าลืมแปลง req.params.id เป็น Number)
-const target = courses.find(c => c.id === Number(req.params.id));
-
-// 4. some: เช็กว่ามีรหัสวิชาซ้ำหรือไม่
-const isDuplicate = courses.some(c => c.code.toUpperCase() === newCode.trim().toUpperCase());
-
-// 5. reduce: คำนวณราคารวมทั้งหมด
-const totalPrice = courses.reduce((sum, c) => sum + c.price, 0);`,
-      },
-      {
-        title: '1.3 Async / Await, Promise Delay และการอ่าน-เขียนไฟล์ JSON (fs/promises)',
-        whenToUse: 'ใช้เมื่อต้องหน่วงเวลาจำลอง หรืออ่าน/เขียนไฟล์ข้อมูล .json บนเซิร์ฟเวอร์',
-        keyPoints: [
-          'ใช้ path.join(__dirname, "../data/menu.json") เสมอ เพื่อให้หาไฟล์เจอไม่ว่าจะสั่งรันจากโฟลเดอร์ไหน',
-          'fs.readFile(filePath, "utf8") คืนค่าเป็นข้อความ String ต้องแปลงด้วย JSON.parse() ก่อนใช้งาน',
-        ],
-        code: `const fs = require('node:fs/promises');
-const path = require('node:path');
-
-// 1. การสร้างฟังก์ชันหน่วงเวลาด้วย Promise
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function waitAndDouble(value) {
-  await delay(40);
-  return value * 2;
-}
-
-// 2. การอ่านไฟล์ JSON อย่างปลอดภัย
-const dataFile = path.join(__dirname, '../data/menu.json');
-
-async function readMenu() {
-  const text = await fs.readFile(dataFile, 'utf8');
-  return JSON.parse(text);
-}
-
-// 3. การเขียนทับไฟล์ JSON
-async function saveMenu(items) {
-  const jsonText = JSON.stringify(items, null, 2);
-  await fs.writeFile(dataFile, jsonText, 'utf8');
-}`,
-      },
-    ],
-  },
-  {
-    id: 'express-api',
-    badge: 'บทที่ 2 · Express & REST API',
-    title: 'Express.js, Routing, Params/Query & HTTP Status',
-    summary: 'การตั้งค่าเซิร์ฟเวอร์ Express, การรับค่าจาก URL/Body, การแยก Router/Controller และการส่ง Status Code ให้ตรงเกณฑ์ตรวจ',
-    sections: [
-      {
-        title: '2.1 โครงสร้าง Express App มาตรฐาน (app.js & server.js)',
-        whenToUse: 'ไฟล์เริ่มต้นของระบบ Backend ทุกโปรเจกต์',
-        keyPoints: [
-          'ต้องใส่ app.use(cors()) และ app.use(express.json()) ก่อนประกาศ Route เสมอ มิฉะนั้น req.body จะเป็น undefined',
-          'แยก app.js (ส่งออก module.exports = app) ออกจาก server.js (ที่สั่ง app.listen) เพื่อให้ชุดตรวจอัตโนมัติ import app ไปทดสอบได้',
-        ],
-        code: `// ไฟล์ backend/app.js
-const express = require('express');
-const cors = require('cors');
-const authRoutes = require('./routes/auth.js');
-const courseRoutes = require('./routes/courses.js');
-
-const app = express();
-
-// 1. Global Middleware
-app.use(cors());
-app.use(express.json());
-
-// 2. Health Check & Custom Header Middleware
-app.use((req, res, next) => {
-  res.set('X-Practice', 'ready');
-  next();
-});
-app.get('/api/health', (req, res) => res.json({ ok: true }));
-
-// 3. Mount Routers
-app.use('/api/auth', authRoutes);
-app.use('/api', courseRoutes);
-
-module.exports = app;
-
-// ------------------------------------------
-// ไฟล์ backend/server.js
-const app = require('./app.js');
-const port = process.env.PORT || 3000;
-app.listen(port, '0.0.0.0', () => console.log('API ready on port ' + port));`,
-      },
-      {
-        title: '2.2 การรับค่า req.params, req.query, req.body และ req.get()',
-        whenToUse: 'ใช้ดึงข้อมูลที่ผู้ใช้ส่งมาจาก URL, Query String, JSON Body หรือ HTTP Header',
-        keyPoints: [
-          'ค่าจาก req.params และ req.query เป็น String เสมอ! หากต้องเทียบกับ id หรือคำนวณตัวเลข ต้องแปลงด้วย Number() ก่อน',
-          'ตรวจความถูกต้องของตัวเลขด้วย Number.isFinite(n) หรือ Number.isInteger(n)',
-        ],
-        code: `// ตัวอย่าง URL: GET /api/courses/12?keyword=react&categoryId=2
-router.get('/courses/:id', (req, res) => {
-  // 1. Path Parameter (:id) -> แปลงเป็นตัวเลข
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Invalid ID' });
-  }
-
-  // 2. Query Parameter (?keyword=...&categoryId=...)
-  const keyword = String(req.query.keyword || '').trim().toLowerCase();
-  const categoryId = req.query.categoryId ? Number(req.query.categoryId) : null;
-
-  // 3. Request Header (เช่น Authorization หรือ X-Booking-Code)
-  const authHeader = req.get('Authorization') || '';
-
-  res.json({ id, keyword, categoryId, hasAuth: authHeader.startsWith('Bearer ') });
-});`,
-      },
-      {
-        title: '2.3 คัมภีร์ HTTP Status Codes ที่ใช้ตรวจข้อสอบ',
-        whenToUse: 'ใช้เลือก res.status(...) ให้ตรงกับสถานการณ์ที่โจทย์กำหนด',
-        keyPoints: [
-          '200 OK = ดึงข้อมูลสำเร็จ (GET) หรือแก้ไข/ลบสำเร็จ (PUT / PATCH / DELETE)',
-          '201 Created = สร้างข้อมูลใหม่สำเร็จ (POST เช่น สมัครสมาชิก, เพิ่มสินค้า, สร้างใบจอง)',
-          '400 Bad Request = ข้อมูลที่ส่งมาไม่ครบ ผิดรูปแบบ ราคาติดลบ หรือรหัสผ่านสั้นเกินไป',
-          '401 Unauthorized = ยังไม่ได้ล็อกอิน ไม่ส่ง Token ส่ง Token ผิด หรือรหัสผ่านตอน Login ไม่ถูกต้อง',
-          '403 Forbidden = ล็อกอินแล้ว แต่ไม่มีสิทธิ์ (เช่น Student จะเข้า Route ของ Admin หรือจะลบข้อมูลของคนอื่น)',
-          '404 Not Found = ไม่พบข้อมูลตาม ID ที่ระบุ',
-          '409 Conflict = ข้อมูลซ้ำ (อีเมลซ้ำ/รหัสวิชาซ้ำ/รีวิวซ้ำ) หรือขัดแย้งกับสถานะปัจจุบัน (ที่นั่งเต็ม/สต็อกไม่พอ/ยกเลิกซ้ำ)',
-        ],
-        code: `// รูปแบบการวางลำดับ Guard Clauses ใน Controller/Route (แนะนำให้ตรวจจากบนลงล่าง)
-router.post('/enrollments', verifyToken, (req, res) => {
-  const courseId = Number(req.body?.courseId);
-
-  // 1. ตรวจรูปแบบข้อมูล (400 Bad Request)
-  if (!Number.isInteger(courseId) || courseId <= 0) {
-    return res.status(400).json({ message: 'Invalid courseId' });
-  }
-
-  // 2. ตรวจว่ามีข้อมูลอยู่จริงไหม (404 Not Found)
-  const course = store.courses.find(c => c.id === courseId);
-  if (!course) {
-    return res.status(404).json({ message: 'Course not found' });
-  }
-
-  // 3. ตรวจความขัดแย้งทางธุรกิจ / ซ้ำ / สต็อกเต็ม (409 Conflict)
-  const alreadyEnrolled = store.enrollments.some(
-    e => e.userId === req.user.userId && e.courseId === courseId && e.status === 'active'
-  );
-  if (alreadyEnrolled) {
-    return res.status(409).json({ message: 'Already enrolled' });
-  }
-  if (course.enrolled >= course.seats) {
-    return res.status(409).json({ message: 'Course is full' });
-  }
-
-  // 4. เมื่อผ่านทุกด่าน จึงเปลี่ยนข้อมูลและตอบ 201 Created
-  course.enrolled += 1;
-  const created = { id: store.nextEnrollmentId++, userId: req.user.userId, courseId, status: 'active' };
-  store.enrollments.push(created);
-  return res.status(201).json(created);
-});`,
-      },
-      {
-        title: '2.4 การเขียน REST CRUD ครบ 5 ฟังก์ชัน (List, Get, Create, Update, Remove)',
-        whenToUse: 'โครงสร้างมาตรฐานสำหรับจัดการข้อมูล (เช่น ลูกค้า สินค้า เมนูอาหาร หรือคอร์สเรียน)',
-        keyPoints: [
-          'แยกการตรวจความถูกต้องของข้อมูล (Validation) เป็นฟังก์ชันช่วยเพื่อใช้ซ้ำได้ทั้งตอน POST และ PUT',
-          'ตอน DELETE หากใช้ Array ให้ใช้ findIndex + splice หรือ filter',
-        ],
-        code: `let items = [{ id: 1, name: 'Keyboard', price: 990 }];
-let nextId = 2;
-
-// GET /api/items?keyword=
-exports.list = (req, res) => {
-  const kw = String(req.query.keyword || '').toLowerCase();
-  res.json(items.filter(i => i.name.toLowerCase().includes(kw)));
-};
-
-// GET /api/items/:id
-exports.get = (req, res) => {
-  const item = items.find(i => i.id === Number(req.params.id));
-  if (!item) return res.status(404).json({ message: 'Not found' });
-  res.json(item);
-};
-
-// POST /api/items
-exports.create = (req, res) => {
-  const { name, price } = req.body || {};
-  if (!name?.trim() || typeof price !== 'number' || price < 0) {
-    return res.status(400).json({ message: 'Invalid input' });
-  }
-  const created = { id: nextId++, name: name.trim(), price };
-  items.push(created);
-  res.status(201).json(created);
-};
-
-// PUT /api/items/:id
-exports.update = (req, res) => {
-  const item = items.find(i => i.id === Number(req.params.id));
-  if (!item) return res.status(404).json({ message: 'Not found' });
-  const { name, price } = req.body || {};
-  if (!name?.trim() || typeof price !== 'number' || price < 0) {
-    return res.status(400).json({ message: 'Invalid input' });
-  }
-  item.name = name.trim();
-  item.price = price;
-  res.status(200).json(item);
-};
-
-// DELETE /api/items/:id
-exports.remove = (req, res) => {
-  const index = items.findIndex(i => i.id === Number(req.params.id));
-  if (index === -1) return res.status(404).json({ message: 'Not found' });
-  items.splice(index, 1);
-  res.status(200).json({ message: 'Deleted' });
-};`,
-      },
-    ],
-  },
-  {
-    id: 'database-orm',
-    badge: 'บทที่ 3 · SQL & Prisma ORM',
-    title: 'ฐานข้อมูล SQL (MySQL2 / SQLite) & Prisma ORM',
-    summary: 'การเขียนคำสั่ง SQL แบบ Parameterized ป้องกัน SQL Injection และการจัดการฐานข้อมูลด้วย Prisma Client',
-    sections: [
-      {
-        title: '3.1 การใช้ Parameterized Query (?) ป้องกัน SQL Injection',
-        whenToUse: 'เมื่อเขียนคำสั่ง SQL ดิบทั้งใน mysql2/promise หรือ sql.js',
-        keyPoints: [
-          'ห้ามนำตัวแปรจากผู้ใช้มาต่อสตริงด้วย + หรือ `${keyword}` ในคำสั่ง SQL เด็ดขาด',
-          'ให้ใช้เครื่องหมาย ? ใน SQL แล้วส่งค่าเป็น Array แยกต่างหากเสมอ',
-        ],
-        code: `// ==========================================
-// แบบที่ 1: ใช้ mysql2/promise (เชื่อมต่อ MySQL จริง / XAMPP)
-// ==========================================
+// =========================================================
+// แบบที่ A: ไฟล์ backend/db/mysql.js (ใช้ mysql2/promise ดึง DB จริง)
+// =========================================================
+require('dotenv').config();
 const mysql = require('mysql2/promise');
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'skillhub_exam',
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
-async function searchCoursesMySql(keyword = '') {
-  const [rows] = await pool.execute(
-    'SELECT * FROM courses WHERE title LIKE ? OR code LIKE ? ORDER BY id ASC',
-    ['%' + keyword + '%', '%' + keyword + '%']
-  );
-  return rows;
-}
+module.exports = pool;
 
-// ==========================================
-// แบบที่ 2: ใช้ sql.js (SQLite ในหน่วยความจำของห้องฝึกเว็บ)
-// ==========================================
-async function searchCustomersSqlite(db, keyword = '') {
-  const statement = db.prepare('SELECT * FROM customers WHERE name LIKE ? ORDER BY id');
-  try {
-    statement.bind(['%' + keyword + '%']);
-    const rows = [];
-    while (statement.step()) {
-      rows.push(statement.getAsObject());
-    }
-    return rows;
-  } finally {
-    statement.free(); // ต้องคืนหน่วยความจำใน finally เสมอ
-  }
-}`,
-      },
-      {
-        title: '3.2 โครงสร้างไฟล์ .sql (CREATE TABLE + FOREIGN KEY + INSERT)',
-        whenToUse: 'ใช้ออกแบบตารางฐานข้อมูลหรือตรวจสอบไฟล์ .sql ก่อน Import เข้า phpMyAdmin',
-        keyPoints: [
-          'ตารางที่มี FOREIGN KEY (เช่น enrollments อ้างอิง courses) ต้องสร้างหลังตารางแม่ และตอน DROP TABLE ต้องลบตารางลูกก่อนเสมอ',
-        ],
-        code: `CREATE DATABASE IF NOT EXISTS skillhub_exam CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE skillhub_exam;
-
-CREATE TABLE categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL UNIQUE
-);
-
-CREATE TABLE courses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  code VARCHAR(20) NOT NULL UNIQUE,
-  title VARCHAR(200) NOT NULL,
-  categoryId INT NOT NULL,
-  price INT NOT NULL DEFAULT 0,
-  seats INT NOT NULL DEFAULT 1,
-  enrolled INT NOT NULL DEFAULT 0,
-  CONSTRAINT fk_courses_category FOREIGN KEY (categoryId) REFERENCES categories(id)
-);
-
-INSERT INTO categories (id, name) VALUES (1, 'Web Development'), (2, 'Data & AI');
-INSERT INTO courses (code, title, categoryId, price, seats, enrolled)
-VALUES ('CS301', 'Full Stack Node & React', 1, 1500, 3, 1);`,
-      },
-      {
-        title: '3.3 การใช้งาน Prisma ORM (schema.prisma & PrismaClient CRUD)',
-        whenToUse: 'เมื่อโจทย์ใช้ Prisma ORM แทนการเขียน SQL เอง',
-        keyPoints: [
-          'Error Code สำคัญของ Prisma: e.code === "P2002" คือข้อมูลซ้ำ (@unique) ควรตอบ 409, ส่วน e.code === "P2025" คือหา record ที่จะแก้/ลบไม่เจอ ควรตอบ 404',
-        ],
-        code: `const { PrismaClient } = require('@prisma/client');
+// =========================================================
+// แบบที่ B: ไฟล์ backend/db/prisma.js (ใช้ Prisma ORM ดึง DB จริง)
+// =========================================================
+require('dotenv').config();
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// 1. อ่านรายการทั้งหมด + ค้นหา + เรียงลำดับ + ดึงตารางที่สัมพันธ์กัน (include)
-exports.list = async (req, res, next) => {
+module.exports = prisma;`,
+      },
+      {
+        step: 'Step 2',
+        file: 'backend/controllers/courseController.js (แบบ MySQL2)',
+        title: '2. เขียน Controller ดึง DB จริงด้วย MySQL2 (SELECT + JOIN + ค้นหา + INSERT + UPDATE + DELETE)',
+        whenToUse: 'เมื่อใช้ mysql2/promise เขียน API ดึงข้อมูลพร้อมตารางหมวดหมู่ (JOIN) และทำ CRUD จนจบ',
+        keyPoints: [
+          'ใช้ const [rows] = await pool.execute(sql, params) เสมอ โดยใส่ ? แทนค่าที่รับมาจากผู้ใช้',
+          'ตอน INSERT: อ่าน ID ที่เพิ่งสร้างได้จาก result.insertId',
+          'ตอน UPDATE / DELETE: เช็กว่ามีแถวที่ถูกแก้หรือไม่จาก result.affectedRows === 0 (ถ้าเป็น 0 ตอบ 404 Not Found)',
+        ],
+        code: `// ไฟล์ backend/controllers/courseController.js (เขียนด้วย mysql2/promise)
+const pool = require('../db/mysql.js');
+
+// 1. GET /api/courses?keyword=&categoryId= (ดึงคอร์ส + JOIN หมวดหมู่ + คำนวณที่นั่งว่าง)
+exports.listCourses = async (req, res, next) => {
   try {
-    const keyword = String(req.query.keyword || '');
+    const keyword = String(req.query.keyword || '').trim();
+    const categoryId = req.query.categoryId ? Number(req.query.categoryId) : null;
+
+    let sql = \`
+      SELECT c.*, cat.name AS categoryName,
+             (c.seats - c.enrolled) AS availableSeats
+      FROM courses c
+      LEFT JOIN categories cat ON c.categoryId = cat.id
+      WHERE (c.title LIKE ? OR c.code LIKE ?)
+    \`;
+    const params = ['%' + keyword + '%', '%' + keyword + '%'];
+
+    if (categoryId) {
+      sql += ' AND c.categoryId = ?';
+      params.push(categoryId);
+    }
+    sql += ' ORDER BY c.id ASC';
+
+    const [rows] = await pool.execute(sql, params);
+    res.status(200).json(rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 2. GET /api/courses/:id (ดึงคอร์สเดียวตาม ID)
+exports.getCourseById = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const [rows] = await pool.execute(
+      \`SELECT c.*, cat.name AS categoryName, (c.seats - c.enrolled) AS availableSeats
+       FROM courses c
+       LEFT JOIN categories cat ON c.categoryId = cat.id
+       WHERE c.id = ?\`,
+      [id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+    }
+    res.status(200).json(rows[0]);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 3. POST /api/courses (สร้างคอร์สใหม่ลง DB จริง)
+exports.createCourse = async (req, res, next) => {
+  try {
+    const { code, title, categoryId, price, seats } = req.body || {};
+    if (!code?.trim() || !title?.trim() || Number(price) < 0 || Number(seats) < 1) {
+      return res.status(400).json({ message: 'ข้อมูลคอร์สไม่ถูกต้อง' });
+    }
+
+    // เช็กรหัสวิชาซ้ำใน DB
+    const [dup] = await pool.execute('SELECT id FROM courses WHERE code = ?', [code.trim().toUpperCase()]);
+    if (dup.length > 0) {
+      return res.status(409).json({ message: 'รหัสวิชานี้มีในระบบแล้ว' });
+    }
+
+    const [result] = await pool.execute(
+      'INSERT INTO courses (code, title, categoryId, price, seats, enrolled) VALUES (?, ?, ?, ?, ?, 0)',
+      [code.trim().toUpperCase(), title.trim(), Number(categoryId), Number(price), Number(seats)]
+    );
+
+    // ดึงแถวที่เพิ่งสร้างส่งกลับไปพร้อม status 201
+    const [created] = await pool.execute('SELECT * FROM courses WHERE id = ?', [result.insertId]);
+    res.status(201).json(created[0]);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 4. PUT /api/courses/:id (แก้ไขคอร์สใน DB จริง + ห้ามลดที่นั่งต่ำกว่าคนเรียน)
+exports.updateCourse = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const { code, title, categoryId, price, seats } = req.body || {};
+
+    const [existing] = await pool.execute('SELECT * FROM courses WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+    }
+    const current = existing[0];
+
+    if (Number(seats) < current.enrolled) {
+      return res.status(409).json({ message: 'ห้ามลดจำนวนที่นั่งต่ำกว่าจำนวนผู้ลงทะเบียนปัจจุบัน' });
+    }
+
+    await pool.execute(
+      'UPDATE courses SET code = ?, title = ?, categoryId = ?, price = ?, seats = ? WHERE id = ?',
+      [
+        code ? code.trim().toUpperCase() : current.code,
+        title ? title.trim() : current.title,
+        categoryId ? Number(categoryId) : current.categoryId,
+        price !== undefined ? Number(price) : current.price,
+        seats !== undefined ? Number(seats) : current.seats,
+        id,
+      ]
+    );
+
+    const [updated] = await pool.execute('SELECT * FROM courses WHERE id = ?', [id]);
+    res.status(200).json(updated[0]);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 5. DELETE /api/courses/:id (ลบคอร์สจาก DB จริง + ห้ามลบถ้ามีคนลงทะเบียนอยู่)
+exports.deleteCourse = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const [existing] = await pool.execute('SELECT * FROM courses WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+    }
+    if (existing[0].enrolled > 0) {
+      return res.status(409).json({ message: 'ลบไม่ได้เนื่องจากยังมีผู้ลงทะเบียนเรียนอยู่' });
+    }
+
+    await pool.execute('DELETE FROM courses WHERE id = ?', [id]);
+    res.status(200).json({ message: 'ลบคอร์สสำเร็จ' });
+  } catch (err) {
+    next(err);
+  }
+};`,
+      },
+      {
+        step: 'Step 2 (ทางเลือก Prisma)',
+        file: 'backend/controllers/courseController.js (แบบ Prisma ORM)',
+        title: '3. เขียน Controller ดึง DB จริงด้วย Prisma ORM (findMany, include, create, update, delete)',
+        whenToUse: 'เมื่อโปรเจกต์ใช้ Prisma ORM แทนการเขียน SQL ดิบ',
+        keyPoints: [
+          'ใช้ include: { category: true } เพื่อดึงข้อมูลตารางที่เชื่อม Foreign Key มาพร้อมกันเหมือน JOIN',
+          'ใช้ where: { OR: [{ title: { contains: keyword } }, { code: { contains: keyword } }] } สำหรับค้นหาหลายคอลัมน์',
+          'ดัก err.code === "P2002" (ข้อมูลซ้ำ -> 409) และ err.code === "P2025" (ไม่พบข้อมูล -> 404)',
+        ],
+        code: `// ไฟล์ backend/controllers/courseController.js (เขียนด้วย Prisma ORM)
+const prisma = require('../db/prisma.js');
+
+// 1. GET /api/courses?keyword=&categoryId=
+exports.listCourses = async (req, res, next) => {
+  try {
+    const keyword = String(req.query.keyword || '').trim();
+    const categoryId = req.query.categoryId ? Number(req.query.categoryId) : undefined;
+
     const rows = await prisma.course.findMany({
-      where: { title: { contains: keyword } },
+      where: {
+        ...(categoryId ? { categoryId } : {}),
+        ...(keyword
+          ? {
+              OR: [
+                { title: { contains: keyword } },
+                { code: { contains: keyword } },
+              ],
+            }
+          : {}),
+      },
       include: { category: true },
       orderBy: { id: 'asc' },
     });
-    res.json(rows);
+
+    const enriched = rows.map(c => ({
+      ...c,
+      categoryName: c.category?.name || '',
+      availableSeats: Math.max(0, c.seats - c.enrolled),
+    }));
+    res.json(enriched);
   } catch (err) {
     next(err);
   }
 };
 
-// 2. อ่านรายการเดียวตาม ID
-exports.get = async (req, res, next) => {
+// 2. POST /api/courses
+exports.createCourse = async (req, res, next) => {
   try {
-    const item = await prisma.course.findUnique({
-      where: { id: Number(req.params.id) },
-    });
-    if (!item) return res.status(404).json({ message: 'Not found' });
-    res.json(item);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// 3. สร้างรายการใหม่ (ดัก P2002 กรณีซ้ำ)
-exports.create = async (req, res, next) => {
-  try {
+    const { code, title, categoryId, price, seats } = req.body || {};
+    if (!code?.trim() || !title?.trim() || Number(price) < 0 || Number(seats) < 1) {
+      return res.status(400).json({ message: 'Invalid input' });
+    }
     const created = await prisma.course.create({
       data: {
-        code: req.body.code.trim(),
-        title: req.body.title.trim(),
-        categoryId: Number(req.body.categoryId),
-        price: Number(req.body.price),
-        seats: Number(req.body.seats),
+        code: code.trim().toUpperCase(),
+        title: title.trim(),
+        categoryId: Number(categoryId),
+        price: Number(price),
+        seats: Number(seats),
+        enrolled: 0,
       },
     });
     res.status(201).json(created);
   } catch (err) {
-    if (err.code === 'P2002') return res.status(409).json({ message: 'Duplicate code' });
-    next(err);
-  }
-};
-
-// 4. แก้ไขและลบ (ดัก P2025 กรณีไม่พบ ID)
-exports.remove = async (req, res, next) => {
-  try {
-    await prisma.course.delete({ where: { id: Number(req.params.id) } });
-    res.json({ message: 'Deleted' });
-  } catch (err) {
-    if (err.code === 'P2025') return res.status(404).json({ message: 'Not found' });
+    if (err.code === 'P2002') return res.status(409).json({ message: 'Duplicate course code' });
     next(err);
   }
 };`,
+      },
+      {
+        step: 'Step 3',
+        file: 'backend/controllers/enrollmentController.js',
+        title: '4. การทำ Transaction ลงทะเบียนตัดที่นั่ง & ยกเลิกคืนที่นั่งใน DB จริง',
+        whenToUse: 'เมื่อต้องแก้ไข 2 ตารางพร้อมกัน (เพิ่มใบลงทะเบียนใน enrollments + บวกยอด enrolled ใน courses)',
+        keyPoints: [
+          'ใน MySQL2 ใช้ const conn = await pool.getConnection(); await conn.beginTransaction(); ... await conn.commit();',
+          'ถ้าเกิดข้อผิดพลาดกลางทาง ให้สั่ง await conn.rollback() เพื่อไม่ให้ที่นั่งถูกตัดฟรี',
+        ],
+        code: `// ไฟล์ backend/controllers/enrollmentController.js (ใช้ MySQL2 Transaction)
+const pool = require('../db/mysql.js');
+
+// POST /api/enrollments - ลงทะเบียนเรียนและตัดที่นั่งใน DB จริง
+exports.enrollCourse = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const userId = req.user.userId;
+    const courseId = Number(req.body?.courseId);
+
+    // 1. ดึงข้อมูลคอร์สและล็อกแถวไว้ตรวจสอบที่นั่ง (FOR UPDATE)
+    const [courses] = await conn.execute('SELECT * FROM courses WHERE id = ? FOR UPDATE', [courseId]);
+    if (courses.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    const course = courses[0];
+
+    // 2. เช็กว่าลงทะเบียนคอร์สนี้แบบ active ไปแล้วหรือยัง
+    const [dup] = await conn.execute(
+      'SELECT id FROM enrollments WHERE userId = ? AND courseId = ? AND status = "active"',
+      [userId, courseId]
+    );
+    if (dup.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ message: 'Already enrolled in this course' });
+    }
+
+    // 3. เช็กที่นั่งว่าง
+    if (course.enrolled >= course.seats) {
+      await conn.rollback();
+      return res.status(409).json({ message: 'Course is full' });
+    }
+
+    // 4. บันทึกใบลงทะเบียน + บวกจำนวนคนเรียนในตาราง courses
+    const [ins] = await conn.execute(
+      'INSERT INTO enrollments (userId, courseId, status) VALUES (?, ?, "active")',
+      [userId, courseId]
+    );
+    await conn.execute('UPDATE courses SET enrolled = enrolled + 1 WHERE id = ?', [courseId]);
+
+    await conn.commit();
+    res.status(201).json({ id: ins.insertId, userId, courseId, status: 'active' });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
+};`,
+      },
+      {
+        step: 'Step 4',
+        file: 'backend/routes/courses.js และ backend/app.js',
+        title: '5. ผูก Controller เข้ากับ Express Router และเปิดใช้งานใน app.js จนเสร็จสมบูรณ์',
+        whenToUse: 'ขั้นตอนสุดท้ายในการประกอบร่าง API ให้พร้อมรับ Request จาก React หรือ Postman',
+        keyPoints: [
+          'Route ไหนที่ใครก็ดูได้ (Public) ไม่ต้องใส่ Middleware',
+          'Route ไหนต้องล็อกอิน पहले ให้ใส่ verifyToken คั่นตรงกลาง',
+          'Route ไหนเฉพาะ Admin ให้ใส่ verifyToken, requireAdmin เรียงกันตามลำดับ',
+        ],
+        code: `// =========================================================
+// 1. ไฟล์ backend/routes/courses.js
+// =========================================================
+const router = require('express').Router();
+const courseController = require('../controllers/courseController.js');
+const { verifyToken, requireAdmin } = require('../middleware/auth.js');
+
+// Public Routes (ทุกคนดูได้)
+router.get('/courses', courseController.listCourses);
+router.get('/courses/:id', courseController.getCourseById);
+
+// Admin Only Routes (ต้องล็อกอิน และมี role === 'admin')
+router.post('/courses', verifyToken, requireAdmin, courseController.createCourse);
+router.put('/courses/:id', verifyToken, requireAdmin, courseController.updateCourse);
+router.delete('/courses/:id', verifyToken, requireAdmin, courseController.deleteCourse);
+
+module.exports = router;
+
+// =========================================================
+// 2. ไฟล์ backend/app.js (ประกอบร่าง API ทั้งระบบ)
+// =========================================================
+const express = require('express');
+const cors = require('cors');
+const authRoutes = require('./routes/auth.js');
+const courseRoutes = require('./routes/courses.js');
+const enrollmentRoutes = require('./routes/enrollments.js');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// เชื่อม Route ทั้งหมดเข้ากับ Prefix /api
+app.use('/api/auth', authRoutes);
+app.use('/api', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+
+// Global Error Handler (ดัก Error จาก next(err) ทุกจุด)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: err.message || 'Internal Server Error' });
+});
+
+module.exports = app;`,
+      },
+    ],
+  },
+  {
+    id: 'auth-rbac',
+    badge: '🔐 Auth + JWT + Role (ดึง DB จริง)',
+    title: 'ระบบสมาชิก, bcrypt, JWT & Role Guard (เชื่อมต่อฐานข้อมูลจริง)',
+    summary: 'การเขียน Register / Login / Middleware ตรวจสิทธิ์ที่ดึงข้อมูลจากตาราง users ในฐานข้อมูลจริง พร้อมกั้นหน้า React ตาม Role',
+    sections: [
+      {
+        step: 'Auth 1',
+        file: 'backend/middleware/auth.js',
+        title: '1. Middleware ตรวจ Token จากฐานข้อมูลจริง: verifyToken (401) & requireAdmin (403)',
+        whenToUse: 'ใช้ตรวจบัตรผ่าน (JWT) และดึงข้อมูลผู้ใช้ล่าสุดจากตาราง users ใน DB',
+        keyPoints: [
+          '401 Unauthorized = ไม่มี Header Bearer, Token หมดอายุ/ถูกแก้ไข หรือไม่มี userId นี้ในฐานข้อมูลแล้ว',
+          '403 Forbidden = ยืนยันตัวตนผ่านแล้ว แต่ req.user.role !== "admin"',
+        ],
+        code: `// ไฟล์ backend/middleware/auth.js
+const jwt = require('jsonwebtoken');
+const pool = require('../db/mysql.js'); // หรือใช้ store / prisma ตามที่โปรเจกต์ตั้งไว้
+const secret = process.env.JWT_KEY || 'practice-only-change-this-key';
+
+async function verifyToken(req, res, next) {
+  const header = req.get('Authorization') || '';
+  if (!header.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Missing token' });
+  }
+  const token = header.slice(7).trim();
+  try {
+    const payload = jwt.verify(token, secret);
+
+    // ดึงข้อมูลผู้ใช้จากตาราง users ใน DB จริง
+    const [rows] = await pool.execute(
+      'SELECT id, userName, email, role FROM users WHERE id = ?',
+      [payload.userId]
+    );
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    const user = rows[0];
+    req.user = {
+      userId: user.id,
+      id: user.id,
+      userName: user.userName,
+      email: user.email,
+      role: user.role,
+    };
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin only' });
+  }
+  next();
+}
+
+module.exports = { verifyToken, requireAdmin, secret };`,
+      },
+      {
+        step: 'Auth 2',
+        file: 'backend/routes/auth.js',
+        title: '2. สมัครสมาชิก (INSERT ลง DB + bcrypt.hash) และเข้าสู่ระบบ (SELECT จาก DB + jwt.sign)',
+        whenToUse: 'ใช้ทำระบบลงทะเบียนและล็อกอินด้วยฐานข้อมูลจริง',
+        keyPoints: [
+          'ตอนสมัคร: เช็กซ้ำใน DB ก่อน (SELECT id FROM users WHERE userName = ? OR email = ?) ถ้าเจอตอบ 409',
+          'แฮชรหัสผ่านด้วย await bcrypt.hash(password, 10) แล้วค่อย INSERT ลงคอลัมน์ passwordHash',
+          'ตอนล็อกอิน: ดึงแถวจาก DB มาตรวจรหัสผ่านด้วย await bcrypt.compare(password, user.passwordHash)',
+        ],
+        code: `// ไฟล์ backend/routes/auth.js (เชื่อมต่อตาราง users ใน MySQL จริง)
+const router = require('express').Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const pool = require('../db/mysql.js');
+const { verifyToken, secret } = require('../middleware/auth.js');
+
+// POST /api/auth/register
+router.post('/register', async (req, res, next) => {
+  try {
+    const { userName, email, password } = req.body || {};
+    if (!userName?.trim() || !email?.includes('@') || !password || password.length < 6) {
+      return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ถูกต้อง (รหัสผ่านอย่างน้อย 6 ตัวอักษร)' });
+    }
+
+    const cleanName = userName.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. ตรวจชื่อผู้ใช้หรืออีเมลซ้ำใน DB
+    const [existing] = await pool.execute(
+      'SELECT id FROM users WHERE LOWER(userName) = LOWER(?) OR LOWER(email) = ?',
+      [cleanName, cleanEmail]
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({ message: 'ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้งานแล้ว' });
+    }
+
+    // 2. แฮชรหัสผ่านและบันทึกลง DB (บังคับ role เป็น student เสมอ)
+    const passwordHash = await bcrypt.hash(password, 10);
+    const [result] = await pool.execute(
+      'INSERT INTO users (userName, email, passwordHash, role) VALUES (?, ?, ?, "student")',
+      [cleanName, cleanEmail, passwordHash]
+    );
+
+    res.status(201).json({
+      id: result.insertId,
+      userName: cleanName,
+      email: cleanEmail,
+      role: 'student',
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/auth/login
+router.post('/login', async (req, res, next) => {
+  try {
+    const { userName, email, password } = req.body || {};
+    const identifier = String(userName || email || '').trim();
+    if (!identifier || !password) {
+      return res.status(401).json({ message: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' });
+    }
+
+    // 1. ค้นหาผู้ใช้จากตาราง users
+    const [rows] = await pool.execute(
+      'SELECT * FROM users WHERE LOWER(userName) = LOWER(?) OR LOWER(email) = LOWER(?)',
+      [identifier, identifier]
+    );
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+    }
+
+    const user = rows[0];
+    // 2. เปรียบเทียบรหัสผ่านด้วย bcrypt
+    const matched = await bcrypt.compare(String(password), user.passwordHash);
+    if (!matched) {
+      return res.status(401).json({ message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
+    }
+
+    // 3. สร้าง JWT Token ส่งกลับพร้อมข้อมูลผู้ใช้ (ห้ามส่ง passwordHash กลับไป!)
+    const token = jwt.sign({ userId: user.id, role: user.role }, secret, { expiresIn: '2h' });
+    res.status(200).json({
+      token,
+      user: { id: user.id, userName: user.userName, email: user.email, role: user.role },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/auth/me
+router.get('/me', verifyToken, (req, res) => {
+  res.status(200).json(req.user);
+});
+
+module.exports = router;`,
+      },
+      {
+        step: 'Auth 3',
+        file: 'frontend/pages/AdminPage.jsx & MyCoursesPage.jsx',
+        title: '3. การกั้นสิทธิ์หน้าเว็บ React ตาม Role (Guest vs Student vs Admin)',
+        whenToUse: 'ใช้ป้องกันไม่ให้คนทั่วไปหรือ Student เข้าถึงหน้าจัดการของ Admin',
+        keyPoints: [
+          'ถ้ายังไม่ล็อกอิน (!user) -> แจ้งให้ไปหน้า /login',
+          'ถ้าล็อกอินแล้วแต่ user.role !== "admin" -> แสดงข้อความใน <p role="alert">ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</p>',
+        ],
+        code: `// 1. กั้นหน้าสำหรับสมาชิกที่ล็อกอินแล้ว (เช่น MyCoursesPage.jsx)
+const { user } = useAuth();
+if (!user) {
+  return (
+    <section>
+      <h1>คอร์สของฉัน</h1>
+      <p role="alert">กรุณาเข้าสู่ระบบก่อนดูรายการลงทะเบียน</p>
+      <Link to="/login">ไปหน้าเข้าสู่ระบบ</Link>
+    </section>
+  );
+}
+
+// 2. กั้นหน้าเฉพาะผู้ดูแลระบบ (เช่น AdminPage.jsx)
+if (!user || user.role !== 'admin') {
+  return (
+    <section>
+      <h1>จัดการคอร์สเรียน (Admin)</h1>
+      <p role="alert">ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</p>
+    </section>
+  );
+}`,
       },
     ],
   },
@@ -441,7 +588,9 @@ exports.remove = async (req, res, next) => {
     summary: 'คู่มือรวมทุก Hook ที่ต้องใช้ใน React และ React Router พร้อมแพตเทิร์นการอัปเดต Array/Object State แบบไม่พัง',
     sections: [
       {
-        title: 'H.1 useState — การเก็บและอัปเดตค่าตัวเลข ข้อความ Object และ Array (เพิ่ม/แก้/ลบ)',
+        step: 'Hook 1',
+        file: 'useState (State พื้นฐาน, Object, Array)',
+        title: 'useState — การเก็บและอัปเดตค่าตัวเลข ข้อความ Object และ Array (เพิ่ม/แก้/ลบ)',
         whenToUse: 'เมื่อต้องการให้หน้าจอ React วาดใหม่ (re-render) ทันทีที่ข้อมูลเปลี่ยน',
         keyPoints: [
           'ห้ามแก้ตัวแปร state โดยตรง (เช่น ห้าม items.push()) ต้องสร้างค่าใหม่ส่งเข้าฟังก์ชัน set... เสมอ',
@@ -480,13 +629,14 @@ const removeItem = (id) =>
   setItems(prev => prev.filter(item => item.id !== id));`,
       },
       {
-        title: 'H.2 useEffect — การรันโค้ดเมื่อเปิดหน้าเว็บ เมื่อตัวแปรเปลี่ยน และการทำ Cleanup',
+        step: 'Hook 2',
+        file: 'useEffect (โหลด API & Dependency Array)',
+        title: 'useEffect — การรันโค้ดเมื่อเปิดหน้าเว็บ เมื่อตัวแปรเปลี่ยน และการทำ Cleanup',
         whenToUse: 'ใช้ดึงข้อมูลจาก API (fetch / axios) ตอนเปิดหน้าเว็บ หรือสั่งโหลดใหม่เมื่อคำค้นหา/พารามิเตอร์เปลี่ยน',
         keyPoints: [
-          'ไม่ใส่ Dependency Array เลย -> รันทุกครั้งที่ render (ระวังเกิด Infinite Loop ถ้านำไปเรียก setState ข้างใน)',
-          'ใส่ [] (Array ว่าง) -> รันแค่ครั้งเดียวตอน Component ถูกสร้างขึ้นครั้งแรก (Mount)',
+          'ใส่ [] (Array ว่าง) -> รันแค่ครั้งเดียวตอนเปิดหน้า Component ครั้งแรก',
           'ใส่ [keyword, categoryId] -> รันตอนเริ่ม และรันใหม่ทุกครั้งที่ keyword หรือ categoryId เปลี่ยนค่า',
-          'return () => { ... } คือฟังก์ชัน Cleanup รันก่อนออกจากหน้าหรือก่อนรันรอบใหม่ (เช่น ยกเลิก fetch หรือ clearInterval)',
+          'return () => { ... } คือฟังก์ชัน Cleanup รันก่อนออกจากหน้า',
         ],
         code: `import { useState, useEffect } from 'react';
 import { api } from '../services/api';
@@ -498,7 +648,7 @@ export default function CourseListDemo() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    let ignore = false; // ป้องกันการ setState หลังปิดหน้า
+    let ignore = false;
 
     async function fetchCourses() {
       setLoading(true);
@@ -514,31 +664,25 @@ export default function CourseListDemo() {
     }
 
     fetchCourses();
-
-    // Cleanup function
-    return () => {
-      ignore = true;
-    };
-  }, [keyword]); // รันใหม่เมื่อ keyword เปลี่ยน
+    return () => { ignore = true; };
+  }, [keyword]); // โหลดใหม่ทุกครั้งที่ keyword เปลี่ยน
 
   return null;
 }`,
       },
       {
-        title: 'H.3 useRef — การอ้างอิง DOM Element (เช่น สั่ง Focus ช่อง Input) และเก็บค่าที่ไม่ทำให้ Re-render',
-        whenToUse: 'เมื่อต้องการสั่ง inputRef.current.focus() หรือเลื่อนหน้าจอ โดยไม่ต้องวาดหน้าใหม่',
+        step: 'Hook 3',
+        file: 'useRef (อ้างอิง DOM / Focus ช่องกรอก)',
+        title: 'useRef — การสั่ง Focus ช่อง Input และเก็บค่าโดยไม่ทำให้หน้า Re-render',
+        whenToUse: 'เมื่อต้องการสั่ง inputRef.current.focus() หลังจากกดปุ่มหรือส่งฟอร์มเสร็จ',
         keyPoints: [
           'สร้างด้วย const inputRef = useRef(null) แล้วผูกเข้ากับแท็ก JSX ด้วย ref={inputRef}',
-          'เข้าถึง DOM จริงผ่าน inputRef.current (เช่น inputRef.current?.focus())',
+          'เข้าถึง DOM จริงผ่าน inputRef.current?.focus()',
         ],
         code: `import { useRef } from 'react';
 
 export default function SearchBox() {
   const inputRef = useRef(null);
-
-  function handleFocusClick() {
-    inputRef.current?.focus();
-  }
 
   return (
     <div>
@@ -546,7 +690,7 @@ export default function SearchBox() {
         ชื่อ
         <input ref={inputRef} type="text" placeholder="กดปุ่มเพื่อโฟกัสช่องนี้" />
       </label>
-      <button type="button" onClick={handleFocusClick}>
+      <button type="button" onClick={() => inputRef.current?.focus()}>
         โฟกัสชื่อ
       </button>
     </div>
@@ -554,120 +698,84 @@ export default function SearchBox() {
 }`,
       },
       {
-        title: 'H.4 createContext & useContext — การแชร์ข้อมูลข้ามหน้า (เช่น Theme หรือ AuthContext)',
-        whenToUse: 'เมื่อหลายหน้าหรือหลาย Component ต้องใช้ข้อมูลชุดเดียวกัน เช่น ข้อมูลผู้ใช้ที่ล็อกอินอยู่ (user, token, logout) หรือธีมมืด/สว่าง',
+        step: 'Hook 4',
+        file: 'createContext & useContext (แชร์ข้อมูลข้ามหน้า)',
+        title: 'createContext & useContext — การแชร์ข้อมูล User / Theme ให้ทุกหน้าเรียกใช้ได้ทันที',
+        whenToUse: 'เมื่อหลายหน้าต้องใช้ข้อมูลชุดเดียวกัน เช่น user ที่ล็อกอินอยู่ หรือธีมของแอปโดยไม่ต้องส่ง props หลายชั้น',
         keyPoints: [
-          'ขั้นตอนที่ 1: สร้าง Context ด้วย const MyContext = createContext(null)',
-          'ขั้นตอนที่ 2: สร้าง Provider Component ที่ส่ง value={{ ... }} ครอบลูกๆ (<MyContext.Provider value={...}>)',
-          'ขั้นตอนที่ 3: ใน Component ลูก เรียก const data = useContext(MyContext)',
+          'สร้างด้วย createContext(null) -> ห่อด้วย <Context.Provider value={{ ... }}> -> อ่านค่าด้วย useContext(Context)',
         ],
         code: `import { createContext, useContext, useState } from 'react';
 
-// 1. สร้าง Context
-const ThemeContext = createContext(null);
+const AuthContext = createContext(null);
 
-// 2. สร้าง Provider ครอบแอป
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState('light');
-  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const logout = () => {
+    sessionStorage.removeItem('practice-token');
+    setUser(null);
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
-    </ThemeContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
-// 3. สร้าง Custom Hook เพื่อเรียกใช้ง่ายๆ ในหน้าลูก
-export function useTheme() {
-  return useContext(ThemeContext);
-}
-
-// 4. ตัวอย่างการนำไปใช้ใน Component ลูก
-export function ThemeToolbar() {
-  const { theme, toggleTheme } = useTheme();
-  return (
-    <div>
-      <p>ธีม: {theme}</p>
-      <button type="button" onClick={toggleTheme}>เปลี่ยนธีม</button>
-    </div>
-  );
+export function useAuth() {
+  return useContext(AuthContext);
 }`,
       },
       {
-        title: 'H.5 useMemo & useReducer — การจำค่าคำนวณและการจัดการ State ซับซ้อน',
-        whenToUse: 'ใช้ useMemo เมื่อต้องกรอง/คำนวณยอดรวมจากรายการจำนวนมาก และใช้ useReducer เมื่อมีหลาย Action ในการเปลี่ยน State',
+        step: 'Hook 5',
+        file: 'useMemo & useReducer',
+        title: 'useMemo & useReducer — การจำค่าคำนวณยอดรวม และการจัดการ State แบบ Action',
+        whenToUse: 'ใช้ useMemo คำนวณผลรวม/กรองข้อมูล และใช้ useReducer จัดการ State ที่มีหลายคำสั่ง',
         keyPoints: [
-          'useMemo(() => คำนวณ, [dependencies]) จะคำนวณใหม่เฉพาะเมื่อตัวแปรใน dependencies เปลี่ยนเท่านั้น',
-          'useReducer(reducerFn, initialState) คืนค่า [state, dispatch] เหมาะกับตะกร้าสินค้าหรือฟอร์มซับซ้อน',
+          'useMemo(() => ..., [items]) คำนวณใหม่เฉพาะเมื่อ items เปลี่ยน',
+          'useReducer(reducer, initialState) คืนค่า [state, dispatch]',
         ],
         code: `import { useMemo, useReducer } from 'react';
 
-// 1. useMemo: คำนวณยอดรวมเฉพาะรายการที่ status === 'active'
-function EnrollmentSummary({ enrollments }) {
-  const totalFee = useMemo(() => {
-    return enrollments
-      .filter(item => item.status === 'active')
-      .reduce((sum, item) => sum + item.price, 0);
-  }, [enrollments]);
+// 1. useMemo คำนวณยอดรวมเฉพาะรายการที่ active
+const totalFee = useMemo(() => {
+  return enrollments
+    .filter(item => item.status === 'active')
+    .reduce((sum, item) => sum + item.price, 0);
+}, [enrollments]);
 
-  return <p>ยอดรวมค่าเรียน: {totalFee} บาท</p>;
-}
-
-// 2. useReducer: จัดการตะกร้าสินค้า
+// 2. useReducer จัดการตะกร้าสินค้า
 function cartReducer(state, action) {
   switch (action.type) {
-    case 'ADD':
-      return [...state, action.item];
-    case 'REMOVE':
-      return state.filter(i => i.id !== action.id);
-    case 'CLEAR':
-      return [];
-    default:
-      return state;
+    case 'ADD': return [...state, action.item];
+    case 'REMOVE': return state.filter(i => i.id !== action.id);
+    case 'CLEAR': return [];
+    default: return state;
   }
 }
-
-export function CartExample() {
-  const [cart, dispatch] = useReducer(cartReducer, []);
-  return (
-    <button onClick={() => dispatch({ type: 'ADD', item: { id: 1, name: 'Book' } })}>
-      เพิ่มลงตะกร้า ({cart.length})
-    </button>
-  );
-}`,
+const [cart, dispatch] = useReducer(cartReducer, []);`,
       },
       {
-        title: 'H.6 React Router Hooks — useParams, useNavigate, useLocation, useSearchParams',
-        whenToUse: 'ใช้ในเว็บหลายหน้า (react-router-dom) เพื่ออ่านพารามิเตอร์บน URL หรือสั่งเปลี่ยนหน้าด้วยโค้ด',
+        step: 'Hook 6',
+        file: 'useParams, useNavigate, useLocation, useSearchParams',
+        title: 'React Router Hooks — การอ่าน :id จาก URL และการสั่งเปลี่ยนหน้าด้วยโค้ด',
+        whenToUse: 'ใช้ในเว็บหลายหน้าด้วย react-router-dom',
         keyPoints: [
-          'useParams() อ่านค่าจากพารามิเตอร์ของ Route เช่น <Route path="/menu/:id" /> -> const { id } = useParams()',
-          'useNavigate() ได้ฟังก์ชัน navigate("/path") ใช้สั่งย้ายหน้าหลังจาก Login หรือบันทึกฟอร์มสำเร็จ',
-          'useSearchParams() ใช้รับ/เปลี่ยนค่า Query String เช่น ?keyword=react',
+          'const { id } = useParams() อ่านค่า :id จาก Route เช่น /courses/:id',
+          'const navigate = useNavigate() ใช้สั่ง navigate("/") หลังล็อกอินหรือบันทึกข้อมูลสำเร็จ',
         ],
         code: `import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 export default function CourseDetailPage() {
-  // 1. อ่าน :id จาก URL เช่น /courses/3 -> id === "3" (อย่าลืมแปลง Number(id) ถ้าต้องเทียบตัวเลข)
-  const { id } = useParams();
-
-  // 2. สั่งเปลี่ยนหน้าด้วยโค้ด (เช่น หลัง Login หรือกดปุ่มย้อนกลับ)
+  const { id } = useParams(); // ได้ค่าเป็น String เช่น "1"
   const navigate = useNavigate();
-
-  // 3. ดูข้อมูล path ปัจจุบัน
-  const location = useLocation(); // เช่น location.pathname === "/courses/3"
-
-  // 4. อ่าน/เขียน Query String (?tab=reviews)
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab = searchParams.get('tab') || 'info';
 
   return (
     <section>
-      <h1>รายละเอียดคอร์ส #{id}</h1>
-      <p>หน้าปัจจุบัน: {location.pathname} (แท็บ: {tab})</p>
-      <button type="button" onClick={() => setSearchParams({ tab: 'reviews' })}>
-        ดูรีวิว
-      </button>
+      <h1>คอร์สรหัส #{Number(id)}</h1>
       <button type="button" onClick={() => navigate('/my-courses')}>
         ไปหน้าคอร์สของฉัน
       </button>
@@ -678,176 +786,63 @@ export default function CourseDetailPage() {
     ],
   },
   {
-    id: 'react-core',
-    badge: 'บทที่ 4 · React UI & Form',
-    title: 'React Components, Props & Controlled Form',
-    summary: 'การสร้าง Component, การผูก Controlled Form, การดึง API ด้วย useEffect และการแชร์ข้อมูลด้วย Context/useRef',
+    id: 'router-axios',
+    badge: '🌐 React หลายหน้า + Axios ต่อ API',
+    title: 'การทำเว็บหลายหน้า (React Router) & การเขียน Axios Service ต่อกับ API',
+    summary: 'การตั้งค่า BrowserRouter 4 หน้า, การเขียน Axios แนบ Bearer Token และการผูก Controlled Form เข้ากับ API',
     sections: [
       {
-        title: '4.1 การสร้าง Component, การส่ง Props และการวาดรายการด้วย .map()',
-        whenToUse: 'ใช้แยกส่วนแสดงผล เช่น การ์ดสินค้า แถวในตาราง หรือปุ่มกด',
+        step: 'Frontend 1',
+        file: 'frontend/services/api.js',
+        title: '1. สร้างไฟล์ Axios Service รวมทุกคำสั่งยิง API พร้อมแนบ Token',
+        whenToUse: 'เขียนไว้ที่เดียวเพื่อให้ทุกหน้าใน React เรียกใช้งานได้สะอาดและไม่เขียน URL ซ้ำ',
         keyPoints: [
-          'ชื่อ Component ต้องขึ้นต้นด้วยตัวพิมพ์ใหญ่เสมอ (เช่น CourseCard)',
-          'เมื่อใช้ .map() วาด JSX ต้องใส่ prop key={item.id} ที่ไม่ซ้ำกันในแท็กนอกสุดเสมอ',
+          'axios.get(url, { params, headers }) และ axios.delete(url, { headers }) รับ config เป็นพารามิเตอร์ตัวที่ 2',
+          'ส่วน axios.post(url, body, { headers }), axios.put(...) และ axios.patch(...) รับ body เป็นตัวที่ 2 และ config เป็นตัวที่ 3!',
         ],
-        code: `// ไฟล์ frontend/components/CourseCard.jsx
-export default function CourseCard({ course, onEnroll }) {
-  const isFull = course.availableSeats <= 0;
-  return (
-    <article className="card">
-      <small>{course.code} · {course.categoryName}</small>
-      <h2>{course.title}</h2>
-      <p>ราคา {course.price} บาท</p>
-      <p>ว่าง {course.availableSeats} / {course.seats} ที่นั่ง</p>
-      <button
-        type="button"
-        disabled={isFull}
-        onClick={() => onEnroll(course.id)}
-      >
-        {isFull ? 'ที่นั่งเต็ม' : 'ลงทะเบียนเรียน'}
-      </button>
-    </article>
-  );
+        code: `// ไฟล์ frontend/services/api.js
+import axios from 'axios';
+
+export const TOKEN_KEY = 'practice-token';
+
+export function authHeaders() {
+  const token = sessionStorage.getItem(TOKEN_KEY);
+  return token ? { headers: { Authorization: 'Bearer ' + token } } : {};
 }
 
-// การเรียกใช้ในหน้าหลัก
-// {courses.map(c => <CourseCard key={c.id} course={c} onEnroll={handleEnroll} />)}`,
+export const api = {
+  // Auth
+  login: async (data) => (await axios.post('/api/auth/login', data)).data,
+  register: async (data) => (await axios.post('/api/auth/register', data)).data,
+  me: async () => (await axios.get('/api/auth/me', authHeaders())).data,
+
+  // Public Courses & Categories
+  categories: async () => (await axios.get('/api/categories')).data,
+  courses: async (params = {}) => (await axios.get('/api/courses', { params })).data,
+
+  // Student Enrollments (แนบ Token)
+  myEnrollments: async () => (await axios.get('/api/enrollments/my', authHeaders())).data,
+  enroll: async (courseId) => (await axios.post('/api/enrollments', { courseId }, authHeaders())).data,
+  cancelEnrollment: async (id) => (await axios.patch('/api/enrollments/' + id + '/cancel', {}, authHeaders())).data,
+
+  // Admin Course CRUD (แนบ Token)
+  createCourse: async (data) => (await axios.post('/api/courses', data, authHeaders())).data,
+  updateCourse: async (id, data) => (await axios.put('/api/courses/' + id, data, authHeaders())).data,
+  deleteCourse: async (id) => (await axios.delete('/api/courses/' + id, authHeaders())).data,
+};`,
       },
       {
-        title: '4.2 Controlled Form, การแปลงตัวเลข และการแสดง Error (role="alert")',
-        whenToUse: 'ใช้กับทุกฟอร์มในข้อสอบ (เช่น ฟอร์มเพิ่มสินค้า ฟอร์มเข้าสู่ระบบ ฟอร์มจอง)',
+        step: 'Frontend 2',
+        file: 'frontend/App.jsx',
+        title: '2. โครงสร้างเว็บหลายหน้าด้วย BrowserRouter, Navbar และ Routes',
+        whenToUse: 'ใช้จัดโครงสร้างหลักของแอปที่มีหลายหน้าและแสดงปุ่มตามสถานะการล็อกอิน',
         keyPoints: [
-          'ต้องใส่ e.preventDefault() บรรทัดแรกของฟังก์ชัน onSubmit เสมอเพื่อไม่ให้หน้าเว็บรีเฟรชเอง',
-          'ค่าจาก e.target.value ของ <input> และ <select> เป็น String เสมอ ต้องแปลงด้วย Number() ก่อนส่งไป API',
-          'ข้อความแจ้งเตือนข้อผิดพลาดควรอยู่ใน <p role="alert">{error}</p> เพื่อให้ชุดตรวจจับได้',
+          'ห่อ <BrowserRouter> และ <AuthProvider> ไว้ชั้นนอกสุด',
+          'ใช้ <Link to="..."> สำหรับสร้างเมนูนำทางโดยไม่รีโหลดหน้าเว็บ',
         ],
-        code: `import React, { useState } from 'react';
-
-export default function CourseForm({ categories, onSave }) {
-  const [code, setCode] = useState('');
-  const [title, setTitle] = useState('');
-  const [categoryId, setCategoryId] = useState('1');
-  const [price, setPrice] = useState('');
-  const [seats, setSeats] = useState('10');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-    if (!code.trim() || !title.trim()) {
-      setError('กรุณากรอกรหัสวิชาและชื่อวิชาให้ครบ');
-      return;
-    }
-    setBusy(true);
-    try {
-      await onSave({
-        code: code.trim().toUpperCase(),
-        title: title.trim(),
-        categoryId: Number(categoryId),
-        price: Number(price),
-        seats: Number(seats),
-      });
-      // ล้างฟอร์มเมื่อบันทึกสำเร็จ
-      setCode('');
-      setTitle('');
-      setPrice('');
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || 'บันทึกไม่สำเร็จ');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      {error && <p role="alert">{error}</p>}
-      <label>
-        รหัสวิชา
-        <input value={code} onChange={e => setCode(e.target.value)} required />
-      </label>
-      <label>
-        ชื่อวิชา
-        <input value={title} onChange={e => setTitle(e.target.value)} required />
-      </label>
-      <label>
-        หมวดหมู่วิชา
-        <select value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        ราคาคอร์ส
-        <input type="number" min="0" value={price} onChange={e => setPrice(e.target.value)} required />
-      </label>
-      <label>
-        จำนวนที่นั่ง
-        <input type="number" min="1" value={seats} onChange={e => setSeats(e.target.value)} required />
-      </label>
-      <button type="submit" disabled={busy}>บันทึกคอร์ส</button>
-    </form>
-  );
-}`,
-      },
-      {
-        title: '4.3 การโหลดข้อมูลด้วย useEffect พร้อมสถานะ Loading และ Error',
-        whenToUse: 'ใช้ดึงข้อมูลจาก Backend ทันทีที่เปิดหน้าเว็บ หรือเมื่อเปลี่ยนคำค้นหา',
-        keyPoints: [
-          'แยกฟังก์ชัน loadData() ออกมาเพื่อให้เรียกซ้ำได้ทั้งใน useEffect และหลังจากกดปุ่มเพิ่ม/ลบข้อมูลสำเร็จ',
-        ],
-        code: `import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-
-export default function CatalogPage() {
-  const [courses, setCourses] = useState([]);
-  const [keyword, setKeyword] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  async function loadData() {
-    setError('');
-    try {
-      const data = await api.courses(keyword ? { keyword } : {});
-      setCourses(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'โหลดข้อมูลไม่สำเร็จ');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadData();
-  }, [keyword]); // โหลดใหม่เมื่อ keyword เปลี่ยน
-
-  if (loading) return <p>กำลังโหลด...</p>;
-  return (
-    <section>
-      {error && <p role="alert">{error}</p>}
-      {/* แสดงรายการ courses */}
-    </section>
-  );
-}`,
-      },
-    ],
-  },
-  {
-    id: 'router-axios',
-    badge: 'บทที่ 5 · Router & Axios',
-    title: 'การทำเว็บหลายหน้า (React Router) & Axios Service',
-    summary: 'การตั้งค่า BrowserRouter, Routes, Link, useParams, useNavigate และการรวมคำสั่งเรียก API ไว้ที่ไฟล์ Service',
-    sections: [
-      {
-        title: '5.1 โครงสร้างเว็บหลายหน้าด้วย React Router (Navbar + Routes + 404)',
-        whenToUse: 'เมื่อโจทย์กำหนดให้มีหลายหน้า เช่น หน้าแรก (/), หน้าเข้าสู่ระบบ (/login), หน้าของฉัน (/my-courses), และหน้าผู้ดูแล (/admin)',
-        keyPoints: [
-          'ใช้ <Link to="..."> แทน <a href="..."> เพื่อเปลี่ยนหน้าโดยไม่ทำให้เบราว์เซอร์รีโหลดหน้าใหม่ทั้งหมด',
-          'ใส่ <Route path="*" element={<h1>404</h1>} /> ไว้ล่างสุดเสมอเพื่อรับ URL ที่ไม่มีในระบบ',
-        ],
-        code: `import React from 'react';
-import { BrowserRouter, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
+        code: `// ไฟล์ frontend/App.jsx
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import CatalogPage from './pages/CatalogPage';
 import LoginPage from './pages/LoginPage';
@@ -863,12 +858,12 @@ function Layout() {
         <Link to="/my-courses">คอร์สของฉัน</Link>
         <Link to="/admin">จัดการคอร์ส (Admin)</Link>
         {user ? (
-          <>
-            <span>{user.userName} ({user.role})</span>
+          <span>
+            {user.userName} ({user.role})
             <button type="button" onClick={logout}>ออกจากระบบ</button>
-          </>
+          </span>
         ) : (
-          <Link to="/login">เข้าสู่ระบบ</Link>
+          <Link to="/login">เข้าสู่ระบบ / สมัครสมาชิก</Link>
         )}
       </nav>
 
@@ -894,246 +889,165 @@ export default function App() {
 }`,
       },
       {
-        title: '5.2 การเขียน Axios Service Layer พร้อมแนบ Bearer Token อัตโนมัติ',
-        whenToUse: 'แยกโค้ดการยิง HTTP ออกจากหน้า React เพื่อให้ทุกหน้าเรียกใช้ง่ายและแก้จุดเดียว',
+        step: 'Frontend 3',
+        file: 'frontend/pages/AdminPage.jsx',
+        title: '3. Controlled Form สำหรับเพิ่มและแก้ไขข้อมูล (Create & Edit ในฟอร์มเดียวกัน)',
+        whenToUse: 'เมื่อหน้าจัดการต้องทั้งเพิ่มรายการใหม่ (POST) และกดปุ่ม "แก้ไข" เพื่อดึงค่าเดิมมาแก้ (PUT)',
         keyPoints: [
-          'axios เก็บผลลัพธ์ JSON ไว้ใน response.data เสมอ',
-          'สำหรับ axios.delete(url, config) พารามิเตอร์ตัวที่ 2 คือ config (ใส่ headers ได้เลย) แต่สำหรับ axios.post(url, data, config) และ axios.patch(url, data, config) พารามิเตอร์ตัวที่ 2 คือ body และตัวที่ 3 คือ config!',
+          'ใช้ state editingId เก็บ id ที่กำลังแก้ (ถ้าเป็น null แปลว่ากำลังเพิ่มใหม่)',
+          'อย่าลืมแปลงค่าตัวเลขด้วย Number(...) ก่อนส่งเข้า api.createCourse หรือ api.updateCourse',
         ],
-        code: `import axios from 'axios';
+        code: `const [editingId, setEditingId] = useState(null);
+const [code, setCode] = useState('');
+const [title, setTitle] = useState('');
+const [categoryId, setCategoryId] = useState('1');
+const [price, setPrice] = useState('');
+const [seats, setSeats] = useState('');
+const [error, setError] = useState('');
 
-export const TOKEN_KEY = 'practice-token';
-
-// ฟังก์ชันช่วยสร้าง Header Authorization
-export function authHeaders() {
-  const token = sessionStorage.getItem(TOKEN_KEY);
-  return token ? { headers: { Authorization: 'Bearer ' + token } } : {};
-}
-
-export const api = {
-  // Public GET (ส่ง query ผ่าน { params })
-  courses: async (params = {}) => (await axios.get('/api/courses', { params })).data,
-
-  // Auth
-  login: async (data) => (await axios.post('/api/auth/login', data)).data,
-  register: async (data) => (await axios.post('/api/auth/register', data)).data,
-  me: async () => (await axios.get('/api/auth/me', authHeaders())).data,
-
-  // Protected Requests (ต้องแนบ authHeaders())
-  myEnrollments: async () => (await axios.get('/api/enrollments/my', authHeaders())).data,
-  enroll: async (courseId) => (await axios.post('/api/enrollments', { courseId }, authHeaders())).data,
-  // ข้อควรระวัง: axios.patch(url, body, config) ต้องส่ง {} เป็น body ก่อน แล้วค่อยส่ง authHeaders() เป็นตัวที่ 3
-  cancelEnrollment: async (id) => (await axios.patch('/api/enrollments/' + id + '/cancel', {}, authHeaders())).data,
-
-  // Admin CRUD
-  createCourse: async (data) => (await axios.post('/api/courses', data, authHeaders())).data,
-  updateCourse: async (id, data) => (await axios.put('/api/courses/' + id, data, authHeaders())).data,
-  // axios.delete(url, config) ส่ง authHeaders() เป็นตัวที่ 2 ได้เลย
-  deleteCourse: async (id) => (await axios.delete('/api/courses/' + id, authHeaders())).data,
-};`,
-      },
-    ],
-  },
-  {
-    id: 'auth-rbac',
-    badge: 'บทที่ 6 · Auth, JWT & Role Guard',
-    title: 'ระบบสมาชิก, bcrypt, JWT & การแยกสิทธิ์ Role (Student / Admin)',
-    summary: 'หัวใจของข้อสอบปลายภาค: การแฮชรหัสผ่าน, การออก/ตรวจ JWT, การกั้นสิทธิ์ 401 vs 403 และการทำ AuthContext',
-    sections: [
-      {
-        title: '6.1 Backend Middleware: verifyToken (401) และ requireAdmin (403)',
-        whenToUse: 'ใช้คั่นหน้า Route ที่ต้องการให้ล็อกอินก่อน หรือ Route ที่อนุญาตเฉพาะ Admin เท่านั้น',
-        keyPoints: [
-          'ไม่ส่ง Token หรือ Token ปลอม/หมดอายุ -> ตอบ 401 Unauthorized',
-          'ส่ง Token ถูกต้องแล้ว แต่ req.user.role !== "admin" -> ตอบ 403 Forbidden',
-        ],
-        code: `const jwt = require('jsonwebtoken');
-const store = require('../db/store.js');
-const secret = process.env.JWT_KEY || 'practice-only-change-this-key';
-
-// 1. ตรวจว่าล็อกอินหรือยัง (401)
-function verifyToken(req, res, next) {
-  const header = req.get('Authorization') || '';
-  if (!header.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Missing token' });
-  }
-  const token = header.slice(7).trim();
-  try {
-    const payload = jwt.verify(token, secret);
-    const user = store.users.find(u => u.id === payload.userId);
-    if (!user) return res.status(401).json({ message: 'Invalid user' });
-
-    req.user = {
-      userId: user.id,
-      id: user.id,
-      userName: user.userName,
-      email: user.email,
-      role: user.role,
-    };
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-}
-
-// 2. ตรวจว่าเป็น Admin หรือไม่ (403)
-function requireAdmin(req, res, next) {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Admin only' });
-  }
-  next();
-}
-
-module.exports = { verifyToken, requireAdmin, secret };`,
-      },
-      {
-        title: '6.2 Backend Auth Routes: Register (bcrypt.hash) & Login (bcrypt.compare + jwt.sign)',
-        whenToUse: 'ใช้ในไฟล์ backend/routes/auth.js',
-        keyPoints: [
-          'ตอนสมัครสมาชิก (POST /register) ห้ามนำค่า req.body.role มาใช้เด็ดขาด ต้องบังคับ role: "student" (หรือ "user") เสมอ และห้ามส่ง passwordHash กลับไปใน JSON response',
-          'ตอนเข้าสู่ระบบ (POST /login) ต้องใช้ await bcrypt.compare(password, user.passwordHash)',
-        ],
-        code: `const router = require('express').Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const store = require('../db/store.js');
-const { verifyToken, secret } = require('../middleware/auth.js');
-
-// POST /api/auth/register
-router.post('/register', async (req, res) => {
-  const { userName, email, password } = req.body || {};
-  if (!userName?.trim() || !email?.includes('@') || !password || password.length < 6) {
-    return res.status(400).json({ message: 'Invalid registration data' });
-  }
-  const exists = store.users.some(
-    u => u.userName.toLowerCase() === userName.trim().toLowerCase() ||
-         u.email.toLowerCase() === email.trim().toLowerCase()
-  );
-  if (exists) return res.status(409).json({ message: 'Duplicate user' });
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const newUser = {
-    id: store.nextUserId++,
-    userName: userName.trim(),
-    email: email.trim().toLowerCase(),
-    passwordHash,
-    role: 'student', // บังคับสิทธิ์เริ่มต้นเสมอ
+async function handleSubmit(e) {
+  e.preventDefault();
+  setError('');
+  const payload = {
+    code: code.trim().toUpperCase(),
+    title: title.trim(),
+    categoryId: Number(categoryId),
+    price: Number(price),
+    seats: Number(seats),
   };
-  store.users.push(newUser);
-  res.status(201).json({ id: newUser.id, userName: newUser.userName, email: newUser.email, role: newUser.role });
-});
-
-// POST /api/auth/login
-router.post('/login', async (req, res) => {
-  const { userName, email, password } = req.body || {};
-  const iden = String(userName || email || '').trim().toLowerCase();
-  const user = store.users.find(
-    u => u.userName.toLowerCase() === iden || u.email.toLowerCase() === iden
-  );
-  if (!user || !(await bcrypt.compare(String(password || ''), user.passwordHash))) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+  try {
+    if (editingId) {
+      await api.updateCourse(editingId, payload);
+    } else {
+      await api.createCourse(payload);
+    }
+    // ล้างฟอร์มและโหลดตารางใหม่
+    setEditingId(null);
+    setCode('');
+    setTitle('');
+    setPrice('');
+    setSeats('');
+    await loadCourses();
+  } catch (err) {
+    setError(err.response?.data?.message || 'บันทึกไม่สำเร็จ');
   }
-  const token = jwt.sign({ userId: user.id, role: user.role }, secret, { expiresIn: '2h' });
-  res.json({
-    token,
-    user: { id: user.id, userName: user.userName, email: user.email, role: user.role },
-  });
-});
-
-// GET /api/auth/me
-router.get('/me', verifyToken, (req, res) => res.json(req.user));
-
-module.exports = router;`,
-      },
-      {
-        title: '6.3 Frontend Role Guard: การกั้นหน้าเฉพาะสมาชิกและหน้าเฉพาะ Admin',
-        whenToUse: 'ใช้ในหน้า MyCoursesPage.jsx (ต้องล็อกอิน) และ AdminPage.jsx (ต้องเป็น role === "admin")',
-        keyPoints: [
-          'ตรวจสอบ user จาก useAuth() ก่อนวาดฟอร์มจัดการข้อมูล',
-          'แม้จะซ่อนปุ่มหรือกั้นหน้าใน React แล้ว ฝั่ง Express API ก็ยังต้องใส่ verifyToken และ requireAdmin เสมอ!',
-        ],
-        code: `// 1. กั้นหน้าสำหรับสมาชิกที่ล็อกอินแล้วเท่านั้น (เช่น MyCoursesPage.jsx)
-const { user } = useAuth();
-if (!user) {
-  return (
-    <section>
-      <h1>คอร์สของฉัน</h1>
-      <p role="alert">กรุณาเข้าสู่ระบบก่อนดูรายการลงทะเบียน</p>
-      <Link to="/login">ไปหน้าเข้าสู่ระบบ</Link>
-    </section>
-  );
-}
-
-// 2. กั้นหน้าสำหรับ Admin เท่านั้น (เช่น AdminPage.jsx)
-if (!user || user.role !== 'admin') {
-  return (
-    <section>
-      <h1>จัดการคอร์สเรียน (Admin)</h1>
-      <p role="alert">ไม่มีสิทธิ์เข้าถึง (Admin เท่านั้น)</p>
-    </section>
-  );
 }`,
       },
     ],
   },
   {
-    id: 'exam-patterns',
-    badge: 'บทที่ 7 · สูตรลัด Logic ข้อสอบ',
-    title: 'รวมสูตร Logic ออกสอบบ่อย (ตัดสต็อก / โควตาที่นั่ง / คืนยอด / เช็กเจ้าของ)',
-    summary: 'รวมแพตเทิร์นเงื่อนไขทางธุรกิจที่มักออกในข้อสอบปฏิบัติ 100 คะแนน',
+    id: 'node-es6',
+    badge: '📦 Node.js & ES6+ พื้นฐาน',
+    title: 'การแยกโมดูล CommonJS, Array Methods (map/filter/reduce) & ไฟล์ JSON',
+    summary: 'พื้นฐานการแยกไฟล์ require/module.exports, การคำนวณด้วย Array Methods และการอ่านเขียนไฟล์ด้วย fs/promises',
     sections: [
       {
-        title: '7.1 สูตรตรวจเจ้าของข้อมูล หรือ Admin (Owner or Admin Guard)',
-        whenToUse: 'เมื่อโจทย์กำหนดว่า "ยกเลิกการจองได้เฉพาะเจ้าของรายการ หรือ Admin เท่านั้น"',
+        step: 'Node 1',
+        file: 'backend/lib/prices.js',
+        title: 'CommonJS (require / module.exports) vs ES Modules (import / export)',
+        whenToUse: 'ใช้แยกฟังก์ชันคำนวณหรือตัวจัดการข้อมูลออกจากไฟล์ Route',
         keyPoints: [
-          'เปรียบเทียบ item.userId !== req.user.userId && req.user.role !== "admin" ถ้าเป็นจริงให้ตอบ 403 Forbidden',
+          'Backend (.js) ใช้ module.exports / require()',
+          'Frontend (.jsx) ใช้ export default / import',
         ],
-        code: `router.patch('/enrollments/:id/cancel', verifyToken, (req, res) => {
-  const enrollment = store.enrollments.find(e => e.id === Number(req.params.id));
-  if (!enrollment) {
-    return res.status(404).json({ message: 'Not found' });
-  }
+        code: `// ไฟล์ backend/lib/prices.js
+exports.total = (items = []) => {
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+};
 
-  // ตรวจสิทธิ์: ถ้าไม่ใช่เจ้าของ และไม่ใช่ admin -> 403 Forbidden
-  if (enrollment.userId !== req.user.userId && req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Forbidden: Owner or admin only' });
-  }
-
-  // ตรวจว่าเคยยกเลิกไปแล้วหรือยัง -> 409 Conflict (ป้องกันการคืนที่นั่งซ้ำ!)
-  if (enrollment.status === 'cancelled') {
-    return res.status(409).json({ message: 'Already cancelled' });
-  }
-
-  // เปลี่ยนสถานะและคืนที่นั่ง 1 ครั้ง
-  enrollment.status = 'cancelled';
-  const course = store.courses.find(c => c.id === enrollment.courseId);
-  if (course) {
-    course.enrolled = Math.max(0, course.enrolled - 1);
-  }
-
-  res.json(enrollment);
-});`,
+// ไฟล์ backend/app.js
+const { total } = require('./lib/prices.js');`,
       },
       {
-        title: '7.2 สูตรป้องกันการแก้จำนวนที่นั่งต่ำกว่าคนเรียน และป้องกันการลบคอร์สที่มีคนเรียนอยู่',
-        whenToUse: 'ใช้ใน PUT /api/courses/:id และ DELETE /api/courses/:id ของหน้า Admin',
+        step: 'Node 2',
+        file: 'Array Methods',
+        title: 'สูตรใช้ map, filter, reduce, find, some สำหรับจัดการข้อมูล',
+        whenToUse: 'ใช้ค้นหา กรอง คำนวณผลรวม หรือเช็กข้อมูลซ้ำ',
         keyPoints: [
-          'ตอนแก้ไขคอร์ส (PUT): ถ้า seats ใหม่ < course.enrolled ปัจจุบัน ต้องตอบ 409',
-          'ตอนลบคอร์ส (DELETE): ถ้า course.enrolled > 0 (ยังมีคนเรียนอยู่) ต้องตอบ 409 ห้ามลบ',
+          'map = แปลงทุกตัว, filter = คัดหลายตัว, find = หาตัวเดียว, some = เช็กว่ามีไหม (true/false), reduce = รวมเป็นค่าเดียว',
         ],
-        code: `// ใน PUT /api/courses/:id
-if (Number(req.body.seats) < course.enrolled) {
-  return res.status(409).json({ message: 'Seats cannot be less than enrolled students' });
+        code: `// 1. map: เติม availableSeats
+const enriched = courses.map(c => ({ ...c, availableSeats: c.seats - c.enrolled }));
+
+// 2. filter: ค้นหาตาม keyword
+const matched = courses.filter(c => c.title.toLowerCase().includes(keyword.toLowerCase()));
+
+// 3. find: หาตาม id
+const item = courses.find(c => c.id === Number(req.params.id));
+
+// 4. some: เช็กซ้ำ
+const exists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
+
+// 5. reduce: รวมราคา
+const sumPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);`,
+      },
+      {
+        step: 'Node 3',
+        file: 'node:fs/promises & node:path',
+        title: 'การอ่านและเขียนไฟล์ JSON ด้วย fs/promises และ path.join(__dirname, ...)',
+        whenToUse: 'เมื่อโจทย์เก็บข้อมูลในไฟล์ .json บนเครื่องเซิร์ฟเวอร์',
+        keyPoints: [
+          'ใช้ path.join(__dirname, "../data/menu.json") เสมอเพื่อป้องกันปัญหาหาไฟล์ไม่เจอ',
+        ],
+        code: `const fs = require('node:fs/promises');
+const path = require('node:path');
+const file = path.join(__dirname, '../data/menu.json');
+
+async function readMenu() {
+  const text = await fs.readFile(file, 'utf8');
+  return JSON.parse(text);
 }
 
-// ใน DELETE /api/courses/:id
-const hasActiveEnrollments =
-  course.enrolled > 0 ||
-  store.enrollments.some(e => e.courseId === course.id && e.status === 'active');
-
-if (hasActiveEnrollments) {
-  return res.status(409).json({ message: 'Cannot delete course with active enrollments' });
+async function writeMenu(data) {
+  await fs.writeFile(file, JSON.stringify(data, null, 2), 'utf8');
 }`,
+      },
+    ],
+  },
+  {
+    id: 'status-and-rules',
+    badge: '🎯 ตาราง HTTP Status & กฎข้อสอบ',
+    title: 'สรุป HTTP Status Codes (200/201/400/401/403/404/409) & สูตรเช็กเงื่อนไขข้อสอบ',
+    summary: 'ตารางเทียบ Status Code ทุกกรณี และสูตรเช็กเจ้าของข้อมูล / การยกเลิกคืนสต็อกแบบไม่คืนซ้ำ',
+    sections: [
+      {
+        step: 'Rule 1',
+        file: 'HTTP Status Codes',
+        title: 'ตารางเลือกใช้ HTTP Status Code ให้ตรงกับชุดตรวจข้อสอบ',
+        whenToUse: 'เช็กทุกครั้งก่อนส่ง res.status(...).json(...)',
+        keyPoints: [
+          '200 OK = ดึงข้อมูล (GET), แก้ไข (PUT/PATCH), หรือลบ (DELETE) สำเร็จ',
+          '201 Created = สร้างข้อมูลใหม่สำเร็จ (POST เช่น สมัครสมาชิก, เพิ่มคอร์ส, ลงทะเบียน)',
+          '400 Bad Request = ข้อมูลว่าง, รูปแบบผิด, ราคาติดลบ, รหัสผ่านสั้นเกินไป',
+          '401 Unauthorized = ไม่ได้ส่ง Token, Token ผิด/หมดอายุ, หรือ Login รหัสผ่านผิด',
+          '403 Forbidden = ล็อกอินแล้ว แต่ Role ไม่ใช่ Admin หรือพยายามแก้/ลบข้อมูลของคนอื่น',
+          '404 Not Found = ไม่พบ ID ของข้อมูลที่ระบุ',
+          '409 Conflict = ข้อมูลซ้ำ (อีเมลซ้ำ/รหัสวิชาซ้ำ/ลงทะเบียนซ้ำ) หรือขัดแย้งกับสถานะ (ที่นั่งเต็ม/สต็อกหมด/ยกเลิกซ้ำ/ลบคอร์สที่มีคนเรียนอยู่)',
+        ],
+        code: `// ลำดับการเช็กใน Route แนะนำให้เรียงตามนี้:
+// 1. ตรวจ Token / สิทธิ์ (401 -> 403)
+// 2. ตรวจว่ามีรายการอยู่จริงไหม (404 Not Found)
+// 3. ตรวจรูปแบบข้อมูล Input (400 Bad Request)
+// 4. ตรวจข้อมูลซ้ำ / โควตาเต็ม / สถานะขัดแย้ง (409 Conflict)
+// 5. บันทึกข้อมูลและส่งกลับ (201 Created หรือ 200 OK)`,
+      },
+      {
+        step: 'Rule 2',
+        file: 'Owner or Admin + Cancel Refund',
+        title: 'สูตรตรวจสิทธิ์ "เจ้าของหรือ Admin" และยกเลิกคืนที่นั่งครั้งเดียว',
+        whenToUse: 'ใช้ใน PATCH /api/enrollments/:id/cancel หรือ DELETE รีวิว',
+        keyPoints: [
+          'ถ้า enrollment.userId !== req.user.userId && req.user.role !== "admin" -> ตอบ 403',
+          'ถ้า enrollment.status === "cancelled" อยู่แล้ว -> ตอบ 409 และห้ามคืนที่นั่งซ้ำเด็ดขาด',
+        ],
+        code: `if (enrollment.userId !== req.user.userId && req.user.role !== 'admin') {
+  return res.status(403).json({ message: 'Forbidden: Owner or admin only' });
+}
+if (enrollment.status === 'cancelled') {
+  return res.status(409).json({ message: 'Already cancelled' });
+}
+enrollment.status = 'cancelled';
+course.enrolled = Math.max(0, course.enrolled - 1);`,
       },
     ],
   },
