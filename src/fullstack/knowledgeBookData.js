@@ -5,23 +5,125 @@
 
 export const knowledgeCategories = [
   {
+    id: 'exam-gameplan',
+    badge: '🧭 แผนผังทำข้อสอบ (เมื่อสมองว่าง เริ่มตรงนี้)',
+    title: 'ลำดับการทำข้อสอบ Full Stack ทีละก้าว (จาก 0 จนครบ 100 คะแนน)',
+    summary: 'ถ้าเปิดข้อสอบมาแล้วสมองว่าง ไม่รู้จะเริ่มพิมพ์ไฟล์ไหนก่อน ให้เดินตาม 6 ขั้นตอนนี้ทีละก้าว ห้ามทำข้ามขั้น เพราะแต่ละขั้นจะปลดล็อกคะแนนขั้นถัดไป',
+    sections: [
+      {
+        step: 'ก้าวที่ 1 (5 นาทีแรก)',
+        file: 'database/*.sql และ .env → backend/db/mysql.js',
+        title: '1. ส่องตารางในไฟล์ .sql แล้วเชื่อมฐานข้อมูลให้ติดก่อน (ยังไม่ต้องแตะ React)',
+        whenToUse: 'ทันทีที่เปิดโจทย์สอบ สิ่งแรกที่ต้องรู้คือ "มีตารางชื่ออะไร และคอลัมน์ชื่ออะไรบ้าง"',
+        keyPoints: [
+          'เปิดไฟล์ .sql ดูชื่อตาราง (เช่น users, categories, courses, enrollments) และชื่อคอลัมน์ให้แม่น',
+          'รันไฟล์ .sql เข้า MySQL/XAMPP แล้วเช็กไฟล์ .env ว่า DB_NAME ตรงกับชื่อฐานข้อมูลใน .sql',
+          'สร้าง/เช็กไฟล์ backend/db/mysql.js ให้ส่งออก mysql.createPool(...) พร้อมใช้งาน',
+        ],
+        code: `// =========================================================
+// เช็กลิสต์ 5 นาทีแรกเวลาเปิดข้อสอบ:
+// =========================================================
+// 1. เปิดไฟล์ database/*.sql ดูชื่อตารางและคอลัมน์จริง เช่น:
+//    - users       (id, userName, email, passwordHash, role)
+//    - categories  (id, name)
+//    - courses     (id, code, title, categoryId, price, seats, enrolled)
+//    - enrollments (id, userId, courseId, status, createdAt)
+//
+// 2. เช็กไฟล์ .env ให้ชื่อ DB_NAME ตรงกับ CREATE DATABASE ใน .sql
+// 3. เปิดเซิร์ฟเวอร์ทวนว่าเชื่อม DB ติด ก่อนเริ่มเขียน API`,
+      },
+      {
+        step: 'ก้าวที่ 2 (เก็บคะแนนไวที่สุด)',
+        file: 'backend/controllers/courseController.js (เฉพาะ GET)',
+        title: '2. ทำ API ดึงข้อมูลสาธารณะ (GET) ที่ไม่ต้องล็อกอินก่อนเสมอ',
+        whenToUse: 'ทำเป็นอันดับแรกของโค้ด เพราะทดสอบง่ายสุด ไม่ติด Token และเอาไปเทสหน้าแรกของ React ได้เลย',
+        keyPoints: [
+          'เริ่มจาก GET /api/categories และ GET /api/courses (พร้อม LEFT JOIN ตารางหมวดหมู่ และ WHERE LIKE สำหรับค้นหา)',
+          'คำนวณค่าที่โจทย์ต้องการเพิ่มใน SQL เลย เช่น (c.seats - c.enrolled) AS availableSeats',
+          'ลองยิงผ่าน API Client หรือเปิดเบราว์เซอร์ดูว่าได้ Array JSON กลับมาครบไหม',
+        ],
+        code: `// เริ่มจากเขียนแค่ฟังก์ชัน GET ก่อน เพื่อปลดล็อกคะแนนก้อนแรกทันที:
+exports.listCategories = async (req, res, next) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM categories ORDER BY id ASC');
+    res.status(200).json(rows);
+  } catch (err) { next(err); }
+};`,
+      },
+      {
+        step: 'ก้าวที่ 3 (ปลดล็อกระบบสิทธิ์)',
+        file: 'backend/middleware/auth.js และ routes/auth.js',
+        title: '3. ทำระบบ Login / Register และ Middleware (verifyToken + requireAdmin)',
+        whenToUse: 'พอ GET ผ่านแล้ว ต้องรีบทำ Auth ทันที เพราะข้อที่เหลือทั้งหมด (POST/PUT/DELETE/Enroll) ต้องใช้ Token!',
+        keyPoints: [
+          'ทำ POST /api/auth/login (เช็กอีเมลจาก DB + bcrypt.compare + ออก jwt.sign ที่ใส่ { userId, role })',
+          'ทำ POST /api/auth/register (เช็กอีเมลซ้ำ 409 + bcrypt.hash + INSERT ลงตาราง users ตอบ 201)',
+          'ทำ middleware verifyToken (ไม่มี/ผิด ตอบ 401) และ requireAdmin (ไม่ใช่ admin ตอบ 403)',
+        ],
+        code: `// จำกฎเหล็ก Status Code ของระบบ Auth:
+// - ไม่ได้ส่ง Header Authorization: Bearer <token> หรือ Token ผิด  --> 401 Unauthorized
+// - ล็อกอินแล้ว แต่ req.user.role !== 'admin'                    --> 403 Forbidden
+// - สมัครสมาชิกด้วย email ที่มีในตาราง users แล้ว                 --> 409 Conflict`,
+      },
+      {
+        step: 'ก้าวที่ 4 (เก็บคะแนนฝั่งจัดการข้อมูล)',
+        file: 'controllers/courseController.js + enrollmentController.js',
+        title: '4. ทำ API ที่ต้องใช้สิทธิ์: Admin CRUD (POST/PUT/DELETE) และระบบลงทะเบียน (Enroll/Cancel)',
+        whenToUse: 'เมื่อมี verifyToken และ requireAdmin พร้อมแล้ว ค่อยมาเขียนปุ่มเพิ่ม/แก้/ลบ และปุ่มลงทะเบียน',
+        keyPoints: [
+          'จำลำดับเช็กใน Controller ทุกตัว: 1) เช็กพบข้อมูลไหม (404) -> 2) เช็กข้อมูลว่าง/ติดลบ (400) -> 3) เช็กข้อมูลซ้ำ/ที่นั่งเต็ม/มีคนเรียนอยู่ (409) -> 4) สั่ง INSERT (201) หรือ UPDATE/DELETE (200)',
+          'ตอนลงทะเบียน (POST /api/enrollments) ต้องทำ 2 อย่างคู่กัน: INSERT ลง enrollments + UPDATE courses SET enrolled = enrolled + 1',
+          'ตอนยกเลิก (PATCH /api/enrollments/:id/cancel) ต้องเช็กว่าเป็นเจ้าของหรือ Admin (403) และถ้า status === "cancelled" ไปแล้วให้ตอบ 409 ห้ามคืนที่นั่งซ้ำ!',
+        ],
+        code: `// สูตรจำลำดับการดัก Error ใน Controller ทุกข้อ (เขียนเรียงตามนี้ได้คะแนนครบทุกเคส):
+// 1. หาแถวตาม id ก่อน -> ถ้า rows.length === 0          return res.status(404)
+// 2. เช็กสิทธิ์เจ้าของ  -> ถ้าไม่ใช่เจ้าของและไม่ใช่ admin    return res.status(403)
+// 3. เช็ก Input ว่าง/ผิด -> ถ้า !title || price < 0       return res.status(400)
+// 4. เช็กซ้ำ/เต็ม/ขัดแย้ง -> ถ้าซ้ำ หรือ enrolled >= seats  return res.status(409)
+// 5. บันทึกลง DB จริง   -> INSERT ตอบ 201 / UPDATE,DELETE ตอบ 200`,
+      },
+      {
+        step: 'ก้าวที่ 5 (เชื่อมหน้าบ้าน React)',
+        file: 'frontend/App.jsx และ frontend/pages/*.jsx',
+        title: '5. ทำฝั่ง React เรียงจาก: เก็บ Token → หน้าแรกดึงรายการ → ปุ่มกดส่ง API → กั้นหน้า Admin',
+        whenToUse: 'หลังจาก Backend ตอบ JSON ถูกต้องแล้ว ค่อยสลับมาทำหน้าเว็บ React',
+        keyPoints: [
+          '1) เช็กว่าตอน Login สำเร็จ เก็บ token และ user ลง localStorage และแนบ Authorization: Bearer <token> ไปกับทุก Request',
+          '2) หน้าแรก (Catalog): ใช้ useEffect ดึงคอร์สเมื่อ keyword หรือ categoryId เปลี่ยน',
+          '3) ปุ่มกด (ลงทะเบียน / ยกเลิก / เพิ่มลบคอร์ส): พอยิง API สำเร็จ ให้เรียกฟังก์ชันดึงข้อมูลใหม่ (loadData()) ทันทีเพื่อให้เลขที่นั่งอัปเดตบนหน้าจอ',
+          '4) กั้น Route หน้า /admin: ถ้า !user ให้ <Navigate to="/login" /> ถ้า user.role !== "admin" ให้แสดงข้อความ 403 Access Denied',
+        ],
+        code: `// แพทเทิร์นมาตรฐานของปุ่มกดทุกปุ่มใน React เวลาสอบ:
+async function handleAction(id) {
+  setError('');
+  try {
+    await api.post('/api/enrollments', { courseId: id });
+    await loadCourses(); // <-- สำคัญมาก! โหลดข้อมูลใหม่เพื่อให้หน้าจออัปเดตทันที
+  } catch (err) {
+    setError(err.response?.data?.message || err.message); // แสดงข้อความ Error จาก Backend
+  }
+}`,
+      },
+    ],
+  },
+  {
     id: 'db-to-api-e2e',
-    badge: '🔥 ลำดับทำข้อสอบ: ดึง DB จริง → API เสร็จ',
-    title: 'Step-by-Step: ตั้งแต่เชื่อมต่อ DB จริง (MySQL2 / Prisma) จนได้ API ครบทั้งระบบ',
-    summary: 'ไล่เรียงทีละไฟล์ตั้งแต่ตั้งค่า .env → สร้างตัวเชื่อม DB → เขียน Controller ดึง/เพิ่ม/แก้/ลบข้อมูลจริง → ผูก Route → เปิด Server',
+    badge: '🔥 ดึง DB จริง (แบบไม่ใช้ Prisma) → API เสร็จ',
+    title: 'Step-by-Step: ดึงฐานข้อมูลจริงด้วย MySQL2 ล้วน (ไม่ใช้ Prisma) จนได้ API ครบทั้งระบบ',
+    summary: 'โค้ดเพียว SQL (mysql2/promise) ไล่ทีละไฟล์ตั้งแต่ .env → ตัวเชื่อม mysql.js → Controller ดึง/ค้นหา/JOIN/เพิ่ม/แก้/ลบ → ลงทะเบียน & ยกเลิกคืนที่นั่ง → ผูก Route',
     sections: [
       {
         step: 'Step 1',
-        file: '.env และ backend/db/db.js',
-        title: '1. สร้างไฟล์เชื่อมต่อฐานข้อมูลจริง (เลือกใช้ MySQL2 Pool หรือ Prisma Client)',
-        whenToUse: 'ก้าวแรกสุดของฝั่ง Backend เพื่อให้ทุก Controller เรียกใช้ฐานข้อมูลตัวเดียวกัน',
+        file: '.env และ backend/db/mysql.js',
+        title: '1. สร้างไฟล์เชื่อมต่อฐานข้อมูล MySQL จริงด้วย mysql2/promise (ไม่ใช้ Prisma)',
+        whenToUse: 'ก้าวแรกสุดของฝั่ง Backend เพื่อให้ทุก Controller เรียกใช้ pool.execute(sql, params) ได้ทันที',
         keyPoints: [
-          'หากโจทย์ให้ไฟล์ .sql มารันกับ MySQL/XAMPP ให้ใช้ mysql2/promise (ได้ผลลัพธ์เป็น Array คู่ [rows] เสมอ)',
-          'หากโจทย์ให้ไฟล์ prisma/schema.prisma มา ให้ใช้ PrismaClient()',
-          'ต้องเรียก require("dotenv").config() ก่อนอ่านค่า process.env เสมอ',
+          'ใช้ require("mysql2/promise") เพื่อให้ใช้ async/await ได้เลยโดยไม่ต้องเขียน Callback',
+          'ผลลัพธ์จาก await pool.execute(sql, params) จะเป็น Array คู่ [rows] เสมอ จึงต้องแกะด้วย const [rows] = ...',
+          'ใช้เครื่องหมาย ? ในคำสั่ง SQL แล้วส่งค่าผ่าน Array ตัวที่สองเสมอ (ป้องกัน SQL Injection และไม่ต้องต่อ String เอง)',
         ],
         code: `// =========================================================
-// ไฟล์ .env (วางไว้ที่ Root ของโปรเจกต์)
+// 1. ไฟล์ .env (วางไว้ที่โฟลเดอร์นอกสุดของโปรเจกต์)
 // =========================================================
 PORT=3000
 JWT_KEY=my-super-secret-exam-key
@@ -30,10 +132,9 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=skillhub_exam
-DATABASE_URL="mysql://root:@localhost:3306/skillhub_exam"
 
 // =========================================================
-// แบบที่ A: ไฟล์ backend/db/mysql.js (ใช้ mysql2/promise ดึง DB จริง)
+// 2. ไฟล์ backend/db/mysql.js (ตัวเชื่อมต่อฐานข้อมูล MySQL จริง)
 // =========================================================
 require('dotenv').config();
 const mysql = require('mysql2/promise');
@@ -48,31 +149,32 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-module.exports = pool;
-
-// =========================================================
-// แบบที่ B: ไฟล์ backend/db/prisma.js (ใช้ Prisma ORM ดึง DB จริง)
-// =========================================================
-require('dotenv').config();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-module.exports = prisma;`,
+module.exports = pool;`,
       },
       {
         step: 'Step 2',
-        file: 'backend/controllers/courseController.js (แบบ MySQL2)',
-        title: '2. เขียน Controller ดึง DB จริงด้วย MySQL2 (SELECT + JOIN + ค้นหา + INSERT + UPDATE + DELETE)',
-        whenToUse: 'เมื่อใช้ mysql2/promise เขียน API ดึงข้อมูลพร้อมตารางหมวดหมู่ (JOIN) และทำ CRUD จนจบ',
+        file: 'backend/controllers/courseController.js',
+        title: '2. เขียน Controller ดึง DB จริงด้วย SQL ล้วน (SELECT + LEFT JOIN + ค้นหา + INSERT + UPDATE + DELETE)',
+        whenToUse: 'ใช้จัดการข้อมูลหลักของระบบ เช่น คอร์สเรียน/สินค้า/อุปกรณ์ พร้อมเชื่อมชื่อหมวดหมู่ (LEFT JOIN) และเช็กเงื่อนไขครบทุกข้อ',
         keyPoints: [
-          'ใช้ const [rows] = await pool.execute(sql, params) เสมอ โดยใส่ ? แทนค่าที่รับมาจากผู้ใช้',
-          'ตอน INSERT: อ่าน ID ที่เพิ่งสร้างได้จาก result.insertId',
-          'ตอน UPDATE / DELETE: เช็กว่ามีแถวที่ถูกแก้หรือไม่จาก result.affectedRows === 0 (ถ้าเป็น 0 ตอบ 404 Not Found)',
+          'ตอนดึงรายการ (SELECT): ใช้ LEFT JOIN เพื่อเอาชื่อหมวดหมู่มาแสดง และคำนวณ (c.seats - c.enrolled) AS availableSeats ใน SQL ได้เลย',
+          'ตอนเพิ่มข้อมูล (INSERT): เช็กรหัสซ้ำก่อน (ถ้าซ้ำตอบ 409) พอ INSERT เสร็จเอา result.insertId ไป SELECT แถวใหม่ส่งกลับพร้อม status 201',
+          'ตอนแก้ไข/ลบ (UPDATE / DELETE): ต้อง SELECT เช็กก่อนว่ามี id นี้จริงไหม (ถ้าไม่มีตอบ 404) และเช็กเงื่อนไขห้ามลดที่นั่งต่ำกว่าคนเรียน / ห้ามลบถ้ามีคนเรียนอยู่ (ตอบ 409)',
         ],
-        code: `// ไฟล์ backend/controllers/courseController.js (เขียนด้วย mysql2/promise)
+        code: `// ไฟล์ backend/controllers/courseController.js (เขียนด้วย mysql2/promise ล้วน ไม่ใช้ Prisma)
 const pool = require('../db/mysql.js');
 
-// 1. GET /api/courses?keyword=&categoryId= (ดึงคอร์ส + JOIN หมวดหมู่ + คำนวณที่นั่งว่าง)
+// 0. GET /api/categories (ดึงหมวดหมู่ทั้งหมดไปทำปุ่มกรอง/Dropdown)
+exports.listCategories = async (req, res, next) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM categories ORDER BY id ASC');
+    res.status(200).json(rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 1. GET /api/courses?keyword=&categoryId= (ดึงคอร์ส + JOIN หมวดหมู่ + ค้นหา)
 exports.listCourses = async (req, res, next) => {
   try {
     const keyword = String(req.query.keyword || '').trim();
@@ -83,9 +185,10 @@ exports.listCourses = async (req, res, next) => {
              (c.seats - c.enrolled) AS availableSeats
       FROM courses c
       LEFT JOIN categories cat ON c.categoryId = cat.id
-      WHERE (c.title LIKE ? OR c.code LIKE ?)
+      WHERE (c.title LIKE ? OR c.code LIKE ? OR c.instructor LIKE ?)
     \`;
-    const params = ['%' + keyword + '%', '%' + keyword + '%'];
+    const like = '%' + keyword + '%';
+    const params = [like, like, like];
 
     if (categoryId) {
       sql += ' AND c.categoryId = ?';
@@ -100,7 +203,7 @@ exports.listCourses = async (req, res, next) => {
   }
 };
 
-// 2. GET /api/courses/:id (ดึงคอร์สเดียวตาม ID)
+// 2. GET /api/courses/:id (ดึงรายละเอียดคอร์สเดียวตาม ID)
 exports.getCourseById = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -112,7 +215,7 @@ exports.getCourseById = async (req, res, next) => {
       [id]
     );
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+      return res.status(404).json({ message: 'Course not found' });
     }
     res.status(200).json(rows[0]);
   } catch (err) {
@@ -120,26 +223,40 @@ exports.getCourseById = async (req, res, next) => {
   }
 };
 
-// 3. POST /api/courses (สร้างคอร์สใหม่ลง DB จริง)
+// 3. POST /api/courses (Admin สร้างคอร์สใหม่ลง DB จริง)
 exports.createCourse = async (req, res, next) => {
   try {
-    const { code, title, categoryId, price, seats } = req.body || {};
+    const { code, title, categoryId, instructor, price, seats, level, description } = req.body || {};
+
+    // เช็กข้อมูลบังคับ (400 Bad Request)
     if (!code?.trim() || !title?.trim() || Number(price) < 0 || Number(seats) < 1) {
-      return res.status(400).json({ message: 'ข้อมูลคอร์สไม่ถูกต้อง' });
+      return res.status(400).json({ message: 'Invalid course data' });
     }
 
-    // เช็กรหัสวิชาซ้ำใน DB
-    const [dup] = await pool.execute('SELECT id FROM courses WHERE code = ?', [code.trim().toUpperCase()]);
+    // เช็กรหัสวิชาซ้ำใน DB (409 Conflict)
+    const cleanCode = code.trim().toUpperCase();
+    const [dup] = await pool.execute('SELECT id FROM courses WHERE code = ?', [cleanCode]);
     if (dup.length > 0) {
-      return res.status(409).json({ message: 'รหัสวิชานี้มีในระบบแล้ว' });
+      return res.status(409).json({ message: 'Duplicate course code' });
     }
 
+    // บันทึกลงตาราง courses
     const [result] = await pool.execute(
-      'INSERT INTO courses (code, title, categoryId, price, seats, enrolled) VALUES (?, ?, ?, ?, ?, 0)',
-      [code.trim().toUpperCase(), title.trim(), Number(categoryId), Number(price), Number(seats)]
+      \`INSERT INTO courses (code, title, categoryId, instructor, price, seats, enrolled, level, description)
+       VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)\`,
+      [
+        cleanCode,
+        title.trim(),
+        Number(categoryId || 1),
+        instructor?.trim() || 'Staff Instructor',
+        Number(price),
+        Number(seats),
+        level || 'Beginner',
+        description?.trim() || '',
+      ]
     );
 
-    // ดึงแถวที่เพิ่งสร้างส่งกลับไปพร้อม status 201
+    // ดึงแถวที่เพิ่งสร้างส่งกลับไปพร้อม status 201 Created
     const [created] = await pool.execute('SELECT * FROM courses WHERE id = ?', [result.insertId]);
     res.status(201).json(created[0]);
   } catch (err) {
@@ -147,30 +264,38 @@ exports.createCourse = async (req, res, next) => {
   }
 };
 
-// 4. PUT /api/courses/:id (แก้ไขคอร์สใน DB จริง + ห้ามลดที่นั่งต่ำกว่าคนเรียน)
+// 4. PUT /api/courses/:id (Admin แก้ไขคอร์สใน DB จริง + ห้ามลดที่นั่งต่ำกว่าคนเรียน)
 exports.updateCourse = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { code, title, categoryId, price, seats } = req.body || {};
+    const { code, title, categoryId, instructor, price, seats, level, description } = req.body || {};
 
+    // เช็กก่อนว่ามีคอร์สนี้ไหม (404 Not Found)
     const [existing] = await pool.execute('SELECT * FROM courses WHERE id = ?', [id]);
     if (existing.length === 0) {
-      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+      return res.status(404).json({ message: 'Course not found' });
     }
     const current = existing[0];
 
-    if (Number(seats) < current.enrolled) {
-      return res.status(409).json({ message: 'ห้ามลดจำนวนที่นั่งต่ำกว่าจำนวนผู้ลงทะเบียนปัจจุบัน' });
+    // ถ้าส่ง seats มาใหม่ ต้องไม่น้อยกว่าจำนวนคนเรียนปัจจุบัน (409 Conflict)
+    const nextSeats = seats !== undefined ? Number(seats) : current.seats;
+    if (nextSeats < current.enrolled) {
+      return res.status(409).json({ message: 'Cannot reduce seats below enrolled count' });
     }
 
     await pool.execute(
-      'UPDATE courses SET code = ?, title = ?, categoryId = ?, price = ?, seats = ? WHERE id = ?',
+      \`UPDATE courses
+       SET code = ?, title = ?, categoryId = ?, instructor = ?, price = ?, seats = ?, level = ?, description = ?
+       WHERE id = ?\`,
       [
         code ? code.trim().toUpperCase() : current.code,
         title ? title.trim() : current.title,
-        categoryId ? Number(categoryId) : current.categoryId,
+        categoryId !== undefined ? Number(categoryId) : current.categoryId,
+        instructor !== undefined ? instructor.trim() : current.instructor,
         price !== undefined ? Number(price) : current.price,
-        seats !== undefined ? Number(seats) : current.seats,
+        nextSeats,
+        level || current.level,
+        description !== undefined ? description : current.description,
         id,
       ]
     );
@@ -182,91 +307,21 @@ exports.updateCourse = async (req, res, next) => {
   }
 };
 
-// 5. DELETE /api/courses/:id (ลบคอร์สจาก DB จริง + ห้ามลบถ้ามีคนลงทะเบียนอยู่)
+// 5. DELETE /api/courses/:id (Admin ลบคอร์สจาก DB จริง + ห้ามลบถ้ามีคนลงทะเบียนอยู่)
 exports.deleteCourse = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     const [existing] = await pool.execute('SELECT * FROM courses WHERE id = ?', [id]);
     if (existing.length === 0) {
-      return res.status(404).json({ message: 'ไม่พบคอร์สเรียนนี้' });
+      return res.status(404).json({ message: 'Course not found' });
     }
     if (existing[0].enrolled > 0) {
-      return res.status(409).json({ message: 'ลบไม่ได้เนื่องจากยังมีผู้ลงทะเบียนเรียนอยู่' });
+      return res.status(409).json({ message: 'Cannot delete course with active enrollments' });
     }
 
     await pool.execute('DELETE FROM courses WHERE id = ?', [id]);
-    res.status(200).json({ message: 'ลบคอร์สสำเร็จ' });
+    res.status(200).json({ message: 'Course deleted' });
   } catch (err) {
-    next(err);
-  }
-};`,
-      },
-      {
-        step: 'Step 2 (ทางเลือก Prisma)',
-        file: 'backend/controllers/courseController.js (แบบ Prisma ORM)',
-        title: '3. เขียน Controller ดึง DB จริงด้วย Prisma ORM (findMany, include, create, update, delete)',
-        whenToUse: 'เมื่อโปรเจกต์ใช้ Prisma ORM แทนการเขียน SQL ดิบ',
-        keyPoints: [
-          'ใช้ include: { category: true } เพื่อดึงข้อมูลตารางที่เชื่อม Foreign Key มาพร้อมกันเหมือน JOIN',
-          'ใช้ where: { OR: [{ title: { contains: keyword } }, { code: { contains: keyword } }] } สำหรับค้นหาหลายคอลัมน์',
-          'ดัก err.code === "P2002" (ข้อมูลซ้ำ -> 409) และ err.code === "P2025" (ไม่พบข้อมูล -> 404)',
-        ],
-        code: `// ไฟล์ backend/controllers/courseController.js (เขียนด้วย Prisma ORM)
-const prisma = require('../db/prisma.js');
-
-// 1. GET /api/courses?keyword=&categoryId=
-exports.listCourses = async (req, res, next) => {
-  try {
-    const keyword = String(req.query.keyword || '').trim();
-    const categoryId = req.query.categoryId ? Number(req.query.categoryId) : undefined;
-
-    const rows = await prisma.course.findMany({
-      where: {
-        ...(categoryId ? { categoryId } : {}),
-        ...(keyword
-          ? {
-              OR: [
-                { title: { contains: keyword } },
-                { code: { contains: keyword } },
-              ],
-            }
-          : {}),
-      },
-      include: { category: true },
-      orderBy: { id: 'asc' },
-    });
-
-    const enriched = rows.map(c => ({
-      ...c,
-      categoryName: c.category?.name || '',
-      availableSeats: Math.max(0, c.seats - c.enrolled),
-    }));
-    res.json(enriched);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// 2. POST /api/courses
-exports.createCourse = async (req, res, next) => {
-  try {
-    const { code, title, categoryId, price, seats } = req.body || {};
-    if (!code?.trim() || !title?.trim() || Number(price) < 0 || Number(seats) < 1) {
-      return res.status(400).json({ message: 'Invalid input' });
-    }
-    const created = await prisma.course.create({
-      data: {
-        code: code.trim().toUpperCase(),
-        title: title.trim(),
-        categoryId: Number(categoryId),
-        price: Number(price),
-        seats: Number(seats),
-        enrolled: 0,
-      },
-    });
-    res.status(201).json(created);
-  } catch (err) {
-    if (err.code === 'P2002') return res.status(409).json({ message: 'Duplicate course code' });
     next(err);
   }
 };`,
@@ -274,16 +329,35 @@ exports.createCourse = async (req, res, next) => {
       {
         step: 'Step 3',
         file: 'backend/controllers/enrollmentController.js',
-        title: '4. การทำ Transaction ลงทะเบียนตัดที่นั่ง & ยกเลิกคืนที่นั่งใน DB จริง',
-        whenToUse: 'เมื่อต้องแก้ไข 2 ตารางพร้อมกัน (เพิ่มใบลงทะเบียนใน enrollments + บวกยอด enrolled ใน courses)',
+        title: '3. เขียน Controller ลงทะเบียนเรียน (ตัดที่นั่ง) & ยกเลิกการลงทะเบียน (คืนที่นั่ง) ด้วย MySQL2 ล้วน',
+        whenToUse: 'เมื่อต้องแก้ไข 2 ตารางพร้อมกันใน DB จริง (ตาราง enrollments และตาราง courses)',
         keyPoints: [
-          'ใน MySQL2 ใช้ const conn = await pool.getConnection(); await conn.beginTransaction(); ... await conn.commit();',
-          'ถ้าเกิดข้อผิดพลาดกลางทาง ให้สั่ง await conn.rollback() เพื่อไม่ให้ที่นั่งถูกตัดฟรี',
+          'ใช้ const conn = await pool.getConnection() แล้วครอบด้วย beginTransaction() -> commit() / rollback() เพื่อให้ตัดและคืนที่นั่งแม่นยำ 100%',
+          'ตอนลงทะเบียน (POST /api/enrollments): เช็กคอร์สมีจริงไหม (404) -> เช็กลงซ้ำไหม (409) -> เช็กที่นั่งเต็มไหม (409) -> INSERT + UPDATE enrolled + 1 (ตอบ 201)',
+          'ตอนยกเลิก (PATCH /api/enrollments/:id/cancel): เช็กมีรายการไหม (404) -> เช็กเป็นเจ้าของหรือ Admin ไหม (403) -> เช็กยกเลิกซ้ำไหม (409) -> UPDATE status="cancelled" + UPDATE enrolled - 1 (ตอบ 200)',
         ],
-        code: `// ไฟล์ backend/controllers/enrollmentController.js (ใช้ MySQL2 Transaction)
+        code: `// ไฟล์ backend/controllers/enrollmentController.js (เขียนด้วย mysql2/promise ล้วน)
 const pool = require('../db/mysql.js');
 
-// POST /api/enrollments - ลงทะเบียนเรียนและตัดที่นั่งใน DB จริง
+// 1. GET /api/enrollments/my (ดึงรายการลงทะเบียนของฉัน + JOIN ข้อมูลคอร์ส)
+exports.listMyEnrollments = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const [rows] = await pool.execute(
+      \`SELECT e.*, c.code AS courseCode, c.title AS courseTitle, c.price, c.instructor
+       FROM enrollments e
+       INNER JOIN courses c ON e.courseId = c.id
+       WHERE e.userId = ?
+       ORDER BY e.id DESC\`,
+      [userId]
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 2. POST /api/enrollments (ลงทะเบียนเรียน + ตัดที่นั่งใน DB จริง)
 exports.enrollCourse = async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
@@ -292,7 +366,7 @@ exports.enrollCourse = async (req, res, next) => {
     const userId = req.user.userId;
     const courseId = Number(req.body?.courseId);
 
-    // 1. ดึงข้อมูลคอร์สและล็อกแถวไว้ตรวจสอบที่นั่ง (FOR UPDATE)
+    // 2.1 ดึงข้อมูลคอร์ส (404 ถ้าไม่พบ)
     const [courses] = await conn.execute('SELECT * FROM courses WHERE id = ? FOR UPDATE', [courseId]);
     if (courses.length === 0) {
       await conn.rollback();
@@ -300,7 +374,7 @@ exports.enrollCourse = async (req, res, next) => {
     }
     const course = courses[0];
 
-    // 2. เช็กว่าลงทะเบียนคอร์สนี้แบบ active ไปแล้วหรือยัง
+    // 2.2 เช็กว่าลงทะเบียนคอร์สนี้แบบ active อยู่แล้วหรือไม่ (409 ถ้าลงซ้ำ)
     const [dup] = await conn.execute(
       'SELECT id FROM enrollments WHERE userId = ? AND courseId = ? AND status = "active"',
       [userId, courseId]
@@ -310,13 +384,13 @@ exports.enrollCourse = async (req, res, next) => {
       return res.status(409).json({ message: 'Already enrolled in this course' });
     }
 
-    // 3. เช็กที่นั่งว่าง
+    // 2.3 เช็กที่นั่งว่าง (409 ถ้าที่นั่งเต็ม)
     if (course.enrolled >= course.seats) {
       await conn.rollback();
       return res.status(409).json({ message: 'Course is full' });
     }
 
-    // 4. บันทึกใบลงทะเบียน + บวกจำนวนคนเรียนในตาราง courses
+    // 2.4 เพิ่มแถวลง enrollments และบวกจำนวนคนเรียนใน courses
     const [ins] = await conn.execute(
       'INSERT INTO enrollments (userId, courseId, status) VALUES (?, ?, "active")',
       [userId, courseId]
@@ -331,16 +405,61 @@ exports.enrollCourse = async (req, res, next) => {
   } finally {
     conn.release();
   }
+};
+
+// 3. PATCH /api/enrollments/:id/cancel (ยกเลิกใบลงทะเบียน + คืนที่นั่ง 1 ที่)
+exports.cancelEnrollment = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const enrollmentId = Number(req.params.id);
+    const [rows] = await conn.execute('SELECT * FROM enrollments WHERE id = ? FOR UPDATE', [enrollmentId]);
+
+    // 3.1 เช็กว่ามีใบลงทะเบียนนี้ไหม (404 Not Found)
+    if (rows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ message: 'Enrollment not found' });
+    }
+    const enrollment = rows[0];
+
+    // 3.2 เช็กสิทธิ์: ต้องเป็นเจ้าของใบลงทะเบียน หรือเป็น Admin เท่านั้น (403 Forbidden)
+    if (enrollment.userId !== req.user.userId && req.user.role !== 'admin') {
+      await conn.rollback();
+      return res.status(403).json({ message: 'Forbidden: Owner or admin only' });
+    }
+
+    // 3.3 เช็กว่าเคยยกเลิกไปแล้วหรือยัง (409 Conflict ห้ามคืนที่นั่งซ้ำ!)
+    if (enrollment.status === 'cancelled') {
+      await conn.rollback();
+      return res.status(409).json({ message: 'Enrollment already cancelled' });
+    }
+
+    // 3.4 เปลี่ยนสถานะเป็น cancelled และลดจำนวน enrolled ลง 1
+    await conn.execute('UPDATE enrollments SET status = "cancelled" WHERE id = ?', [enrollmentId]);
+    await conn.execute(
+      'UPDATE courses SET enrolled = GREATEST(0, enrolled - 1) WHERE id = ?',
+      [enrollment.courseId]
+    );
+
+    await conn.commit();
+    res.status(200).json({ ...enrollment, status: 'cancelled' });
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    conn.release();
+  }
 };`,
       },
       {
         step: 'Step 4',
-        file: 'backend/routes/courses.js และ backend/app.js',
-        title: '5. ผูก Controller เข้ากับ Express Router และเปิดใช้งานใน app.js จนเสร็จสมบูรณ์',
-        whenToUse: 'ขั้นตอนสุดท้ายในการประกอบร่าง API ให้พร้อมรับ Request จาก React หรือ Postman',
+        file: 'backend/routes/*.js และ backend/app.js',
+        title: '4. ผูก Controller เข้ากับ Express Router และเปิดใช้งานใน app.js จนเสร็จสมบูรณ์',
+        whenToUse: 'ขั้นตอนสุดท้ายในการประกอบร่าง API ให้พร้อมรับ Request จาก React หรือ API Client',
         keyPoints: [
           'Route ไหนที่ใครก็ดูได้ (Public) ไม่ต้องใส่ Middleware',
-          'Route ไหนต้องล็อกอิน पहले ให้ใส่ verifyToken คั่นตรงกลาง',
+          'Route ไหนต้องล็อกอินก่อน ให้ใส่ verifyToken คั่นตรงกลาง',
           'Route ไหนเฉพาะ Admin ให้ใส่ verifyToken, requireAdmin เรียงกันตามลำดับ',
         ],
         code: `// =========================================================
@@ -350,7 +469,8 @@ const router = require('express').Router();
 const courseController = require('../controllers/courseController.js');
 const { verifyToken, requireAdmin } = require('../middleware/auth.js');
 
-// Public Routes (ทุกคนดูได้)
+// Public Routes (ทุกคนดูได้ ไม่ต้องล็อกอิน)
+router.get('/categories', courseController.listCategories);
 router.get('/courses', courseController.listCourses);
 router.get('/courses/:id', courseController.getCourseById);
 
@@ -362,7 +482,20 @@ router.delete('/courses/:id', verifyToken, requireAdmin, courseController.delete
 module.exports = router;
 
 // =========================================================
-// 2. ไฟล์ backend/app.js (ประกอบร่าง API ทั้งระบบ)
+// 2. ไฟล์ backend/routes/enrollments.js
+// =========================================================
+const enrollRouter = require('express').Router();
+const enrollmentController = require('../controllers/enrollmentController.js');
+const { verifyToken } = require('../middleware/auth.js');
+
+enrollRouter.get('/my', verifyToken, enrollmentController.listMyEnrollments);
+enrollRouter.post('/', verifyToken, enrollmentController.enrollCourse);
+enrollRouter.patch('/:id/cancel', verifyToken, enrollmentController.cancelEnrollment);
+
+module.exports = enrollRouter;
+
+// =========================================================
+// 3. ไฟล์ backend/app.js (ประกอบร่าง API ทั้งระบบ)
 // =========================================================
 const express = require('express');
 const cors = require('cors');
@@ -374,12 +507,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// เชื่อม Route ทั้งหมดเข้ากับ Prefix /api
 app.use('/api/auth', authRoutes);
 app.use('/api', courseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 
-// Global Error Handler (ดัก Error จาก next(err) ทุกจุด)
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ message: err.message || 'Internal Server Error' });
