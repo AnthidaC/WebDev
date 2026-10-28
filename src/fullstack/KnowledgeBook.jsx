@@ -1,31 +1,30 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { KNOWLEDGE_BOOK_CATEGORIES } from './knowledgeBookData';
+import { knowledgeCategories } from './knowledgeBookData';
+
+const CHAPTER_COLORS = [
+  '#38bdf8',
+  '#a855f7',
+  '#22c55e',
+  '#f59e0b',
+  '#ec4899',
+  '#6366f1',
+];
 
 const styles = {
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    zIndex: 9999,
-    backgroundColor: 'rgba(2, 6, 23, 0.85)',
-    backdropFilter: 'blur(8px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '14px',
-  },
-  modal: {
-    width: 'min(1440px, 98vw)',
-    height: 'min(920px, 95vh)',
+  container: (isModal) => ({
+    flex: 1,
+    width: '100%',
+    height: isModal ? 'min(88vh, 900px)' : 'calc(100vh - 58px)',
+    minHeight: '620px',
     backgroundColor: '#0b1120',
-    border: '1px solid #334155',
-    borderRadius: '16px',
-    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.75)',
+    border: isModal ? '1px solid #334155' : 'none',
+    borderRadius: isModal ? '16px' : '0',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
     color: '#f8fafc',
     fontFamily: "'Inter', 'Noto Sans Thai', system-ui, -apple-system, sans-serif",
-  },
+  }),
   topBar: {
     padding: '14px 22px',
     backgroundColor: '#0f172a',
@@ -75,8 +74,8 @@ const styles = {
   },
   searchBox: {
     position: 'relative',
-    flex: '1 1 260px',
-    maxWidth: '380px',
+    flex: '1 1 250px',
+    maxWidth: '360px',
   },
   searchInput: {
     width: '100%',
@@ -115,6 +114,17 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
   }),
+  actionBtn: {
+    padding: '8px 13px',
+    backgroundColor: '#1e293b',
+    border: '1px solid #3b82f6',
+    borderRadius: '9px',
+    color: '#93c5fd',
+    fontSize: '12.5px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
   closeBtn: {
     padding: '8px 14px',
     backgroundColor: '#dc2626',
@@ -129,14 +139,14 @@ const styles = {
   workspace: {
     flex: 1,
     display: 'grid',
-    gridTemplateColumns: '300px 1fr',
+    gridTemplateColumns: '310px 1fr',
     overflow: 'hidden',
   },
   sidebar: {
     backgroundColor: '#0f172a',
     borderRight: '1px solid #1e293b',
     overflowY: 'auto',
-    padding: '14px 12px',
+    padding: '14px 12px 28px',
     display: 'flex',
     flexDirection: 'column',
     gap: '6px',
@@ -163,70 +173,83 @@ const styles = {
     gap: '4px',
     transition: 'all 0.15s ease',
   }),
+  chapterBadgeSmall: (color) => ({
+    fontSize: '11px',
+    fontWeight: 800,
+    color: color,
+  }),
   chapterBtnTop: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: '8px',
-    fontSize: '13.5px',
+    fontSize: '13px',
     fontWeight: 700,
-    lineHeight: 1.35,
+    lineHeight: 1.4,
   },
   chapterCount: (active, color) => ({
     padding: '2px 7px',
     borderRadius: '999px',
     fontSize: '11px',
-    fontWeight: 700,
+    fontWeight: 800,
     backgroundColor: active ? color : '#1e293b',
     color: active ? '#090d16' : '#94a3b8',
     flexShrink: 0,
   }),
   topicSubList: {
-    marginLeft: '12px',
+    marginLeft: '10px',
     marginTop: '4px',
-    marginBottom: '6px',
+    marginBottom: '8px',
     paddingLeft: '10px',
     borderLeft: '2px solid #334155',
     display: 'flex',
     flexDirection: 'column',
     gap: '3px',
   },
-  topicJumpBtn: (active) => ({
+  topicJumpBtn: {
     textAlign: 'left',
     padding: '6px 9px',
     borderRadius: '7px',
     border: 'none',
-    backgroundColor: active ? 'rgba(59, 130, 246, 0.18)' : 'transparent',
-    color: active ? '#93c5fd' : '#94a3b8',
+    backgroundColor: 'transparent',
+    color: '#94a3b8',
     fontSize: '12px',
-    fontWeight: active ? 700 : 500,
+    fontWeight: 500,
     cursor: 'pointer',
-    lineHeight: 1.35,
-  }),
+    lineHeight: 1.38,
+  },
   mainPane: {
     overflowY: 'auto',
-    padding: '22px 28px 40px',
+    padding: '22px 28px 44px',
     backgroundColor: '#0b1120',
   },
   chapterHero: (color) => ({
     padding: '18px 22px',
     borderRadius: '14px',
-    background: 'linear-gradient(135deg, #162033 0%, #0f172a 100%)',
+    background: 'linear-gradient(135deg, #162238 0%, #0f172a 100%)',
     border: '1px solid #26354d',
     borderLeft: `5px solid ${color}`,
-    marginBottom: '20px',
+    marginBottom: '22px',
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
+  }),
+  chapterHeroBadge: (color) => ({
+    alignSelf: 'flex-start',
+    padding: '4px 10px',
+    borderRadius: '6px',
+    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    border: `1px solid ${color}`,
+    color: color,
+    fontSize: '12px',
+    fontWeight: 800,
   }),
   chapterHeroTitle: {
     margin: 0,
     fontSize: '20px',
     fontWeight: 800,
     color: '#ffffff',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
+    lineHeight: 1.35,
   },
   chapterHeroDesc: {
     margin: 0,
@@ -240,20 +263,20 @@ const styles = {
     gap: '8px',
     marginTop: '6px',
   },
-  stepPill: (active, color) => ({
+  stepPill: {
     padding: '6px 12px',
     borderRadius: '8px',
-    border: active ? `1.5px solid ${color}` : '1px solid #334155',
-    backgroundColor: active ? 'rgba(59, 130, 246, 0.18)' : '#0f172a',
-    color: active ? '#ffffff' : '#cbd5e1',
+    border: '1px solid #334155',
+    backgroundColor: '#0f172a',
+    color: '#e2e8f0',
     fontSize: '12.5px',
     fontWeight: 600,
     cursor: 'pointer',
-  }),
+  },
   sectionsStack: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '22px',
+    gap: '24px',
   },
   card: {
     backgroundColor: '#111c30',
@@ -340,7 +363,7 @@ const styles = {
     gap: '6px',
     fontSize: `${Math.round(14 * scale)}px`,
     color: '#f1f5f9',
-    lineHeight: 1.6,
+    lineHeight: 1.65,
   }),
   codeHeader: {
     padding: '8px 18px',
@@ -374,7 +397,7 @@ const styles = {
     tabSize: 2,
   }),
   footerNav: {
-    marginTop: '26px',
+    marginTop: '28px',
     paddingTop: '18px',
     borderTop: '1px solid #1e293b',
     display: 'flex',
@@ -395,60 +418,75 @@ const styles = {
   },
 };
 
-export default function KnowledgeBook({ isOpen, onClose }) {
+export default function KnowledgeBook({ isOpen, onClose, onOpenActivity }) {
+  const categories = useMemo(
+    () =>
+      knowledgeCategories.map((cat, idx) => ({
+        ...cat,
+        color: CHAPTER_COLORS[idx % CHAPTER_COLORS.length],
+        sections: cat.sections.map((sec, sIdx) => ({
+          ...sec,
+          uid: sec.id || `${cat.id}-${sIdx}`,
+        })),
+      })),
+    []
+  );
+
   const [activeCategoryId, setActiveCategoryId] = useState(
-    KNOWLEDGE_BOOK_CATEGORIES[0]?.id || 'db-to-api-e2e'
+    categories[0]?.id || 'db-to-api-e2e'
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
-  const [fontScale, setFontScale] = useState(1); // 0.92 | 1 | 1.12
+  const [fontScale, setFontScale] = useState(1);
   const mainPaneRef = useRef(null);
 
   const isSearching = searchQuery.trim().length > 0;
 
   const filteredCategories = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return KNOWLEDGE_BOOK_CATEGORIES;
+    if (!q) return categories;
 
-    return KNOWLEDGE_BOOK_CATEGORIES.map((cat) => {
-      const matchedSections = cat.sections.filter(
-        (sec) =>
-          sec.title.toLowerCase().includes(q) ||
-          (sec.file && sec.file.toLowerCase().includes(q)) ||
-          (sec.step && sec.step.toLowerCase().includes(q)) ||
-          sec.whenToUse.toLowerCase().includes(q) ||
-          sec.keyPoints.some((kp) => kp.toLowerCase().includes(q)) ||
-          sec.code.toLowerCase().includes(q)
-      );
-      return {
-        ...cat,
-        sections: matchedSections,
-      };
-    }).filter((cat) => cat.sections.length > 0);
-  }, [searchQuery]);
+    return categories
+      .map((cat) => {
+        const matchedSections = cat.sections.filter(
+          (sec) =>
+            sec.title.toLowerCase().includes(q) ||
+            (sec.file && sec.file.toLowerCase().includes(q)) ||
+            (sec.step && sec.step.toLowerCase().includes(q)) ||
+            (sec.whenToUse && sec.whenToUse.toLowerCase().includes(q)) ||
+            (sec.keyPoints &&
+              sec.keyPoints.some((kp) => kp.toLowerCase().includes(q))) ||
+            sec.code.toLowerCase().includes(q)
+        );
+        return {
+          ...cat,
+          sections: matchedSections,
+        };
+      })
+      .filter((cat) => cat.sections.length > 0);
+  }, [searchQuery, categories]);
 
-  if (!isOpen) return null;
+  if (isOpen === false) return null;
 
   const currentCategory =
-    KNOWLEDGE_BOOK_CATEGORIES.find((c) => c.id === activeCategoryId) ||
-    KNOWLEDGE_BOOK_CATEGORIES[0];
+    categories.find((c) => c.id === activeCategoryId) || categories[0];
 
-  const currentCatIndex = KNOWLEDGE_BOOK_CATEGORIES.findIndex(
+  const currentCatIndex = categories.findIndex(
     (c) => c.id === currentCategory?.id
   );
   const prevCategory =
-    currentCatIndex > 0 ? KNOWLEDGE_BOOK_CATEGORIES[currentCatIndex - 1] : null;
+    currentCatIndex > 0 ? categories[currentCatIndex - 1] : null;
   const nextCategory =
-    currentCatIndex >= 0 && currentCatIndex < KNOWLEDGE_BOOK_CATEGORIES.length - 1
-      ? KNOWLEDGE_BOOK_CATEGORIES[currentCatIndex + 1]
+    currentCatIndex >= 0 && currentCatIndex < categories.length - 1
+      ? categories[currentCatIndex + 1]
       : null;
 
-  const handleCopy = async (id, code) => {
+  const handleCopy = async (uid, code) => {
     try {
       await navigator.clipboard.writeText(code);
-      setCopiedId(id);
+      setCopiedId(uid);
       setTimeout(() => {
-        setCopiedId((prev) => (prev === id ? null : prev));
+        setCopiedId((prev) => (prev === uid ? null : prev));
       }, 1800);
     } catch {
       const textarea = document.createElement('textarea');
@@ -457,7 +495,7 @@ export default function KnowledgeBook({ isOpen, onClose }) {
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      setCopiedId(id);
+      setCopiedId(uid);
       setTimeout(() => setCopiedId(null), 1800);
     }
   };
@@ -470,17 +508,17 @@ export default function KnowledgeBook({ isOpen, onClose }) {
     }
   };
 
-  const scrollToSection = (sectionId) => {
-    const el = document.getElementById(`kb-sec-${sectionId}`);
+  const scrollToSection = (uid) => {
+    const el = document.getElementById(`kb-sec-${uid}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   const renderSectionCard = (sec, catColor) => {
-    const isCopied = copiedId === sec.id;
+    const isCopied = copiedId === sec.uid;
     return (
-      <article id={`kb-sec-${sec.id}`} key={sec.id} style={styles.card}>
+      <article id={`kb-sec-${sec.uid}`} key={sec.uid} style={styles.card}>
         <div style={styles.cardHeader}>
           <div style={styles.badgeRow}>
             <div style={styles.badgesLeft}>
@@ -494,17 +532,19 @@ export default function KnowledgeBook({ isOpen, onClose }) {
             <button
               type="button"
               style={styles.copyBtn(isCopied)}
-              onClick={() => handleCopy(sec.id, sec.code)}
+              onClick={() => handleCopy(sec.uid, sec.code)}
             >
               {isCopied ? '✓ คัดลอกโค้ดแล้ว' : '📋 คัดลอกโค้ด'}
             </button>
           </div>
 
           <h3 style={styles.cardTitle(fontScale)}>{sec.title}</h3>
-          <p style={styles.whenBox(fontScale)}>
-            <strong style={{ color: '#38bdf8' }}>💡 ใช้เมื่อไหร่: </strong>
-            {sec.whenToUse}
-          </p>
+          {sec.whenToUse && (
+            <p style={styles.whenBox(fontScale)}>
+              <strong style={{ color: '#38bdf8' }}>💡 ใช้เมื่อไหร่: </strong>
+              {sec.whenToUse}
+            </p>
+          )}
         </div>
 
         {sec.keyPoints && sec.keyPoints.length > 0 && (
@@ -519,7 +559,7 @@ export default function KnowledgeBook({ isOpen, onClose }) {
         )}
 
         <div style={styles.codeHeader}>
-          <span>💻 ตัวอย่างโค้ดพร้อมใช้งาน (วางต่อยอดได้ทันที)</span>
+          <span>💻 ตัวอย่างโค้ดพร้อมใช้งาน (คัดลอกไปปรับใช้ได้ทันที)</span>
           <span style={{ fontFamily: 'monospace', color: '#7dd3fc' }}>
             {sec.file || 'JavaScript / JSX'}
           </span>
@@ -532,245 +572,264 @@ export default function KnowledgeBook({ isOpen, onClose }) {
   };
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        {/* Top Header */}
-        <div style={styles.topBar}>
-          <div style={styles.titleGroup}>
-            <div style={styles.bookBadge}>📘</div>
-            <div>
-              <h2 style={styles.title}>
-                คลังสมุดโค้ด Full Stack (ตั้งแต่ต่อ DB จริง → API → Auth → React Hooks)
-              </h2>
-              <p style={styles.subtitle}>
-                เลือกบททางซ้ายเพื่ออ่านทีละบทแบบสบายตา • มีลำดับไฟล์ Step 1 → 4 พร้อมปุ่มคัดลอกโค้ด
-              </p>
-            </div>
+    <div style={styles.container(Boolean(onClose))}>
+      {/* Top Header */}
+      <div style={styles.topBar}>
+        <div style={styles.titleGroup}>
+          <div style={styles.bookBadge}>📘</div>
+          <div>
+            <h2 style={styles.title}>
+              คลังสมุดโค้ด Full Stack (ตั้งแต่ต่อ DB จริง → API → Auth → React Hooks)
+            </h2>
+            <p style={styles.subtitle}>
+              เลือกบททางซ้ายเพื่ออ่านทีละบทแบบสบายตา • มีลำดับไฟล์ Step 1 → 4 พร้อมปุ่มคัดลอกโค้ด
+            </p>
+          </div>
+        </div>
+
+        <div style={styles.controlsGroup}>
+          <div style={styles.searchBox}>
+            <span style={styles.searchIcon}>🔍</span>
+            <input
+              type="text"
+              placeholder="ค้นหา เช่น mysql2, JOIN, transaction, JWT, useEffect..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={styles.searchInput}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                }}
+                title="ล้างคำค้นหา"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          <div style={styles.controlsGroup}>
-            <div style={styles.searchBox}>
-              <span style={styles.searchIcon}>🔍</span>
-              <input
-                type="text"
-                placeholder="ค้นหา เช่น mysql2, JOIN, transaction, JWT, useEffect..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={styles.searchInput}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  style={{
-                    position: 'absolute',
-                    right: '8px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: '#94a3b8',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                  }}
-                  title="ล้างคำค้นหา"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+          <div style={styles.fontBtnGroup} title="ปรับขนาดตัวอักษร">
+            <button
+              type="button"
+              style={styles.fontBtn(fontScale === 0.92)}
+              onClick={() => setFontScale(0.92)}
+            >
+              A-
+            </button>
+            <button
+              type="button"
+              style={styles.fontBtn(fontScale === 1)}
+              onClick={() => setFontScale(1)}
+            >
+              A
+            </button>
+            <button
+              type="button"
+              style={styles.fontBtn(fontScale === 1.12)}
+              onClick={() => setFontScale(1.12)}
+            >
+              A+
+            </button>
+          </div>
 
-            {/* Font size selector for comfortable reading */}
-            <div style={styles.fontBtnGroup} title="ปรับขนาดตัวอักษร">
-              <button
-                type="button"
-                style={styles.fontBtn(fontScale === 0.92)}
-                onClick={() => setFontScale(0.92)}
-              >
-                A-
-              </button>
-              <button
-                type="button"
-                style={styles.fontBtn(fontScale === 1)}
-                onClick={() => setFontScale(1)}
-              >
-                A
-              </button>
-              <button
-                type="button"
-                style={styles.fontBtn(fontScale === 1.12)}
-                onClick={() => setFontScale(1.12)}
-              >
-                A+
-              </button>
-            </div>
+          {onOpenActivity && (
+            <button
+              type="button"
+              style={styles.actionBtn}
+              onClick={() => onOpenActivity('exam-final-practice')}
+            >
+              🎯 ไปโจทย์ซ้อมสอบปลายภาค (F)
+            </button>
+          )}
 
+          {onClose && (
             <button type="button" style={styles.closeBtn} onClick={onClose}>
               ✕ ปิดสมุด
             </button>
-          </div>
+          )}
         </div>
+      </div>
 
-        {/* Two-Column Notebook Layout */}
-        <div style={styles.workspace}>
-          {/* Left Table of Contents Sidebar */}
-          <aside style={styles.sidebar}>
-            <div style={styles.sidebarLabel}>สารบัญบทเรียน ({KNOWLEDGE_BOOK_CATEGORIES.length} บท)</div>
+      {/* Two-Column Notebook Layout */}
+      <div style={styles.workspace}>
+        {/* Left Table of Contents Sidebar */}
+        <aside style={styles.sidebar}>
+          <div style={styles.sidebarLabel}>
+            สารบัญบทเรียน ({categories.length} หมวด)
+          </div>
 
-            {KNOWLEDGE_BOOK_CATEGORIES.map((cat) => {
-              const isSelected = !isSearching && activeCategoryId === cat.id;
-              return (
-                <div key={cat.id}>
-                  <button
-                    type="button"
-                    style={styles.chapterBtn(isSelected, cat.color)}
-                    onClick={() => selectChapter(cat.id)}
-                  >
-                    <div style={styles.chapterBtnTop}>
-                      <span>
-                        {cat.icon} {cat.title}
-                      </span>
-                      <span style={styles.chapterCount(isSelected, cat.color)}>
-                        {cat.sections.length}
-                      </span>
-                    </div>
-                  </button>
-
-                  {/* Sub-topics inside the active chapter */}
-                  {isSelected && (
-                    <div style={styles.topicSubList}>
-                      {cat.sections.map((sec) => (
-                        <button
-                          key={sec.id}
-                          type="button"
-                          style={styles.topicJumpBtn(false)}
-                          onClick={() => scrollToSection(sec.id)}
-                        >
-                          {sec.step ? `[${sec.step}] ` : '• '}
-                          {sec.title}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </aside>
-
-          {/* Right Main Reading Pane */}
-          <main ref={mainPaneRef} style={styles.mainPane}>
-            {isSearching ? (
-              filteredCategories.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '60px 20px',
-                    color: '#94a3b8',
-                  }}
+          {categories.map((cat) => {
+            const isSelected = !isSearching && activeCategoryId === cat.id;
+            return (
+              <div key={cat.id}>
+                <button
+                  type="button"
+                  style={styles.chapterBtn(isSelected, cat.color)}
+                  onClick={() => selectChapter(cat.id)}
                 >
-                  <div style={{ fontSize: '42px', marginBottom: '12px' }}>🔎</div>
-                  <div style={{ fontSize: '17px', fontWeight: 700, color: '#f8fafc' }}>
-                    ไม่พบหัวข้อที่ตรงกับ &ldquo;{searchQuery}&rdquo;
+                  <span style={styles.chapterBadgeSmall(cat.color)}>
+                    {cat.badge}
+                  </span>
+                  <div style={styles.chapterBtnTop}>
+                    <span>{cat.title}</span>
+                    <span style={styles.chapterCount(isSelected, cat.color)}>
+                      {cat.sections.length}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '13.5px', marginTop: '6px' }}>
-                    ลองค้นหาด้วยคำว่า pool, query, prisma, transaction, jwt, useEffect, axios
-                  </div>
-                </div>
-              ) : (
-                <div style={styles.sectionsStack}>
-                  <div
-                    style={{
-                      padding: '12px 18px',
-                      borderRadius: '10px',
-                      backgroundColor: '#162238',
-                      border: '1px solid #334155',
-                      fontSize: '14px',
-                      color: '#cbd5e1',
-                    }}
-                  >
-                    🔍 ผลการค้นหาสำหรับ <strong style={{ color: '#38bdf8' }}>&ldquo;{searchQuery}&rdquo;</strong>
-                  </div>
-                  {filteredCategories.map((cat) => (
-                    <div key={cat.id} style={styles.sectionsStack}>
-                      <h3
-                        style={{
-                          margin: '8px 0 0',
-                          fontSize: '16px',
-                          color: cat.color,
-                        }}
-                      >
-                        {cat.icon} {cat.title}
-                      </h3>
-                      {cat.sections.map((sec) => renderSectionCard(sec, cat.color))}
-                    </div>
-                  ))}
-                </div>
-              )
-            ) : (
-              <>
-                {/* Chapter Hero Banner */}
-                <div style={styles.chapterHero(currentCategory.color)}>
-                  <h3 style={styles.chapterHeroTitle}>
-                    <span>{currentCategory.icon}</span>
-                    <span>{currentCategory.title}</span>
-                  </h3>
-                  <p style={styles.chapterHeroDesc}>{currentCategory.description}</p>
+                </button>
 
-                  {/* Quick Jump Pills */}
-                  <div style={styles.stepPillsRow}>
-                    {currentCategory.sections.map((sec) => (
+                {isSelected && (
+                  <div style={styles.topicSubList}>
+                    {cat.sections.map((sec) => (
                       <button
-                        key={sec.id}
+                        key={sec.uid}
                         type="button"
-                        style={styles.stepPill(false, currentCategory.color)}
-                        onClick={() => scrollToSection(sec.id)}
+                        style={styles.topicJumpBtn}
+                        onClick={() => scrollToSection(sec.uid)}
                       >
-                        {sec.step ? `${sec.step}: ` : ''}
-                        {sec.file ? sec.file.split(' ')[0] : sec.title}
+                        {sec.step ? `[${sec.step}] ` : '• '}
+                        {sec.title}
                       </button>
                     ))}
                   </div>
+                )}
+              </div>
+            );
+          })}
+        </aside>
+
+        {/* Right Main Reading Pane */}
+        <main ref={mainPaneRef} style={styles.mainPane}>
+          {isSearching ? (
+            filteredCategories.length === 0 ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '60px 20px',
+                  color: '#94a3b8',
+                }}
+              >
+                <div style={{ fontSize: '42px', marginBottom: '12px' }}>🔎</div>
+                <div
+                  style={{ fontSize: '17px', fontWeight: 700, color: '#f8fafc' }}
+                >
+                  ไม่พบหัวข้อที่ตรงกับ &ldquo;{searchQuery}&rdquo;
                 </div>
-
-                {/* Chapter Sections */}
-                <div style={styles.sectionsStack}>
-                  {currentCategory.sections.map((sec) =>
-                    renderSectionCard(sec, currentCategory.color)
-                  )}
+                <div style={{ fontSize: '13.5px', marginTop: '6px' }}>
+                  ลองค้นหาด้วยคำว่า pool, query, prisma, transaction, jwt,
+                  useEffect, axios
                 </div>
-
-                {/* Prev / Next Chapter Footer Navigation */}
-                <div style={styles.footerNav}>
-                  {prevCategory ? (
-                    <button
-                      type="button"
-                      style={styles.navBtn}
-                      onClick={() => selectChapter(prevCategory.id)}
-                    >
-                      ← บทก่อนหน้า: {prevCategory.icon} {prevCategory.title}
-                    </button>
-                  ) : (
-                    <div />
-                  )}
-
-                  {nextCategory && (
-                    <button
-                      type="button"
+              </div>
+            ) : (
+              <div style={styles.sectionsStack}>
+                <div
+                  style={{
+                    padding: '12px 18px',
+                    borderRadius: '10px',
+                    backgroundColor: '#162238',
+                    border: '1px solid #334155',
+                    fontSize: '14px',
+                    color: '#cbd5e1',
+                  }}
+                >
+                  🔍 ผลการค้นหาสำหรับ{' '}
+                  <strong style={{ color: '#38bdf8' }}>
+                    &ldquo;{searchQuery}&rdquo;
+                  </strong>
+                </div>
+                {filteredCategories.map((cat) => (
+                  <div key={cat.id} style={styles.sectionsStack}>
+                    <h3
                       style={{
-                        ...styles.navBtn,
-                        backgroundColor: '#2563eb',
-                        borderColor: '#3b82f6',
+                        margin: '8px 0 0',
+                        fontSize: '16px',
+                        color: cat.color,
                       }}
-                      onClick={() => selectChapter(nextCategory.id)}
                     >
-                      บทถัดไป: {nextCategory.icon} {nextCategory.title} →
+                      {cat.badge} — {cat.title}
+                    </h3>
+                    {cat.sections.map((sec) =>
+                      renderSectionCard(sec, cat.color)
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            <>
+              {/* Chapter Hero Banner */}
+              <div style={styles.chapterHero(currentCategory.color)}>
+                <span style={styles.chapterHeroBadge(currentCategory.color)}>
+                  {currentCategory.badge}
+                </span>
+                <h3 style={styles.chapterHeroTitle}>{currentCategory.title}</h3>
+                <p style={styles.chapterHeroDesc}>{currentCategory.summary}</p>
+
+                {/* Quick Jump Pills */}
+                <div style={styles.stepPillsRow}>
+                  {currentCategory.sections.map((sec) => (
+                    <button
+                      key={sec.uid}
+                      type="button"
+                      style={styles.stepPill}
+                      onClick={() => scrollToSection(sec.uid)}
+                    >
+                      {sec.step ? `${sec.step}: ` : ''}
+                      {sec.file ? sec.file.split(' ')[0] : sec.title}
                     </button>
-                  )}
+                  ))}
                 </div>
-              </>
-            )}
-          </main>
-        </div>
+              </div>
+
+              {/* Chapter Sections */}
+              <div style={styles.sectionsStack}>
+                {currentCategory.sections.map((sec) =>
+                  renderSectionCard(sec, currentCategory.color)
+                )}
+              </div>
+
+              {/* Prev / Next Chapter Footer Navigation */}
+              <div style={styles.footerNav}>
+                {prevCategory ? (
+                  <button
+                    type="button"
+                    style={styles.navBtn}
+                    onClick={() => selectChapter(prevCategory.id)}
+                  >
+                    ← หมวดก่อนหน้า: {prevCategory.badge}
+                  </button>
+                ) : (
+                  <div />
+                )}
+
+                {nextCategory && (
+                  <button
+                    type="button"
+                    style={{
+                      ...styles.navBtn,
+                      backgroundColor: '#2563eb',
+                      borderColor: '#3b82f6',
+                    }}
+                    onClick={() => selectChapter(nextCategory.id)}
+                  >
+                    หมวดถัดไป: {nextCategory.badge} →
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </main>
       </div>
     </div>
   );
