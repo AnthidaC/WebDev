@@ -918,65 +918,607 @@ export default function CourseDetailPage() {
   },
   {
     id: 'router-axios',
-    badge: '🌐 React หลายหน้า + Axios ต่อ API',
-    title: 'การทำเว็บหลายหน้า (React Router) & การเขียน Axios Service ต่อกับ API',
-    summary: 'การตั้งค่า BrowserRouter 4 หน้า, การเขียน Axios แนบ Bearer Token และการผูก Controlled Form เข้ากับ API',
+    badge: '🌐 ต่อหน้าเว็บกับ API ทุกแบบ + CRUD ครบวงจร',
+    title: 'การต่อหน้าเว็บ React กับ API ทุกแบบ (ทั้ง fetch & axios) + โค้ดหน้าเว็บ CRUD (Read / Create / Update / Delete) เต็มระบบ',
+    summary: 'รวมวิธีเชื่อม Frontend เข้ากับ Backend ทุกแบบ ทั้งแบบใช้ fetch ล้วน และใช้ axios พร้อมโค้ดหน้าเว็บดึงข้อมูล ค้นหา เพิ่ม แก้ไข ลบ และเปลี่ยนสถานะครบทุกปุ่ม',
     sections: [
       {
-        step: 'Frontend 1',
-        file: 'frontend/services/api.js',
-        title: '1. สร้างไฟล์ Axios Service รวมทุกคำสั่งยิง API พร้อมแนบ Token',
-        whenToUse: 'เขียนไว้ที่เดียวเพื่อให้ทุกหน้าใน React เรียกใช้งานได้สะอาดและไม่เขียน URL ซ้ำ',
+        step: 'ต่อ API แบบที่ 1 (fetch)',
+        file: 'frontend/services/api.js (แบบ fetch มาตรฐาน ไม่ต้องลงแพ็กเกจ)',
+        title: '1. ตัวเชื่อม API แบบใช้ fetch ล้วน (รองรับ GET ค้นหา, POST, PUT, PATCH, DELETE + แนบ Token)',
+        whenToUse: 'ใช้เมื่อโปรเจกต์ไม่ได้ติดตั้ง axios หรือต้องการใช้ fetch มาตรฐานของเบราว์เซอร์เชื่อม API ทุกแบบ',
         keyPoints: [
-          'axios.get(url, { params, headers }) และ axios.delete(url, { headers }) รับ config เป็นพารามิเตอร์ตัวที่ 2',
-          'ส่วน axios.post(url, body, { headers }), axios.put(...) และ axios.patch(...) รับ body เป็นตัวที่ 2 และ config เป็นตัวที่ 3!',
+          'สร้างฟังก์ชันกลาง request(path, options) ตัวเดียว แล้วใช้ซ้ำได้ทั้ง GET, POST, PUT, PATCH, DELETE',
+          'เช็ก if (!res.ok) throw new Error(data.message) เพื่อให้หน้าเว็บจับ Error ใน catch (err) ได้ทันที',
+          'ตอนส่ง GET พร้อมคำค้นหา ใช้ new URLSearchParams(params).toString() ต่อท้าย URL',
         ],
-        code: `// ไฟล์ frontend/services/api.js
+        code: `// ไฟล์ frontend/services/api.js (แบบใช้ fetch ล้วน ไม่พึ่งพาไลบรารีอื่น)
+export const TOKEN_KEY = 'practice-token';
+
+// ฟังก์ชันกลางสำหรับยิง API ทุก Method (แนบ Token + แปลง JSON + ดัก Error ให้อัตโนมัติ)
+async function request(path, { method = 'GET', body, auth = false } = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (auth) {
+    const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
+    if (token) headers.Authorization = 'Bearer ' + token;
+  }
+
+  const res = await fetch(path, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || 'เกิดข้อผิดพลาด (' + res.status + ')');
+  }
+  return data;
+}
+
+export const api = {
+  // 1. Auth (Login / Register / Me)
+  login: (body) => request('/api/auth/login', { method: 'POST', body }),
+  register: (body) => request('/api/auth/register', { method: 'POST', body }),
+  me: () => request('/api/auth/me', { auth: true }),
+
+  // 2. READ (GET ดึงข้อมูล + ส่ง Query String ค้นหา/กรอง)
+  categories: () => request('/api/categories'),
+  courses: (params = {}) => {
+    const qs = new URLSearchParams(
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== '')
+    ).toString();
+    return request('/api/courses' + (qs ? '?' + qs : ''));
+  },
+  courseById: (id) => request('/api/courses/' + id),
+
+  // 3. CREATE (POST เพิ่มข้อมูลใหม่)
+  createCourse: (body) => request('/api/courses', { method: 'POST', body, auth: true }),
+
+  // 4. UPDATE (PUT แก้ไขทั้งก้อน / PATCH แก้ไขบางจุด เช่น ยกเลิก)
+  updateCourse: (id, body) => request('/api/courses/' + id, { method: 'PUT', body, auth: true }),
+  cancelEnrollment: (id) => request('/api/enrollments/' + id + '/cancel', { method: 'PATCH', body: {}, auth: true }),
+
+  // 5. DELETE (DELETE ลบข้อมูลตาม id)
+  deleteCourse: (id) => request('/api/courses/' + id, { method: 'DELETE', auth: true }),
+
+  // 6. Action พิเศษ (เช่น ลงทะเบียนเรียน / ดึงรายการของฉัน)
+  myEnrollments: () => request('/api/enrollments/my', { auth: true }),
+  enroll: (courseId) => request('/api/enrollments', { method: 'POST', body: { courseId }, auth: true }),
+};`,
+      },
+      {
+        step: 'ต่อ API แบบที่ 2 (axios)',
+        file: 'frontend/services/api.js (แบบใช้ axios)',
+        title: '2. ตัวเชื่อม API แบบใช้ Axios (ครบทั้ง GET params, POST, PUT, PATCH, DELETE + แนบ Token)',
+        whenToUse: 'ใช้เมื่อโปรเจกต์มีแพ็กเกจ axios (แปลง JSON ให้อัตโนมัติ และส่ง Query params ผ่าน { params } ได้เลย)',
+        keyPoints: [
+          'จำตำแหน่งพารามิเตอร์ของ axios ให้แม่น:',
+          '• axios.get(url, { params, headers }) และ axios.delete(url, { headers }) -> config อยู่ตัวที่ 2',
+          '• axios.post(url, body, { headers }), axios.put(url, body, { headers }), axios.patch(url, body, { headers }) -> body อยู่ตัวที่ 2 และ headers อยู่ตัวที่ 3!',
+          'เวลาดึงข้อความ Error จาก Backend ใน catch(err) ให้ใช้ err.response?.data?.message || err.message',
+        ],
+        code: `// ไฟล์ frontend/services/api.js (แบบใช้ axios)
 import axios from 'axios';
 
 export const TOKEN_KEY = 'practice-token';
 
 export function authHeaders() {
-  const token = sessionStorage.getItem(TOKEN_KEY);
+  const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
   return token ? { headers: { Authorization: 'Bearer ' + token } } : {};
 }
 
 export const api = {
-  // Auth
+  // 1. Auth
   login: async (data) => (await axios.post('/api/auth/login', data)).data,
   register: async (data) => (await axios.post('/api/auth/register', data)).data,
   me: async () => (await axios.get('/api/auth/me', authHeaders())).data,
 
-  // Public Courses & Categories
+  // 2. READ (GET พร้อมส่ง Query String ?keyword=&categoryId= อัตโนมัติผ่าน { params })
   categories: async () => (await axios.get('/api/categories')).data,
   courses: async (params = {}) => (await axios.get('/api/courses', { params })).data,
+  courseById: async (id) => (await axios.get('/api/courses/' + id)).data,
 
-  // Student Enrollments (แนบ Token)
-  myEnrollments: async () => (await axios.get('/api/enrollments/my', authHeaders())).data,
-  enroll: async (courseId) => (await axios.post('/api/enrollments', { courseId }, authHeaders())).data,
+  // 3. CREATE (POST ส่ง body ตัวที่ 2, authHeaders() ตัวที่ 3)
+  createCourse: async (data) => (await axios.post('/api/courses', data, authHeaders())).data,
+
+  // 4. UPDATE (PUT / PATCH ส่ง body ตัวที่ 2, authHeaders() ตัวที่ 3)
+  updateCourse: async (id, data) => (await axios.put('/api/courses/' + id, data, authHeaders())).data,
   cancelEnrollment: async (id) => (await axios.patch('/api/enrollments/' + id + '/cancel', {}, authHeaders())).data,
 
-  // Admin Course CRUD (แนบ Token)
-  createCourse: async (data) => (await axios.post('/api/courses', data, authHeaders())).data,
-  updateCourse: async (id, data) => (await axios.put('/api/courses/' + id, data, authHeaders())).data,
+  // 5. DELETE (ส่ง authHeaders() เป็นตัวที่ 2!)
   deleteCourse: async (id) => (await axios.delete('/api/courses/' + id, authHeaders())).data,
+
+  // 6. Student Enrollments
+  myEnrollments: async () => (await axios.get('/api/enrollments/my', authHeaders())).data,
+  enroll: async (courseId) => (await axios.post('/api/enrollments', { courseId }, authHeaders())).data,
 };`,
       },
       {
-        step: 'Frontend 2',
-        file: 'frontend/App.jsx',
-        title: '2. โครงสร้างเว็บหลายหน้าด้วย BrowserRouter, Navbar และ Routes',
-        whenToUse: 'ใช้จัดโครงสร้างหลักของแอปที่มีหลายหน้าและแสดงปุ่มตามสถานะการล็อกอิน',
+        step: 'CRUD 1: READ + ค้นหา/กรอง',
+        file: 'frontend/pages/CatalogPage.jsx',
+        title: '3. [R - Read] ดึงข้อมูลจาก API มาแสดงผล + ช่องค้นหา (Keyword) + ปุ่มกรองหมวดหมู่ + ปุ่มกดลงทะเบียน',
+        whenToUse: 'ใช้กับหน้าแรกของเว็บเพื่อดึงรายการจากฐานข้อมูลมาแสดง พร้อมค้นหา กรองหมวดหมู่ และกดปุ่มทำรายการ',
         keyPoints: [
-          'ห่อ <BrowserRouter> และ <AuthProvider> ไว้ชั้นนอกสุด',
-          'ใช้ <Link to="..."> สำหรับสร้างเมนูนำทางโดยไม่รีโหลดหน้าเว็บ',
+          'แยกฟังก์ชัน loadCourses() ออกมาไว้ข้างนอก หรือเรียกใน useEffect เมื่อ [keyword, categoryId] เปลี่ยน',
+          'เมื่อกดปุ่มทำรายการ (เช่น กดลงทะเบียน) พอยิง API สำเร็จ ต้องเรียก await loadCourses() ทันทีเพื่อให้เลขที่นั่งคงเหลือบนการ์ดอัปเดต!',
         ],
-        code: `// ไฟล์ frontend/App.jsx
-import React from 'react';
+        code: `// ไฟล์ frontend/pages/CatalogPage.jsx (ดึงข้อมูล + ค้นหา + กรองหมวดหมู่ + กดลงทะเบียน)
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+
+export default function CatalogPage() {
+  const { user } = useAuth();
+  const [categories, setCategories] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [keyword, setKeyword] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  // ฟังก์ชันดึงรายการคอร์สตามคำค้นหาและหมวดหมู่
+  async function loadCourses() {
+    setLoading(true);
+    setError('');
+    try {
+      const params = {};
+      if (keyword.trim()) params.keyword = keyword.trim();
+      if (categoryId) params.categoryId = categoryId;
+      const data = await api.courses(params);
+      setCourses(data);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'โหลดข้อมูลไม่สำเร็จ');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // โหลดหมวดหมู่ครั้งแรกครั้งเดียวตอนเปิดหน้า
+  useEffect(() => {
+    api.categories().then(setCategories).catch(() => {});
+  }, []);
+
+  // โหลดคอร์สใหม่ทุกครั้งที่ keyword หรือ categoryId เปลี่ยน
+  useEffect(() => {
+    loadCourses();
+  }, [keyword, categoryId]);
+
+  // กดปุ่มลงทะเบียนเรียน (POST /api/enrollments)
+  async function handleEnroll(courseId) {
+    setError('');
+    setMessage('');
+    try {
+      await api.enroll(courseId);
+      setMessage('ลงทะเบียนสำเร็จ!');
+      await loadCourses(); // โหลดข้อมูลใหม่เพื่อให้ที่นั่งว่างลดลงทันทีบนหน้าจอ
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'ลงทะเบียนไม่สำเร็จ');
+    }
+  }
+
+  return (
+    <section>
+      <h1>รายการคอร์สเรียนทั้งหมด</h1>
+
+      {/* แถบค้นหาและกรองหมวดหมู่ */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <input
+          type="search"
+          placeholder="ค้นหาชื่อคอร์ส หรือ รหัสวิชา..."
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+          <option value="">ทุกหมวดหมู่</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* แสดงข้อความแจ้งเตือน Error / Success */}
+      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
+      {message && <p role="status" style={{ color: 'green' }}>{message}</p>}
+      {loading && <p>กำลังโหลดข้อมูล...</p>}
+
+      {/* ตารางหรือการ์ดแสดงรายการ */}
+      <div>
+        {courses.map((course) => {
+          const isFull = course.enrolled >= course.seats;
+          return (
+            <article key={course.id} style={{ border: '1px solid #ccc', padding: '12px', marginBottom: '8px' }}>
+              <h3>[{course.code}] {course.title}</h3>
+              <p>หมวดหมู่: {course.categoryName} | ราคา: {course.price} บาท</p>
+              <p>ที่นั่ง: {course.enrolled}/{course.seats} (ว่าง {course.seats - course.enrolled} ที่นั่ง)</p>
+
+              {user && (
+                <button
+                  type="button"
+                  disabled={isFull}
+                  onClick={() => handleEnroll(course.id)}
+                >
+                  {isFull ? 'ที่นั่งเต็มแล้ว' : 'ลงทะเบียนเรียน'}
+                </button>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}`,
+      },
+      {
+        step: 'CRUD 2: CREATE + UPDATE + DELETE',
+        file: 'frontend/pages/AdminPage.jsx (หน้าเดียวครบทุกปุ่ม CRUD)',
+        title: '4. [C / U / D ครบในหน้าเดียว] โค้ดหน้าจัดการข้อมูล: ฟอร์มเพิ่มใหม่ (POST) + ดึงค่ามาแก้ไข (PUT) + ปุ่มลบ (DELETE)',
+        whenToUse: 'ก๊อปโครงสร้างนี้ไปใช้ในหน้า Admin หรือหน้าจัดการสินค้า/คอร์สเรียนที่ต้องทำ CRUD ครบทั้ง 4 คำสั่ง',
+        keyPoints: [
+          'ใช้ตัวแปร state editingId เพื่อแยกโหมด: ถ้า editingId === null คือโหมด "เพิ่มข้อมูลใหม่ (POST)", ถ้ามีค่าคือโหมด "แก้ไขข้อมูลเดิม (PUT)"',
+          'เวลากดปุ่ม "แก้ไข" ในตาราง ให้เรียก startEdit(course) เพื่อคัดลอกค่าของแถวนั้นขึ้นมาใส่ช่อง input ทุกช่อง',
+          'เวลากดปุ่ม "ลบ" ให้เรียก handleDelete(course.id) ถ้ายิง DELETE สำเร็จให้เรียก await loadCourses() เพื่อรีเฟรชตารางทันที',
+        ],
+        code: `// ไฟล์ frontend/pages/AdminPage.jsx (รวม Create + Read + Update + Delete ครบในไฟล์เดียว)
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+
+export default function AdminPage() {
+  const { user } = useAuth();
+  const [courses, setCourses] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  // State สำหรับฟอร์ม (ใช้ร่วมกันทั้งตอนเพิ่มใหม่ POST และตอนแก้ไข PUT)
+  const [editingId, setEditingId] = useState(null);
+  const [code, setCode] = useState('');
+  const [title, setTitle] = useState('');
+  const [categoryId, setCategoryId] = useState('1');
+  const [price, setPrice] = useState('');
+  const [seats, setSeats] = useState('');
+
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  // 1. [READ] ดึงข้อมูลคอร์สและหมวดหมู่มาแสดงในตาราง
+  async function loadData() {
+    try {
+      const [courseList, catList] = await Promise.all([
+        api.courses(),
+        api.categories(),
+      ]);
+      setCourses(courseList);
+      setCategories(catList);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  }
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      loadData();
+    }
+  }, [user]);
+
+  // ฟังก์ชันล้างฟอร์มกลับเป็นโหมด "เพิ่มข้อมูลใหม่"
+  function resetForm() {
+    setEditingId(null);
+    setCode('');
+    setTitle('');
+    setCategoryId('1');
+    setPrice('');
+    setSeats('');
+  }
+
+  // กดปุ่ม "แก้ไข" ในตาราง -> ดึงข้อมูลแถวนั้นขึ้นมาใส่ฟอร์ม
+  function startEdit(course) {
+    setError('');
+    setMessage('');
+    setEditingId(course.id);
+    setCode(course.code);
+    setTitle(course.title);
+    setCategoryId(String(course.categoryId || 1));
+    setPrice(String(course.price));
+    setSeats(String(course.seats));
+  }
+
+  // 2. [CREATE & UPDATE] กด Submit ฟอร์ม (ถ้ามี editingId ยิง PUT, ถ้าไม่มี ยิง POST)
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+
+    const payload = {
+      code: code.trim().toUpperCase(),
+      title: title.trim(),
+      categoryId: Number(categoryId),
+      price: Number(price),
+      seats: Number(seats),
+    };
+
+    try {
+      if (editingId) {
+        // โหมดแก้ไข (PUT /api/courses/:id)
+        await api.updateCourse(editingId, payload);
+        setMessage('แก้ไขข้อมูลคอร์สสำเร็จ');
+      } else {
+        // โหมดเพิ่มใหม่ (POST /api/courses)
+        await api.createCourse(payload);
+        setMessage('เพิ่มคอร์สใหม่สำเร็จ');
+      }
+      resetForm();
+      await loadData(); // โหลดตารางใหม่ทันที
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'บันทึกไม่สำเร็จ');
+    }
+  }
+
+  // 3. [DELETE] กดปุ่ม "ลบ" ในตาราง (DELETE /api/courses/:id)
+  async function handleDelete(id) {
+    setError('');
+    setMessage('');
+    try {
+      await api.deleteCourse(id);
+      setMessage('ลบคอร์สเรียบร้อยแล้ว');
+      if (editingId === id) resetForm();
+      await loadData(); // โหลดตารางใหม่ทันที
+    } catch (err) {
+      // เช่น ถ้ามีนักเรียนลงทะเบียนอยู่ Backend จะตอบ 409 Conflict มาแสดงตรงนี้
+      setError(err.response?.data?.message || err.message || 'ลบไม่สำเร็จ');
+    }
+  }
+
+  // กั้นสิทธิ์: ถ้าไม่ใช่ Admin ห้ามเข้าใช้งาน
+  if (!user || user.role !== 'admin') {
+    return (
+      <section>
+        <h1>จัดการคอร์สเรียน (Admin)</h1>
+        <p role="alert">ไม่มีสิทธิ์เข้าถึง (เฉพาะผู้ดูแลระบบ Admin เท่านั้น)</p>
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <h1>จัดการคอร์สเรียน (Admin CRUD)</h1>
+
+      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
+      {message && <p role="status" style={{ color: 'green' }}>{message}</p>}
+
+      {/* ฟอร์มเพิ่ม / แก้ไขข้อมูล */}
+      <form onSubmit={handleSubmit} style={{ marginBottom: '20px', padding: '12px', border: '1px solid #ccc' }}>
+        <h2>{editingId ? 'แก้ไขคอร์ส #' + editingId : 'เพิ่มคอร์สใหม่'}</h2>
+
+        <label>
+          รหัสวิชา
+          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="เช่น CS101" required />
+        </label>
+
+        <label>
+          ชื่อคอร์ส
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="ชื่อวิชา" required />
+        </label>
+
+        <label>
+          หมวดหมู่
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          ราคา (บาท)
+          <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+        </label>
+
+        <label>
+          จำนวนที่นั่งทั้งหมด
+          <input type="number" value={seats} onChange={(e) => setSeats(e.target.value)} required />
+        </label>
+
+        <button type="submit">
+          {editingId ? 'บันทึกการแก้ไข (PUT)' : 'เพิ่มคอร์ส (POST)'}
+        </button>
+
+        {editingId && (
+          <button type="button" onClick={resetForm}>
+            ยกเลิกการแก้ไข
+          </button>
+        )}
+      </form>
+
+      {/* ตารางแสดงรายการพร้อมปุ่ม แก้ไข / ลบ */}
+      <table>
+        <thead>
+          <tr>
+            <th>รหัส</th>
+            <th>ชื่อคอร์ส</th>
+            <th>ราคา</th>
+            <th>คนเรียน / ที่นั่ง</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.map((c) => (
+            <tr key={c.id}>
+              <td>{c.code}</td>
+              <td>{c.title}</td>
+              <td>{c.price}</td>
+              <td>{c.enrolled} / {c.seats}</td>
+              <td>
+                <button type="button" onClick={() => startEdit(c)}>แก้ไข</button>
+                <button type="button" onClick={() => handleDelete(c.id)}>ลบ</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}`,
+      },
+      {
+        step: 'CRUD 3: PATCH (เปลี่ยนสถานะ/ยกเลิก)',
+        file: 'frontend/pages/MyCoursesPage.jsx',
+        title: '5. [PATCH / เปลี่ยนสถานะ] หน้าดูรายการของฉัน + ปุ่มกดยกเลิกการลงทะเบียน (คืนที่นั่ง) + คำนวณยอดรวม',
+        whenToUse: 'ใช้เมื่อต้องการดึงข้อมูลเฉพาะของคนที่ล็อกอินอยู่ (GET /api/enrollments/my) และมีปุ่มกดยกเลิก (PATCH)',
+        keyPoints: [
+          'คำนวณยอดรวมเฉพาะรายการที่ status === "active" ด้วย .filter(...).reduce(...)',
+          'ปุ่มยกเลิกให้ซ่อนหรือปิด (disabled) ถ้ารายการนั้นมี status === "cancelled" ไปแล้ว',
+        ],
+        code: `// ไฟล์ frontend/pages/MyCoursesPage.jsx (ดึงรายการของฉัน + ปุ่ม PATCH ยกเลิกคืนที่นั่ง)
+import React, { useState, useEffect } from 'react';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+
+export default function MyCoursesPage() {
+  const { user } = useAuth();
+  const [items, setItems] = useState([]);
+  const [error, setError] = useState('');
+
+  async function loadMyCourses() {
+    setError('');
+    try {
+      const data = await api.myEnrollments();
+      setItems(data);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  }
+
+  useEffect(() => {
+    if (user) loadMyCourses();
+  }, [user]);
+
+  async function handleCancel(enrollmentId) {
+    setError('');
+    try {
+      await api.cancelEnrollment(enrollmentId);
+      await loadMyCourses(); // โหลดรายการใหม่หลังยกเลิกสำเร็จ
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  }
+
+  if (!user) {
+    return <p role="alert">กรุณาเข้าสู่ระบบก่อนดูคอร์สของฉัน</p>;
+  }
+
+  // คำนวณยอดรวมเฉพาะคอร์สที่ยัง active
+  const activeItems = items.filter((item) => item.status === 'active');
+  const totalAmount = activeItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
+  return (
+    <section>
+      <h1>คอร์สของฉัน ({activeItems.length} วิชาที่กำลังเรียน)</h1>
+      <p>ยอดรวมค่าเรียนสุทธิ: <strong>{totalAmount}</strong> บาท</p>
+
+      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
+
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            <strong>[{item.courseCode}] {item.courseTitle}</strong> — ราคา {item.price} บาท — สถานะ: {item.status}
+            {item.status === 'active' && (
+              <button type="button" onClick={() => handleCancel(item.id)}>
+                ยกเลิกการลงทะเบียน
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}`,
+      },
+      {
+        step: 'CRUD 4: หน้า Login & Register',
+        file: 'frontend/pages/LoginPage.jsx และ frontend/App.jsx',
+        title: '6. หน้า Login / สมัครสมาชิก (เก็บ Token ลง Storage) + โครงสร้าง BrowserRouter หลายหน้า',
+        whenToUse: 'ใช้เชื่อมต่อระบบล็อกอินกับ API แล้วเก็บ Token ไว้ให้ทุกหน้าใช้งานผ่าน AuthContext',
+        keyPoints: [
+          'เมื่อ api.login(...) สำเร็จ ต้องบันทึก Token ลง sessionStorage / localStorage และอัปเดต setUser(res.user)',
+          'หลังล็อกอินสำเร็จ ใช้ navigate("/") เพื่อพากลับหน้าแรกอัตโนมัติ',
+        ],
+        code: `// =========================================================
+// 1. ไฟล์ frontend/pages/LoginPage.jsx (สลับโหมด Login / Register ได้ในหน้าเดียว)
+// =========================================================
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, TOKEN_KEY } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+
+export default function LoginPage() {
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    try {
+      if (mode === 'register') {
+        await api.register({ userName, email, password });
+      }
+      // พอล็อกอิน (หรือสมัครเสร็จแล้วล็อกอินต่อ) เก็บ Token และ User
+      const res = await api.login({ userName: userName || email, email, password });
+      sessionStorage.setItem(TOKEN_KEY, res.token);
+      setUser(res.user);
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'เข้าสู่ระบบไม่สำเร็จ');
+    }
+  }
+
+  return (
+    <section>
+      <h1>{mode === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิกใหม่'}</h1>
+      {error && <p role="alert" style={{ color: 'red' }}>{error}</p>}
+
+      <form onSubmit={handleSubmit}>
+        <label>
+          ชื่อผู้ใช้หรืออีเมล
+          <input value={userName} onChange={(e) => setUserName(e.target.value)} required />
+        </label>
+
+        {mode === 'register' && (
+          <label>
+            อีเมล
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+        )}
+
+        <label>
+          รหัสผ่าน
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label>
+
+        <button type="submit">
+          {mode === 'login' ? 'เข้าสู่ระบบ' : 'ยืนยันสมัครสมาชิก'}
+        </button>
+      </form>
+
+      <button type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
+        {mode === 'login' ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีแล้ว? เข้าสู่ระบบ'}
+      </button>
+    </section>
+  );
+}
+
+// =========================================================
+// 2. ไฟล์ frontend/App.jsx (ผูก BrowserRouter + Navbar + Routes)
+// =========================================================
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import CatalogPage from './pages/CatalogPage';
-import LoginPage from './pages/LoginPage';
 import MyCoursesPage from './pages/MyCoursesPage';
 import AdminPage from './pages/AdminPage';
 
@@ -984,17 +1526,17 @@ function Layout() {
   const { user, logout } = useAuth();
   return (
     <main>
-      <nav>
+      <nav style={{ display: 'flex', gap: '12px', padding: '12px', borderBottom: '1px solid #ccc' }}>
         <Link to="/">คอร์สเรียนทั้งหมด</Link>
         <Link to="/my-courses">คอร์สของฉัน</Link>
         <Link to="/admin">จัดการคอร์ส (Admin)</Link>
         {user ? (
           <span>
-            {user.userName} ({user.role})
+            สวัสดี {user.userName} ({user.role}){' '}
             <button type="button" onClick={logout}>ออกจากระบบ</button>
           </span>
         ) : (
-          <Link to="/login">เข้าสู่ระบบ / สมัครสมาชิก</Link>
+          <Link to="/login">เข้าสู่ระบบ</Link>
         )}
       </nav>
 
@@ -1003,65 +1545,9 @@ function Layout() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/my-courses" element={<MyCoursesPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="*" element={<h1>404 ไม่พบหน้านี้</h1>} />
       </Routes>
     </main>
   );
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Layout />
-      </AuthProvider>
-    </BrowserRouter>
-  );
-}`,
-      },
-      {
-        step: 'Frontend 3',
-        file: 'frontend/pages/AdminPage.jsx',
-        title: '3. Controlled Form สำหรับเพิ่มและแก้ไขข้อมูล (Create & Edit ในฟอร์มเดียวกัน)',
-        whenToUse: 'เมื่อหน้าจัดการต้องทั้งเพิ่มรายการใหม่ (POST) และกดปุ่ม "แก้ไข" เพื่อดึงค่าเดิมมาแก้ (PUT)',
-        keyPoints: [
-          'ใช้ state editingId เก็บ id ที่กำลังแก้ (ถ้าเป็น null แปลว่ากำลังเพิ่มใหม่)',
-          'อย่าลืมแปลงค่าตัวเลขด้วย Number(...) ก่อนส่งเข้า api.createCourse หรือ api.updateCourse',
-        ],
-        code: `const [editingId, setEditingId] = useState(null);
-const [code, setCode] = useState('');
-const [title, setTitle] = useState('');
-const [categoryId, setCategoryId] = useState('1');
-const [price, setPrice] = useState('');
-const [seats, setSeats] = useState('');
-const [error, setError] = useState('');
-
-async function handleSubmit(e) {
-  e.preventDefault();
-  setError('');
-  const payload = {
-    code: code.trim().toUpperCase(),
-    title: title.trim(),
-    categoryId: Number(categoryId),
-    price: Number(price),
-    seats: Number(seats),
-  };
-  try {
-    if (editingId) {
-      await api.updateCourse(editingId, payload);
-    } else {
-      await api.createCourse(payload);
-    }
-    // ล้างฟอร์มและโหลดตารางใหม่
-    setEditingId(null);
-    setCode('');
-    setTitle('');
-    setPrice('');
-    setSeats('');
-    await loadCourses();
-  } catch (err) {
-    setError(err.response?.data?.message || 'บันทึกไม่สำเร็จ');
-  }
 }`,
       },
     ],
